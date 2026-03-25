@@ -1,0 +1,31 @@
+Initital Task to create single rotor for enigma maschine 
+
+chose alphabet encode wiring   for this Rotor
+A=F 
+B=X
+C=B
+D=C 
+E=G
+F=L
+G=K
+H=M
+I=Y
+J=T 
+K=N
+L=A
+M=R
+N=Q
+O=Z
+P=D
+Q=P
+R=W
+S=V
+T=E 
+U=I
+V=J
+W=H
+X=O
+Y=U
+Z=S 
+
+
