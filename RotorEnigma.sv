@@ -89,3 +89,27 @@ always @(shift_amout) begin
 end
 
 endmodule
+
+module shift_adder_tb;
+
+    logic[4:0] letter_index;
+    logic[4:0] rotor_position;
+    logic[4:0] shift_amout;
+
+    shift_adder dut(
+        .letter_index(letter_index),
+        .rotor_position(rotor_position),
+        .shift_amout(shift_amout)
+    );
+
+    initial begin
+        letter_index = 5'b00000
+        rotor_position = 5'b01010
+        #1
+        $display("shift amount for lookup= %0d", shift_amout);
+        $finish
+
+    end
+
+
+endmodule
