@@ -105,10 +105,31 @@ module shift_adder_tb;
     initial begin
         letter_index = 5'b00000
         rotor_position = 5'b01010
-        #1
+        #5
         $display("shift amount for lookup= %0d", shift_amout);
         $finish
 
+    end
+
+
+endmodule
+
+
+module rotor_wire_assign_tb;
+
+    logic[4:0] shift_amout;
+    logic[4:0] encode_letter;
+
+    rotor_wire_assign dut(
+        .shift_amout(shift_amout),
+        .encode_letter(encode_letter)
+    );
+
+    initial begin
+        shift_amout = 5'b00000
+        #5
+        $display("Encoded letter is %0d", encode_letter);
+        $finish
     end
 
 
