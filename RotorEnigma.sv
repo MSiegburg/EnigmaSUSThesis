@@ -21,7 +21,8 @@ module rotor_position_reg(
     input logic[4:0] set_rotor,
     input logic advance,
     input logic clk,
-    input logic rst
+    input logic rst,
+    output logic[4:0] cur_rotor_position
     );
 
 logic[4:0] rotor_position;
@@ -32,7 +33,9 @@ always_ff @(posedge clk) begin
     else if(advance) begin
         rotor_position <= (rotor_position+1) %26;
     end
+    cur_rotor_position <= rotor_position;
 end
+
 
 
 endmodule
@@ -44,7 +47,7 @@ module shift_adder(
     input logic[4:0] rotor_position,
     output logic[4:0] shift_amout
 );
-always_comb @(letter_index) begin
+always @(letter_index) begin
     shift_amout=(letter_index+rotor_position)%26;
 end
 
@@ -54,7 +57,7 @@ module rotor_wire_assign(
     input logic[4:0] shift_amout,
     output logic[4:0] encode_letter
 );
-always_comb @(shift_amout) begin
+always @(shift_amout) begin
     case (shift_amout)
         5'b00000:encode_letter = 5'b00101;   //A=F
         5'b00001:encode_letter = 5'b10111;   //B=X
