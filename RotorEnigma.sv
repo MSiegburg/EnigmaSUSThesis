@@ -14,7 +14,7 @@ always_comb @(A) begin
 end
 
 endmodule */
-
+`timescale 1ns / 1ps
 
 
 module rotor_position_reg(
@@ -35,8 +35,6 @@ always_ff @(posedge clk) begin
     end
     cur_rotor_position <= rotor_position;
 end
-
-
 
 endmodule
 
