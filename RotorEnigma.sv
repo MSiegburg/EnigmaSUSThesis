@@ -152,7 +152,7 @@ module full_rotor_tb;
     logic [4:0] encoded_char;
 
     // Instanziierung der Module
-    rotor_position_reg uut_rotor (
+    rotor_position_reg uut_rotor_pos (
         .advance(advance),
         .clk(clk),
         .rst(rst),
@@ -163,7 +163,7 @@ module full_rotor_tb;
         .rotor_position(cur_rotor_position),
         .shift_amount_out(shift_amount_out)
     );
-    rotor_wire_assign uut_wire (
+    rotor_wire_assign uut_wire_assign (
         .shift_amount_in(shift_amount_out),
         .encode_letter(encoded_char)
     );
