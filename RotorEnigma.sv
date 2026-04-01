@@ -1,19 +1,3 @@
-/* module shift_increment(
-    input [4:0] rotor_position,
-    input logic A,
-    output [4:0] cur_shift
-
-);
-
-always_comb @(A) begin
-    if (rotor_position%25) 
-        S = 5'b00000
-    else 
-        S = S+1
-    
-end
-
-endmodule */
 `timescale 1ns / 1ps
 
 
@@ -26,11 +10,11 @@ module rotor_position_reg(
     );
 
 logic[4:0] rotor_position;
-always_ff @(posedge clk) begin
-    if (rst) begin
+always_ff @(posedge clk) begin                  //check for changes to register on clk
+    if (rst) begin                              //check for reset signal
         rotor_position <= 0;
     end else if (advance) begin
-        rotor_position <= (rotor_position+1) %26; 
+        rotor_position <= (rotor_position+1) %26; //assign rotor position 0 if it would increment to 26
         
     end
     cur_rotor_position <= rotor_position;
@@ -46,11 +30,8 @@ module shift_adder(
     output logic[4:0] shift_amount_out
 );
 
-    /*logic[4:0] sum;
-    
-    assign sum = letter_index + rotor_position;*/
 always_comb begin
-    shift_amount_out=(letter_index+rotor_position)%26;
+    shift_amount_out=(letter_index+rotor_position)%26; //adding two 5 bit arrays and modchecking 
 end
 
 endmodule
@@ -60,7 +41,7 @@ module rotor_wire_assign(
     output logic[4:0] encode_letter
 );
 always_comb begin
-    case (shift_amount_in)
+    case (shift_amount_in)                   //case statement to assign Letters based on predetermined hard wiring
         5'b00000:encode_letter = 5'b00101;   //A=F
         5'b00001:encode_letter = 5'b10111;   //B=X
         5'b00010:encode_letter = 5'b00001;   //C=B
@@ -88,13 +69,13 @@ always_comb begin
         5'b11000:encode_letter = 5'b10100;   //Y=U
         5'b11001:encode_letter = 5'b10010;   //Z=S
         
-        default:encode_letter = 5'b00000; // sollte nicht vorkommen können
+        default:encode_letter = 5'b10011; // sollte nicht vorkommen können
     endcase
 end
 
 endmodule
 
-/*module shift_adder_tb;
+/*module shift_adder_tb;                    early attempts at testbenching 
 
     logic[4:0] letter_index;
     logic[4:0] rotor_position;
@@ -129,7 +110,7 @@ endmodule
 endmodule
 
 
-module rotor_wire_assign_tb;
+module rotor_wire_assign_tb;                early attempts at testbenching 
 
     logic[4:0] shift_amout;
     logic[4:0] encode_letter;
@@ -158,67 +139,9 @@ module rotor_wire_assign_tb;
 endmodule*/
 
 
-/*module full_rotor_tb;
 
-    //logic[4:0] set_rotor;
-    logic advance;
-    logic clk;
-    logic rst;
-    //logic[4:0] cur_rotor_position;
-    logic[4:0] rotor_position;
-    logic[4:0] letter_index;
-    //logic[4:0] shift_amount_out;
-    //logic[4:0] shift_amount_in;
-    logic[4:0] encode_letter;
 
-    rotor_position_reg my_reg(
-        //.set_rotor(set_rotor),
-        .advance(advance),
-        .clk(clk),
-        .rst(rst),
-        .cur_rotor_position(rotor_position)
-    );
-
-    shift_adder my_adder(
-        .clk(clk),
-        .letter_index(letter_index),
-        .rotor_position(rotor_position),
-        .shift_amount_out(shift_amount_in)
-    );
-
-    rotor_wire_assign my_encode(
-        .clk(clk),
-        .shift_amount_in(shift_amount_in),
-        .encode_letter(encode_letter)
-    );
-    always #5 clk = ~clk;
-    
-    initial begin
-        $display("Starting simulation of rotor_position_reg and shift_addder with rotor_wire_assign");
-        clk=0;
-        rst=1;
-        advance=0;
-        letter_index= 5'b00000;
-        #10;
-        rst=0;
-        for (int i = 0; i < 5; i++) begin
-            @(posedge clk);
-            advance = 1;
-            #1;
-            $display("encoded letter=%0d", encode_letter);
-            $display("rotor_position=%0d", rotor_position);
-            advance = 0;
-        end
-          
-        $display("Simulation abgeschlossen.");
-        #200
-        $finish;
-
-    end
-
-endmodule*/
-
-module tb_enigma_rotor;
+module full_rotor_tb;
     // Signale
     logic advance;
     logic clk;
@@ -262,7 +185,7 @@ module tb_enigma_rotor;
 
         #20;
         rst = 0;
-        $display("Reset deaktiviert. Starte Verschlüsselungstest...");
+        $display("reset deactivated, encoding steps are next");
     
         // Test 1: A (0) -> F (5)
         $display("\n--- Test 1: A (0) -> F (5) ---");
@@ -303,8 +226,8 @@ module tb_enigma_rotor;
         $display("Time %0t: Nach 26 Schritten: rotor_position = %d", $time, cur_rotor_position);
         assert (cur_rotor_position == 0) else $error("Fehler: Rotorposition sollte 0 sein!");
 
-        // Test 6: Reset → Position = 0
-        $display("\n--- Test 6: Reset → Position = 0 ---");
+        // Test 6: Reset -> Position = 0
+        $display("\n--- Test 6: Reset -> Position = 0 ---");
         rst = 1;
         @(posedge clk);
         $display("Time %0t: Nach Reset: rotor_position = %d", $time, cur_rotor_position);
