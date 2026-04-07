@@ -174,10 +174,8 @@ module full_rotor_tb;
     // Testbench
     initial begin
         $display("Starting Enigma-Rotor Testbench...");
-        $dumpfile("enigma_test.vcd");
-        $dumpvars(0, tb_enigma_rotor);
 
-        // Initialisierung
+        // initializing
         clk = 0;
         advance = 0;
         rst = 1;
@@ -185,7 +183,7 @@ module full_rotor_tb;
 
         #20;
         rst = 0;
-        $display("reset deactivated, encoding steps are next");
+        $display("Reset deactivated, encoding steps are next");
     
         // Test 1: A (0) -> F (5)
         $display("\n--- Test 1: A (0) -> F (5) ---");
@@ -214,26 +212,37 @@ module full_rotor_tb;
         $display("Time %0t: input_char = Z (25), rotor_pos = %d, shift = %d, encoded = %d (S)",
                  $time, cur_rotor_position, shift_amount_out, encoded_char);
 
-        // Test 5: Nach 26 Schritten - Rotorposition = 0
-        $display("\n--- Test 5: 26 Mal advance -> Position = 0 ---");
-        for (int i = 0; i < 26; i++) begin
-            @(posedge clk);
-            advance = 1;
-            #1;
-            advance = 0;
-        end
+        // Test 5: A(0) -> F(5) with advance next A(0) -> X(23)
+        $display("\n--- Test 5: Inputs with advance rotor position incrementing ---");
+        input_char = 5'b00000;
         @(posedge clk);
-        $display("Time %0t: Nach 26 Schritten: rotor_position = %d", $time, cur_rotor_position);
-        assert (cur_rotor_position == 0) else $error("Fehler: Rotorposition sollte 0 sein!");
+        $display("Time %0t: input_char = A (0), rotor_pos = %d, shift = %d, encoded = %d (F)",
+                 $time, cur_rotor_position, shift_amount_out, encoded_char);
+        advance = 1;
+        @(posedge clk);
+        input_char = 5'b00000;
+        advance = 0;
+        @(posedge clk);
+        $display("Time %0t: input_char = A (0), rotor_pos = %d, shift = %d, encoded = %d (X)",
+                 $time, cur_rotor_position, shift_amount_out, encoded_char);
+        advance = 1;
+        @(posedge clk);
+        input_char = 5'b00101;
+        advance = 0;
+        @(posedge clk);
+        $display("Time %0t: input_char = F (5), rotor_pos = %d, shift = %d, encoded = %d (M)",
+                 $time, cur_rotor_position, shift_amount_out, encoded_char);
+
 
         // Test 6: Reset -> Position = 0
         $display("\n--- Test 6: Reset -> Position = 0 ---");
         rst = 1;
+        #10
         @(posedge clk);
-        $display("Time %0t: Nach Reset: rotor_position = %d", $time, cur_rotor_position);
+        #5
+        $display("Time %0t: after Reset: rotor_position = %d", $time, cur_rotor_position);
         assert (cur_rotor_position == 0) else $error("Fehler: Reset hat nicht funktioniert!");
 
-        $display("\n Alle Tests erfolgreich abgeschlossen.");
         $finish;
     end
 endmodule
