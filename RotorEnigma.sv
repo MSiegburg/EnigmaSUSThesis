@@ -22,8 +22,11 @@ always_ff @(posedge clk) begin                  //check for changes to register 
     else if (advance) begin
         rotor_position <= (rotor_position+1) %26; //assign rotor position 0 if it would increment to 26
     end
-    cur_rotor_position <= rotor_position;
+    //cur_rotor_position <= rotor_position; created extra register
 end
+
+assign cur_rotor_position = rotor_position;         //use assign for logical wire assignment in registers
+
 
 endmodule
 
