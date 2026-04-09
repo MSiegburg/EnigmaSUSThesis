@@ -1,0 +1,44 @@
+const int[26] rotor_I =[5]
+
+
+
+module rotor_position_reg {
+
+}
+
+module shift_add {
+    input int#(FROM: 0,TO: 26) letter_index
+    input int#(FROM: 0,TO: 26) rotor_position
+    output int#(FROM: 0,TO: 26) shift_amount_encode_out
+
+    shift_amount_encode_out=(letter_index+rotor_position)%26
+    
+}
+
+module wire_encode {
+    input int#(FROM: 0,TO: 26) shift_amount_in
+    output int#(FROM: 0,TO: 26) encoded_letter
+
+    int[5,23,1,2,6,11,10] wire_assign
+
+    encoded_letter=wire_assign[shift_amount_in]
+
+}
+
+module shift_sub {
+    input int#(FROM: 0,TO: 26) letter_index
+    input int#(FROM: 0,TO: 26) rotor_position
+    output int#(FROM: 0,TO: 26) shift_amount_decode_out
+
+    shift_amount_decode_out=(letter_index-rotor_position)%26
+}
+
+module wire_decode {
+    input int#(FROM: 0,TO: 26) shift_amount_in
+    output int#(FROM: 0,TO: 26) decoded_letter
+
+
+    encoded_letter=wire_assign[shift_amount_in]    
+
+}
+
