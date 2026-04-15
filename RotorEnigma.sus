@@ -2,9 +2,11 @@ module rotor_position_reg {
     interface start: bool rst
     interface set: bool write_rotor, int#(FROM: 0,TO: 26) set_rotor
     interface rotate: bool advance -> int#(FROM: 0,TO: 26) cur_rotor_position
+
+    // where to use interfaces where not ?
     
     state int#(FROM: 0,TO: 26) rotor_position 
-    initial rotor_position=0
+    initial rotor_position=0            // could/should be done with another interface ?
 
     //initial rotor_position=0
     
@@ -59,9 +61,9 @@ module wire_decode {
     output int#(FROM: 0,TO: 26) decoded_letter
 
     int[26] wire_assign_rev = [11,2,3,15,19,0,4,22,20,21,6,5,7,10,23,15,13,12,25,9,24,18,17,1,8,14]
-    int letter_index_shift =(letter_index-cur_rotor_position)%26        //why is this not working ?
+    int letter_index_shift =(letter_index-cur_rotor_position)%26        //mod not properly used ?
 
-    decoded_letter=wire_assign_rev[letter_index_shift]
+    decoded_letter=wire_assign_rev[letter_index_shift]                  //why is this not working ?
 
 }
 
