@@ -1,0 +1,41 @@
+Introduction
+
+- Enigma is pretty well known example of a cypher that required a machine to break
+- we will be Looking at the Version of the Wehrmacht in this Thesis
+	- commonly thought of when Talking About Enigma machines due to them being the type that was most commonly recovered during the war
+	- Commercial Enigma without plugboard and only 3 Rotors was known before the war 
+	- polish worked on Decoding that
+- HDL well suited to creating an Enigma machine intuitively due to it mostly relying on wiring 
+	- 
+- 
+
+
+
+Motivation
+
+- the language SUS hasnt been used  to solve a Problem of this variaty 
+- see what Kind of Problems one would come across while working on a Project of this variaty in SUS
+- any primitive functions to be found along the way should be reported if seen as useful might be added to the language 
+
+Goals
+
+- create Enigma Maschine (Wehrmacht Version) 
+	- 5 possible Rotors in any cofig 3 in the machine 
+	- reflector plate at the end
+	- plugboard in the front 
+- implement on FPGA
+- find a suitable Approach to Breaking Enigma code of this machine type 
+	- 1. IOC 
+	- 2. Banburismus Technique 
+- code and implement one of the possible Solutions of an Enigma code breaker on FPGA
+	- 
+
+
+Limitations:
+- short Messages harder to break with Things like IoC and Trigram scores 
+- well look at Messages of a certain length 
+- known plaintext to which Degree should we assume it
+	- if not assumed at all then text length might Need to be set at Minimum
+
+
+
