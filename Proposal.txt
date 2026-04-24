@@ -39,3 +39,40 @@ Limitations:
 
 
 
+
+Description of Enigma 
+
+An Enigma machine is an electro-mechanical cipher device.
+It operates using a series of Rotors and wires as well as a reflector, as well as a plugboard to tranform a a letter press on the Keyboard into an encrypted letter.
+The only known Information about the relation of Input to Output letter from the outside is, that the Input letter can never be the saem as the Output letter.
+The way the Enigma machine achieves this encryption is by passing the current given by the Pressing of the letter through the wires in the different parts of the machine.
+In the first and last instance of the travel of this electrical current is the plugboard with which an Operator can Designate a up to 10 of 13 letter pairs for which the current will flow form one letter to the other both at the start and the end of ist traversel fo the machines wires.
+This Transition is a symetric property meaning if the current went through no other parts of the machine that for all x,y element of A xRy it follow that yRx.
+After the current first passes through this plugboard it enter the first of 3 (Wehrmacht Enigma) Rotors.
+For each rotor that can be inserted into the machine it hold that it has a fixed wiring maypping each of the 26 letter of the Alphabet to another one of the 26 letters.
+The Rotors in Enigma can be arranged in any configuration out of the 5(later 8) Rotors available to the Operator.
+after the current passes through all of These 3 Rotors it goes through the plugboard which works similarly to a rotor in that it Maps 26 letter to 26 letters hard wired but instead of passing it to the plugboard or Output it passes the current back through the 3 Rotors.
+This is followed by the current passing through the plugboard again before finally lighting up a light bulb which Displays the encrypted letter.
+after the current has passed through the Rotors the first rotor also steps once meaning it turns to the next configuration.
+there were fixed notches in the Rotors marking the Point when the first rotor would turn the secdond and the second would turn the third.
+The only rotor that turned after every press of a button was the first in line.
+The configuration of the rotos (i.e. at which letter they were initially set) could be read by the Operator through 3 Windows at the top of the machine.
+
+
+o calculate the overall number of combinations, one must consider the variable components: the selection of rotors, their order, their starting positions, and the plugboard settings. The standard German Army Enigma used 3 rotors chosen from a set of 5. The number of ways to arrange these is 5×4×3=60. Each rotor has 26 possible starting positions, yielding 263=17,576 settings. The plugboard typically connected 10 pairs of letters out of 26. The number of ways to wire these pairs is approximately 150 trillion. Multiplying these factors together (60×17,576×150,000,000,000,000), the total number of possible initial configurations is roughly 1.5×1020, or 159 trillion billion. This astronomical number made bruteforce decryption impossible for human operators of the era.
+
+Looking back at the wroking of the Enigma machine as described earlier we can see the central flaw that the allies exploited in order to break Enigma even at a time when the machines they were able to use for such Tasks were far less efficient then what we have today.
+This flaw being the inpossibility of an Input letter being the same as an Output letter.
+
+
+This allowed experience codebreakers at the time to Devise Methods which, via a known plaintext attacks, were able to break Enigma codes at a high enough frequency to where they were able to reliably decript Messages intercepted from german communication Points.
+
+
+This "non-self-encryption" property drastically reduced the search space. If an operator knew the probable start of a message (a "crib," such as standard weather Reports), they could eliminate millions of impossible rotor settings instantly.
+Combined with procedural errors (like operators repeating message keys, using predictable Settings or creating Messages that were far longer then ordered by high command \cite 1985 paper), this fundamental mechanical limitation allowed the Allies to reverse-engineer the daily keys and read German communications, a contribution widely considered decisive in the Allied victory.
+
+
+
+Introduction to SUS via example module for the rotor i made
+
+

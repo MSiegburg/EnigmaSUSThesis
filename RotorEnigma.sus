@@ -1,41 +1,46 @@
-module rotor_position_reg {
     //interface start: bool rst
     //interface set: bool write_rotor, int#(FROM: 0,TO: 26) set_rotor
     //interface rotate: bool advance -> int#(FROM: 0,TO: 26) cur_rotor_position
+    // where to use interfaces where not ? Deprecated soon
+/*
 
     //actions analogy to functions 
-/*
     action do_x : int arg {
-
     }
-
     input bool do_x
     input int arg
     when do_x {
         // do stuff with arg
     }
-
-
     myMod.do_x(5)
-
     // 
     myMod.do_x = true
     myMod.arg = 5
 
-*/
-    
+    //initial rotor_position=0      
+    // default use reset if you dotn care what the value is at the beginning jsut need a value to be there
+
+module shift_sub {
+    input int#(FROM: 0,TO: 26) letter_index
+    input int#(FROM: 0,TO: 26) rotor_position
+    output int#(FROM: 0,TO: 26) shift_amount_decode_out
+    shift_amount_decode_out=(letter_index-rotor_position)%26
+}
+module shift_add {
+    input int#(FROM: 0,TO: 26) letter_index
+    input int#(FROM: 0,TO: 26) rotor_position
+    output int#(FROM: 0,TO: 26) shift_amount_encode_out
+    shift_amount_encode_out=(letter_index+rotor_position)%26
+}*/
+
+module rotor_position_reg {
     input bool rst
     input bool write_rotor
     input bool advance
     input int#(FROM: 0,TO: 26) set_rotor
     output int#(FROM: 0,TO: 26) cur_rotor_position
-     
-
-    // where to use interfaces where not ? Deprecated soon
-    
     state int#(FROM: 0,TO: 26) rotor_position 
-    //initial rotor_position=0            default use reset if you dotn care what the value is at the beginning jsut need a value to be there
-    
+
     when rst{
         rotor_position=0
     } else when write_rotor{
@@ -44,52 +49,23 @@ module rotor_position_reg {
         rotor_position=(rotor_position+1)mod 26
     }
     cur_rotor_position = rotor_position
-    
 }
-
-
-
-
-
-/*module shift_add {
-    input int#(FROM: 0,TO: 26) letter_index
-    input int#(FROM: 0,TO: 26) rotor_position
-    output int#(FROM: 0,TO: 26) shift_amount_encode_out
-
-    shift_amount_encode_out=(letter_index+rotor_position)%26
-    
-}*/
 
 module wire_encode {
     input int#(FROM: 0,TO: 26) letter_index
     input int#(FROM: 0,TO: 26) cur_rotor_position
     output int#(FROM: 0,TO: 26) encoded_letter
-
     gen int[26] wire_assign = [5,23,1,2,6,11,10,12,24,19,13,0,17,16,25,3,15,22,21,4,8,9,7,14,20,18]
     int letter_index_shift =letter_index+cur_rotor_position mod 26
     encoded_letter=wire_assign[letter_index_shift]
-
 }
-
-/*module shift_sub {
-    input int#(FROM: 0,TO: 26) letter_index
-    input int#(FROM: 0,TO: 26) rotor_position
-    output int#(FROM: 0,TO: 26) shift_amount_decode_out
-
-    
-
-    shift_amount_decode_out=(letter_index-rotor_position)%26
-}*/
 
 module wire_decode {
     input int#(FROM: 0,TO: 26) letter_index
     input int#(FROM: 0,TO: 26) cur_rotor_position
     output int#(FROM: 0,TO: 26) decoded_letter
-
     gen int[26] wire_assign_rev = [11,2,3,15,19,0,4,22,20,21,6,5,7,10,23,15,13,12,25,9,24,18,17,1,8,14]
-    int letter_index_shift =letter_index-cur_rotor_position mod 26        //mod not properly used ?
-
-    decoded_letter=wire_assign_rev[letter_index_shift]                  //why is this not working ?
-
+    int letter_index_shift =letter_index-cur_rotor_position mod 26        
+    decoded_letter=wire_assign_rev[letter_index_shift]                
 }
 
