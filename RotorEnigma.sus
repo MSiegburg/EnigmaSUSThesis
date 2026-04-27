@@ -33,7 +33,7 @@ module shift_add {
     shift_amount_encode_out=(letter_index+rotor_position)%26
 }*/
 
-module rotor_position_reg {
+module rotor_position_reg{
     input bool rst
     input bool write_rotor
     input bool advance
