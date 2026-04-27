@@ -28,7 +28,16 @@ Goals
 	- 1. IOC 
 	- 2. Banburismus Technique 
 - code and implement one of the possible Solutions of an Enigma code breaker on FPGA
-	- 
+	
+
+		More on Goals 
+
+	- The Troughput of our FPGA Enigma machine is not nessecarily something we will try to optimize as we plan to use only parts of it for the Enigma code 	breaker.
+	- The Enigma code breaker will utilize specified subsets of the full Enigma machines structure in oder to perform specific parts of the Operation depending on which method we end up choosing after further Research into Breaking Enigma during the Course of this Thesis. Such operations could include running through certain rotor configurations while ignoring plugboard Settings as described in \cite 1985 paper. we might end up using the full Enigma machine at Points but we assume that for a majority of the operations using the full machine would create a lot of unnessecary Overhead.
+	- As for additional Goals that could be worked on during this Thesis depending on how difficult the initial Enigma amchine and subsequent code breaker prove to be we would like to look into doing some work on cracking naval Enigma as well, which would require some additional Methods to be implemented beyond what army Enigma would require.
+	We would also like to see as stated in the Motivation if we are able to find primitive fuctions along the way to be added to the language SUS.
+	- Our main concern with this Thesis is 
+	
 
 
 Limitations:
@@ -59,7 +68,7 @@ The only rotor that turned after every press of a button was the first in line.
 The configuration of the rotos (i.e. at which letter they were initially set) could be read by the Operator through 3 Windows at the top of the machine.
 
 
-o calculate the overall number of combinations, one must consider the variable components: the selection of rotors, their order, their starting positions, and the plugboard settings. The standard German Army Enigma used 3 rotors chosen from a set of 5. The number of ways to arrange these is 5×4×3=60. Each rotor has 26 possible starting positions, yielding 263=17,576 settings. The plugboard typically connected 10 pairs of letters out of 26. The number of ways to wire these pairs is approximately 150 trillion. Multiplying these factors together (60×17,576×150,000,000,000,000), the total number of possible initial configurations is roughly 1.5×1020, or 159 trillion billion. This astronomical number made bruteforce decryption impossible for human operators of the era.
+To calculate the overall number of combinations, one must consider the variable components: the selection of rotors, their order, their starting positions, and the plugboard settings. The standard German Army Enigma used 3 rotors chosen from a set of 5. The number of ways to arrange these is 5×4×3=60. Each rotor has 26 possible starting positions, yielding 263=17,576 settings. The plugboard typically connected 10 pairs of letters out of 26. The number of ways to wire these pairs is approximately 150 trillion. Multiplying these factors together (60×17,576×150,000,000,000,000), the total number of possible initial configurations is roughly 1.5×1020, or 159 trillion billion. This astronomical number made bruteforce decryption impossible for human operators of the era.
 
 Looking back at the wroking of the Enigma machine as described earlier we can see the central flaw that the allies exploited in order to break Enigma even at a time when the machines they were able to use for such Tasks were far less efficient then what we have today.
 This flaw being the inpossibility of an Input letter being the same as an Output letter.
@@ -74,5 +83,14 @@ Combined with procedural errors (like operators repeating message keys, using pr
 
 
 Introduction to SUS via example module for the rotor i made
+
+The Language SUS is an HDL which compiles into SystemVerilog code which can then be entered into Xilinx Vivado. 
+We can then write Testbenches in SystemVerilog (Verilog or VHDL are also supported).
+These Testbenches are then used to confim wether or not the modules written in SUS work as intended.
+Vivado also allows us to synthesize as well as implement our Project in order to then generate a bitstream used to Programm our FPGA.
+
+An FPGA (Field-Programmable Gate Array) is a type of integrated circuit that can be configured by the user after manufacturing. Unlike standard processors that run software instructions sequentially, an FPGA consists of an array of programmable logic blocks and interconnects that can be physically wired to perform specific hardware functions in parallel. This makes it ideal for applications requiring high-speed, custom processing, such as signal processing and prototyping.
+
+Xilinx Vivado is the comprehensive integrated development environment (IDE) used to design, simulate, synthesize, and implement digital logic for Xilinx (now AMD) FPGAs and SoCs. It provides a unified workflow that takes a design from high-level hardware description languages (like Verilog or VHDL) or high-level synthesis (HLS) down to the final bitstream file that programs the hardware.
 
 
