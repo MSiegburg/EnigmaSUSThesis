@@ -1,0 +1,52 @@
+module enigma_rotor_I{
+    input bool rst
+    input bool write_rotor
+    input bool advance
+    input int#(FROM: 0,TO: 26) set_rotor_I
+    input int#(FROM: 0,TO: 26) letter_index
+
+    output int#(FROM: 0,TO: 26) encoded_letter
+
+    state int#(FROM: 0,TO: 26) rotor_position 
+
+    gen int#(FROM: 0,TO: 26) ring_position_I
+    gen int[26] wire_assign = [5,23,1,2,6,11,10,12,24,19,13,0,17,16,25,3,15,22,21,4,8,9,7,14,20,18]
+
+    when rst{
+        rotor_position=0
+    } else when write_rotor{
+        rotor_position=set_rotor_I
+    } else when advance{
+        rotor_position=(rotor_position+1)mod 26
+    }
+
+    
+    int letter_index_shift =letter_index+rotor_position mod 26
+    encoded_letter=wire_assign[letter_index_shift]
+
+}
+
+module enigma_rotor_II{
+
+
+}
+
+module enigma_rotor_III{
+
+
+}
+
+module enigma_rotor_IV{
+
+
+}
+
+module enigma_rotor_V{
+
+
+}
+
+module plugboard{
+
+
+}
