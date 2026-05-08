@@ -98,3 +98,8 @@ An FPGA (Field-Programmable Gate Array) is a type of integrated circuit that can
 Xilinx Vivado is the comprehensive integrated development environment (IDE) used to design, simulate, synthesize, and implement digital logic for Xilinx (now AMD) FPGAs and SoCs. It provides a unified workflow that takes a design from high-level hardware description languages (like Verilog or VHDL) or high-level synthesis (HLS) down to the final bitstream file that programs the hardware.
 
 
+unused in Proposal might be useful in thesis
+@article{mcintoshall,
+	title={" All You Ever Wanted to Know About Banburismus but were Afraid to Ask},
+	author={McIntosh, Alan and Erskine, Ralph and Sale, Tony}
+}
