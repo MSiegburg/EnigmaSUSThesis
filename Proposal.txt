@@ -28,6 +28,10 @@ Goals
 	- 1. IOC 
 	- 2. Banburismus Technique 
 - code and implement one of the possible Solutions of an Enigma code breaker on FPGA
+
+Possible issues in the implementation of code breaker
+
+
 	
 
 		More on Goals 
