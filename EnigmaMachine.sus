@@ -5,21 +5,25 @@ module enigma_rotor_I{
     input int#(FROM: 0,TO: 26) set_rotor_I
     input int#(FROM: 0,TO: 26) input_letter
 
+    //input int#(FROM: 0,TO: 26) ring_position_I      // as input when setting up enigma machine or gen variable ? leads to error
+
+    gen int#(FROM: 0,TO: 26) ring_position_I        // leads to different error                                    
+
     output int#(FROM: 0,TO: 26) output_letter
-    output bool advance_next
+    output bool advance_next                        // signal to advance the next rotor in line right -> advance middle -> advance left
 
-    state int#(FROM: 0,TO: 26) rotor_position 
+    state int#(FROM: 0,TO: 26) rotor_position       // register to save rotor position
 
-    gen int turnover_position = 16
+    gen int turnover_position = 16      // fixed turnover position for Rotor I turnover at Q -> R
+    gen int LEN = 25                    // for any for loops over the rotor tables
+
     
-
-    gen int#(FROM: 0,TO: 26) ring_position_I
     // [E,K,M,F,L,G,D,Q,V,Z,N,T,O,W,Y,H,X,U,S,P,A,I,B,R,C,J] Rotor I of Enigma
     gen int[26] wire_assign = [4,10,12,5,11,6,3,16,21,25,13,19,14,22,24,7,23,20,18,15,0,8,1,17,2,9]
 
-    gen int LEN = 25
+    
     for int I in 0..LEN{
-        wire_assign[I]=wire_assign[I]+ring_position_I
+        wire_assign[I]=wire_assign[I]+ring_position_I  // whats the issue here ?
     }
 
     when rst{
@@ -44,20 +48,31 @@ module enigma_rotor_I{
 
 module enigma_rotor_II{
 
+    gen int LEN = 25                    // for any for loops over the rotor tables
+    gen int turnover_position = 4       // fixed turnover position for Rotor II turnover at E -> F
 
 }
 
 module enigma_rotor_III{
+
+    gen int LEN = 25                    // for any for loops over the rotor tables
+    gen int turnover_position = 21      // fixed turnover position for Rotor III turnover at V -> W
 
 
 }
 
 module enigma_rotor_IV{
 
+    gen int LEN = 25                    // for any for loops over the rotor tables
+    gen int turnover_position = 9       // fixed turnover position for Rotor IV turnover at J -> K
+
 
 }
 
 module enigma_rotor_V{
+
+    gen int LEN = 25                    // for any for loops over the rotor tables
+    gen int turnover_position = 25       // fixed turnover position for Rotor IV turnover at Z -> A
 
 
 }
@@ -68,12 +83,33 @@ module reflector{
 
     // (AY) (BR) (CU) (DH) (EQ) (FS) (GL) (IP) (JX) (KN) (MO) (TZ) (VW) Reflector B 
     gen int[26] reflector_table = [24, 17, 20, 7, 16, 18, 11, 3, 15, 23, 13, 6, 14, 10, 12, 8, 4, 1, 5, 25, 2, 22, 21, 9, 0, 19]
-    
+
     output_letter=reflector_table[input_letter]
 
 }
 
 module plugboard{
+    input int#(FROM: 0,TO: 26) input_letter
+    input bool set_plugboard
+    input int#(FROM: 0,TO: 27)[26] plugboard_config
+    output int#(FROM: -1,TO: 26) output_letter              // relating to the comments below
 
+    gen int LEN = 25                    // for any for loops over the rotor tables
+
+    // gen variable in this context a good idea ?
+    int[26] plugboard_settings=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+
+    // setting the plugboard to the given array | we will use 0 as no plug is set and 1-26 
+    when set_plugboard{
+        for int I in 0..LEN{
+        plugboard_settings[I]=plugboard_config[I]
+        }
+    } else when plugboard_settings[input_letter]==0{
+        output_letter=input_letter
+    } else{
+        output_letter=plugboard_settings[input_letter]-1    // will never end up with -1 since we check for value being 0 before 
+                                                            // better way to do this ?
+    }
 
 }
