@@ -47,8 +47,9 @@ module rotor_position_reg{
         rotor_position=set_rotor
     } else when advance{
         rotor_position=(rotor_position+1)mod 26
+        cur_rotor_position = rotor_position
     }
-    cur_rotor_position = rotor_position
+    
 }
 
 module wire_encode {
