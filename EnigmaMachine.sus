@@ -1,4 +1,11 @@
 module enigma_machine{
+    // [E,K,M,F,L,G,D,Q,V,Z,N,T,O,W,Y,H,X,U,S,P,A,I,B,R,C,J] Rotor I of Enigma
+    gen int[26] rotor_one =[4,10,12,5,11,6,3,16,21,25,13,19,14,22,24,7,23,20,18,15,0,8,1,17,2,9]
+    gen int turnover_position_one = 16      // fixed turnover position for Rotor I turnover at Q -> R
+
+    
+    
+
 
     // input Rotors used 0-4
     // plugboard settings array with values 0-26
@@ -12,7 +19,8 @@ module enigma_machine{
     // execute turnover on advance signal 
     // go through the encoding process via ancode actions
     // save result in output array
-
+    
+    //enigma_rotor rightRotor(values needed)
 
 
 }
