@@ -48,6 +48,20 @@
 
 module enigma_machine{
 
+    // input Rotors used 0-4
+    // plugboard settings array with values 0-26
+    // rotor settings array 3 values int#(FROM: 0,TO: 26)
+    // ring settings array of values int#(FROM: 0,TO: 26)
+    // input message 
+
+    // instantiate rotors via enigma rotor module 
+    
+    // execute advance checking for advance signal 
+    // execute turnover on advance signal 
+    // go through the encoding process via ancode actions
+    // save result in output array
+
+
 
 }
 
@@ -58,8 +72,11 @@ module enigma_rotor#(int[26] wire_assign, int turnover_position, int initial_pos
     gen int[26] sub_array_left
     gen int[26] sub_array_right
     Temp = wire_assign                              // work with Temp internally
-    
+    gen int modified_turnover_position
+
     rotor_position=initial_position                 // setup rotor
+
+    modified_turnover_position=(turnover_position+ring_position) mod 26
     
     for int I in 0..LEN{
         Temp[I]=wire_assign[I]+ring_position        
@@ -81,7 +98,7 @@ module enigma_rotor#(int[26] wire_assign, int turnover_position, int initial_pos
         rotor_position=write_value
     }   
     action advance:-> bool advance_signal{          // advance signal checking for turnover returning whether that needs to be actioned
-        when (rotor_position==turnover_position){
+        when (rotor_position==modified_turnover_position){
             rotor_position=(rotor_position+1)mod 26
             advance_signal=true
         } else {
@@ -128,27 +145,22 @@ module reflector{
 }
 
 module plugboard{
-    input int#(FROM: 0,TO: 26) input_letter
-    input bool set_plugboard
-    input int#(FROM: 0,TO: 27)[26] plugboard_config
-    output int#(FROM: -1,TO: 26) output_letter              // relating to the comments below
-
-    gen int LEN = 25                    // for any for loops over the rotor tables
-
-    // gen variable in this context a good idea ?
-    int[26] plugboard_settings=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-
-
+    gen int LEN = 25
+    int[26] plugboard_settings=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]   
+    
     // setting the plugboard to the given array | we will use 0 as no plug is set and 1-26 
-    when set_plugboard{
+    action set_plugboard: int#(FROM: 0,TO: 27)[26] plugboard_config{
         for int I in 0..LEN{
         plugboard_settings[I]=plugboard_config[I]
         }
-    } else when plugboard_settings[input_letter]==0{
-        output_letter=input_letter
-    } else{
-        output_letter=plugboard_settings[input_letter]-1    // will never end up with -1 since we check for value being 0 before 
-                                                            // better way to do this ?
     }
 
+    action pass_letter: int#(FROM: 0,TO: 26) input_letter -> int#(FROM: -1,TO: 26) output_letter{
+        when plugboard_settings[input_letter]==0{
+            output_letter=input_letter
+        } else{
+            output_letter=plugboard_settings[input_letter]-1    // will never end up with -1 since we check for value being 0 before better way?
+        }
+
+    }
 }
