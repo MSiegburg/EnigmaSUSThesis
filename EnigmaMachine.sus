@@ -59,6 +59,12 @@ module enigma_rotor#(int[26] wire_assign, int turnover_position, int initial_pos
             }
         }
     }
+    /*
+    gen int [26] result map
+        for int I in 0..LEN{
+        Resultmap[inputmap[I]]=I
+        }
+    */
     // setup for both encode/decode arrays is done here
 
     action reset{                                   // reset action to set rotor to 0
@@ -117,7 +123,7 @@ module plugboard{
             output_letter=input_letter
         } else{
             output_letter=plugboard_settings[input_letter]-1    // will never end up with -1 since we check for value being 0 before better way?
-        }
+        }                                                       // IntNarrow#(FROM:X, TO: Y)(v)
 
     }
 }
