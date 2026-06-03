@@ -38,10 +38,8 @@ module enigma_machine{
 module enigma_rotor#(int[26] wire_assign, int turnover_position, int initial_position, int ring_position ){ // setup with inputs for compile time variables 
     state int#(FROM: 0,TO: 26) rotor_position       // register to save rotor position
     gen int LEN = 25
-    gen int[26] Temp
     gen int[26] sub_array_left
     gen int[26] sub_array_right
-    Temp = wire_assign                              // work with Temp internally
     gen int modified_turnover_position
 
     rotor_position=initial_position                 // setup rotor
@@ -49,31 +47,20 @@ module enigma_rotor#(int[26] wire_assign, int turnover_position, int initial_pos
     modified_turnover_position=(turnover_position+ring_position) mod 26
     
     for int I in 0..LEN{
-        Temp[I]=wire_assign[I]+ring_position        
+        sub_array_left[I]=wire_assign[I]+ring_position        
     }
-    sub_array_left = Temp
     for int I in 0..LEN{
-        for int J in 0..LEN{
-            if sub_array_left[J]==I{
-                sub_array_right[I]=J
-            }
-        }
+        sub_array_right[sub_array_left[I]]=I
     }
-    /*
-    gen int [26] result map
-        for int I in 0..LEN{
-        Resultmap[inputmap[I]]=I
-        }
-    */
-    // setup for both encode/decode arrays is done here
+    // setup for both arrays is done here
 
-    action reset{                                   // reset action to set rotor to 0
+    action reset{                                                                                           // reset action to set rotor to 0
         rotor_position=0
     }
     action write_rotor: int#(FROM: 0,TO: 26) write_value -> int#(FROM: 0,TO: 26) new_rotor_position{        // write new value to rotor
         rotor_position=write_value
     }   
-    action advance:-> bool advance_signal{          // advance signal checking for turnover returning whether that needs to be actioned
+    action advance:-> bool advance_signal{                                                                  // advance signal checking for turnover 
         when (rotor_position==modified_turnover_position){
             rotor_position=(rotor_position+1)mod 26
             advance_signal=true
@@ -82,21 +69,17 @@ module enigma_rotor#(int[26] wire_assign, int turnover_position, int initial_pos
             advance_signal=false
         }
     }
-    action turnover:int[26] in_left, int[26] in_right-> int[26] out_left, int[26] out_right{    // incrementing the arrays on a turnover 
-        for int I in 0..LEN{
-            out_left[I]=in_left[(I+1 mod 25)]
-            out_right[I]=(in_right[I]-1 mod 25)     // double check if im thinking right on this checked in small example
-        }
+    action turnover{
+        rotor_position=(rotor_position+1)mod 26
     }
     action encode_left: int#(FROM: 0,TO: 26) letter_index -> int#(FROM: 0,TO: 26) encode_letter{
-        encode_letter=sub_array_left[letter_index]
+        encode_letter=sub_array_left[(letter_index+rotor_position)mod 26]
     }
     action encode_right: int#(FROM: 0,TO: 26) rev_letter_index -> int#(FROM: 0,TO: 26) rev_encode_letter{
-        rev_encode_letter=sub_array_right[rev_letter_index]
+        rev_encode_letter=sub_array_right[(rev_letter_index+rotor_position)mod 26]
     }
 
 }
-
 
 // int new_char = reflector(old_char)
 module reflector{
@@ -107,24 +90,15 @@ module reflector{
     }
 }
 
-module plugboard{
+module plugboard#(int[26] plugboard_config){
     gen int LEN = 25
-    int[26] plugboard_settings=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]   
-    
-    // setting the plugboard to the given array | we will use 0 as no plug is set and 1-26 
-    action set_plugboard: int#(FROM: 0,TO: 27)[26] plugboard_config{
-        for int I in 0..LEN{
+    gen int[26] plugboard_settings
+    // setting the plugboard to the given array | missing plugs will be set to themselves
+    for int I in 0..LEN{
         plugboard_settings[I]=plugboard_config[I]
-        }
     }
-
-    action pass_letter: int#(FROM: 0,TO: 26) input_letter -> int#(FROM: -1,TO: 26) output_letter{
-        when plugboard_settings[input_letter]==0{
-            output_letter=input_letter
-        } else{
-            output_letter=plugboard_settings[input_letter]-1    // will never end up with -1 since we check for value being 0 before better way?
-        }                                                       // IntNarrow#(FROM:X, TO: Y)(v)
-
+    action pass_letter: int#(FROM: 0,TO: 26) input_letter -> int#(FROM: 0,TO: 26) output_letter{
+            output_letter=plugboard_settings[input_letter]
     }
 }
 
