@@ -169,7 +169,7 @@ module reflector{
 }
 
 module plugboard#(int[26] plugboard_config){
-    gen int LEN = 25
+    gen int LEN = 26
     int[26] plugboard_settings
     // setting the plugboard to the given array | missing plugs will be set to themselves
     for int I in 0..LEN{

@@ -1,4 +1,4 @@
-// THIS IS A GENERATED FILE (Generated at 2026-06-05T15:38:01+02:00)
+// THIS IS A GENERATED FILE (Generated at 2026-06-05T15:40:45+02:00)
 // This file was generated with SUS Compiler 0.3.10
 // main #()
 module main(
@@ -838,6 +838,7 @@ always_comb begin // combinatorial plugboard_settings
 	plugboard_settings[22] = 5'd22;
 	plugboard_settings[23] = 5'd23;
 	plugboard_settings[24] = 5'd24;
+	plugboard_settings[25] = 5'd25;
 end
 always_comb begin // combinatorial output_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
