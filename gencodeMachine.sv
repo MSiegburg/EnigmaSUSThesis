@@ -1,4 +1,4 @@
-// THIS IS A GENERATED FILE (Generated at 2026-06-05T15:32:55+02:00)
+// THIS IS A GENERATED FILE (Generated at 2026-06-05T15:38:01+02:00)
 // This file was generated with SUS Compiler 0.3.10
 // main #()
 module main(
@@ -346,62 +346,63 @@ module enigma_rotor_initial_position_0_ring_position_0_rotor_number_3(
 /*state*/ logic[4:0] rotor_position;
 /*mux_wire*/ logic[4:0] sub_array_left[25:0];
 /*mux_wire*/ logic[4:0] sub_array_right[25:0];
-wire[4:0] _26 = sub_array_left[0];
-wire[4:0] _27 = sub_array_left[1];
-wire[4:0] _28 = sub_array_left[2];
-wire[4:0] _29 = sub_array_left[3];
-wire[4:0] _30 = sub_array_left[4];
-wire[4:0] _31 = sub_array_left[5];
-wire[4:0] _32 = sub_array_left[6];
-wire[4:0] _33 = sub_array_left[7];
-wire[4:0] _34 = sub_array_left[8];
-wire[4:0] _35 = sub_array_left[9];
-wire[4:0] _36 = sub_array_left[10];
-wire[4:0] _37 = sub_array_left[11];
-wire[4:0] _38 = sub_array_left[12];
-wire[4:0] _39 = sub_array_left[13];
-wire[4:0] _40 = sub_array_left[14];
-wire[4:0] _41 = sub_array_left[15];
-wire[4:0] _42 = sub_array_left[16];
-wire[4:0] _43 = sub_array_left[17];
-wire[4:0] _44 = sub_array_left[18];
-wire[4:0] _45 = sub_array_left[19];
-wire[4:0] _46 = sub_array_left[20];
-wire[4:0] _47 = sub_array_left[21];
-wire[4:0] _48 = sub_array_left[22];
-wire[4:0] _49 = sub_array_left[23];
-wire[4:0] _50 = sub_array_left[24];
-wire _54;
-assign _54 = rotor_position == 5'd21;
-wire[4:0] _57;
-assign _57 = rotor_position + 1'd1;
+wire[4:0] _27 = sub_array_left[0];
+wire[4:0] _28 = sub_array_left[1];
+wire[4:0] _29 = sub_array_left[2];
+wire[4:0] _30 = sub_array_left[3];
+wire[4:0] _31 = sub_array_left[4];
+wire[4:0] _32 = sub_array_left[5];
+wire[4:0] _33 = sub_array_left[6];
+wire[4:0] _34 = sub_array_left[7];
+wire[4:0] _35 = sub_array_left[8];
+wire[4:0] _36 = sub_array_left[9];
+wire[4:0] _37 = sub_array_left[10];
+wire[4:0] _38 = sub_array_left[11];
+wire[4:0] _39 = sub_array_left[12];
+wire[4:0] _40 = sub_array_left[13];
+wire[4:0] _41 = sub_array_left[14];
+wire[4:0] _42 = sub_array_left[15];
+wire[4:0] _43 = sub_array_left[16];
+wire[4:0] _44 = sub_array_left[17];
+wire[4:0] _45 = sub_array_left[18];
+wire[4:0] _46 = sub_array_left[19];
+wire[4:0] _47 = sub_array_left[20];
+wire[4:0] _48 = sub_array_left[21];
+wire[4:0] _49 = sub_array_left[22];
+wire[4:0] _50 = sub_array_left[23];
+wire[4:0] _51 = sub_array_left[24];
+wire[4:0] _52 = sub_array_left[25];
+wire _56;
+assign _56 = rotor_position == 5'd21;
 wire[4:0] _59;
-assign _59 = (_57 == 26) ? 0 : _57; // == mod 26
-wire[4:0] _62;
-assign _62 = rotor_position + 1'd1;
+assign _59 = rotor_position + 1'd1;
+wire[4:0] _61;
+assign _61 = (_59 == 26) ? 0 : _59; // == mod 26
 wire[4:0] _64;
-assign _64 = (_62 == 26) ? 0 : _62; // == mod 26
-wire[4:0] _67;
-assign _67 = rotor_position + 1'd1;
+assign _64 = rotor_position + 1'd1;
+wire[4:0] _66;
+assign _66 = (_64 == 26) ? 0 : _64; // == mod 26
 wire[4:0] _69;
-assign _69 = (_67 == 26) ? 0 : _67; // == mod 26
-wire[5:0] _72;
-assign _72 = letter_index + rotor_position;
-wire[4:0] _74;
-assign _74 = _72 - ((_72 >= 26) ? 26 : 0); // == mod 26
-wire[4:0] _75 = sub_array_left[_74];
-wire[5:0] _78;
-assign _78 = rev_letter_index + rotor_position;
-wire[4:0] _80;
-assign _80 = _78 - ((_78 >= 26) ? 26 : 0); // == mod 26
-wire[4:0] _81 = sub_array_right[_80];
+assign _69 = rotor_position + 1'd1;
+wire[4:0] _71;
+assign _71 = (_69 == 26) ? 0 : _69; // == mod 26
+wire[5:0] _74;
+assign _74 = letter_index + rotor_position;
+wire[4:0] _76;
+assign _76 = _74 - ((_74 >= 26) ? 26 : 0); // == mod 26
+wire[4:0] _77 = sub_array_left[_76];
+wire[5:0] _80;
+assign _80 = rev_letter_index + rotor_position;
+wire[4:0] _82;
+assign _82 = _80 - ((_80 >= 26) ? 26 : 0); // == mod 26
+wire[4:0] _83 = sub_array_right[_82];
 always_ff @(posedge clk) begin // state rotor_position
 	rotor_position <= 1'd0;
 	if(reset) rotor_position <= 1'd0;
 	if(write_rotor) rotor_position <= write_value;
-	if(advance) if(_54) rotor_position <= _59;
-	if(advance) if(!_54) rotor_position <= _64;
-	if(turnover) rotor_position <= _69;
+	if(advance) if(_56) rotor_position <= _61;
+	if(advance) if(!_56) rotor_position <= _66;
+	if(turnover) rotor_position <= _71;
 end
 always_comb begin // combinatorial sub_array_left
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -431,53 +432,55 @@ always_comb begin // combinatorial sub_array_left
 	sub_array_left[22] = 5'd20;
 	sub_array_left[23] = 5'd18;
 	sub_array_left[24] = 5'd16;
+	sub_array_left[25] = 4'd14;
 end
 always_comb begin // combinatorial sub_array_right
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	sub_array_right = '{5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx};
-	sub_array_right[_26] = 1'd0;
-	sub_array_right[_27] = 1'd1;
-	sub_array_right[_28] = 2'd2;
-	sub_array_right[_29] = 2'd3;
-	sub_array_right[_30] = 3'd4;
-	sub_array_right[_31] = 3'd5;
-	sub_array_right[_32] = 3'd6;
-	sub_array_right[_33] = 3'd7;
-	sub_array_right[_34] = 4'd8;
-	sub_array_right[_35] = 4'd9;
-	sub_array_right[_36] = 4'd10;
-	sub_array_right[_37] = 4'd11;
-	sub_array_right[_38] = 4'd12;
-	sub_array_right[_39] = 4'd13;
-	sub_array_right[_40] = 4'd14;
-	sub_array_right[_41] = 4'd15;
-	sub_array_right[_42] = 5'd16;
-	sub_array_right[_43] = 5'd17;
-	sub_array_right[_44] = 5'd18;
-	sub_array_right[_45] = 5'd19;
-	sub_array_right[_46] = 5'd20;
-	sub_array_right[_47] = 5'd21;
-	sub_array_right[_48] = 5'd22;
-	sub_array_right[_49] = 5'd23;
-	sub_array_right[_50] = 5'd24;
+	sub_array_right[_27] = 1'd0;
+	sub_array_right[_28] = 1'd1;
+	sub_array_right[_29] = 2'd2;
+	sub_array_right[_30] = 2'd3;
+	sub_array_right[_31] = 3'd4;
+	sub_array_right[_32] = 3'd5;
+	sub_array_right[_33] = 3'd6;
+	sub_array_right[_34] = 3'd7;
+	sub_array_right[_35] = 4'd8;
+	sub_array_right[_36] = 4'd9;
+	sub_array_right[_37] = 4'd10;
+	sub_array_right[_38] = 4'd11;
+	sub_array_right[_39] = 4'd12;
+	sub_array_right[_40] = 4'd13;
+	sub_array_right[_41] = 4'd14;
+	sub_array_right[_42] = 4'd15;
+	sub_array_right[_43] = 5'd16;
+	sub_array_right[_44] = 5'd17;
+	sub_array_right[_45] = 5'd18;
+	sub_array_right[_46] = 5'd19;
+	sub_array_right[_47] = 5'd20;
+	sub_array_right[_48] = 5'd21;
+	sub_array_right[_49] = 5'd22;
+	sub_array_right[_50] = 5'd23;
+	sub_array_right[_51] = 5'd24;
+	sub_array_right[_52] = 5'd25;
 end
 always_comb begin // combinatorial advance_signal
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	advance_signal = 1'bx;
-	if(advance) if(_54) advance_signal = 1'b1;
-	if(advance) if(!_54) advance_signal = 1'b0;
+	if(advance) if(_56) advance_signal = 1'b1;
+	if(advance) if(!_56) advance_signal = 1'b0;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	advance_signal = advance_signal;
 end
 always_comb begin // combinatorial encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	encode_letter = 5'dx;
-	if(encode_left) encode_letter = _75;
+	if(encode_left) encode_letter = _77;
 end
 always_comb begin // combinatorial rev_encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	rev_encode_letter = 5'dx;
-	if(encode_right) rev_encode_letter = _81;
+	if(encode_right) rev_encode_letter = _83;
 end
 endmodule
 
@@ -501,62 +504,63 @@ module enigma_rotor_initial_position_0_ring_position_0_rotor_number_2(
 /*state*/ logic[4:0] rotor_position;
 /*mux_wire*/ logic[4:0] sub_array_left[25:0];
 /*mux_wire*/ logic[4:0] sub_array_right[25:0];
-wire[4:0] _26 = sub_array_left[0];
-wire[4:0] _27 = sub_array_left[1];
-wire[4:0] _28 = sub_array_left[2];
-wire[4:0] _29 = sub_array_left[3];
-wire[4:0] _30 = sub_array_left[4];
-wire[4:0] _31 = sub_array_left[5];
-wire[4:0] _32 = sub_array_left[6];
-wire[4:0] _33 = sub_array_left[7];
-wire[4:0] _34 = sub_array_left[8];
-wire[4:0] _35 = sub_array_left[9];
-wire[4:0] _36 = sub_array_left[10];
-wire[4:0] _37 = sub_array_left[11];
-wire[4:0] _38 = sub_array_left[12];
-wire[4:0] _39 = sub_array_left[13];
-wire[4:0] _40 = sub_array_left[14];
-wire[4:0] _41 = sub_array_left[15];
-wire[4:0] _42 = sub_array_left[16];
-wire[4:0] _43 = sub_array_left[17];
-wire[4:0] _44 = sub_array_left[18];
-wire[4:0] _45 = sub_array_left[19];
-wire[4:0] _46 = sub_array_left[20];
-wire[4:0] _47 = sub_array_left[21];
-wire[4:0] _48 = sub_array_left[22];
-wire[4:0] _49 = sub_array_left[23];
-wire[4:0] _50 = sub_array_left[24];
-wire _54;
-assign _54 = rotor_position == 3'd4;
-wire[4:0] _57;
-assign _57 = rotor_position + 1'd1;
+wire[4:0] _27 = sub_array_left[0];
+wire[4:0] _28 = sub_array_left[1];
+wire[4:0] _29 = sub_array_left[2];
+wire[4:0] _30 = sub_array_left[3];
+wire[4:0] _31 = sub_array_left[4];
+wire[4:0] _32 = sub_array_left[5];
+wire[4:0] _33 = sub_array_left[6];
+wire[4:0] _34 = sub_array_left[7];
+wire[4:0] _35 = sub_array_left[8];
+wire[4:0] _36 = sub_array_left[9];
+wire[4:0] _37 = sub_array_left[10];
+wire[4:0] _38 = sub_array_left[11];
+wire[4:0] _39 = sub_array_left[12];
+wire[4:0] _40 = sub_array_left[13];
+wire[4:0] _41 = sub_array_left[14];
+wire[4:0] _42 = sub_array_left[15];
+wire[4:0] _43 = sub_array_left[16];
+wire[4:0] _44 = sub_array_left[17];
+wire[4:0] _45 = sub_array_left[18];
+wire[4:0] _46 = sub_array_left[19];
+wire[4:0] _47 = sub_array_left[20];
+wire[4:0] _48 = sub_array_left[21];
+wire[4:0] _49 = sub_array_left[22];
+wire[4:0] _50 = sub_array_left[23];
+wire[4:0] _51 = sub_array_left[24];
+wire[4:0] _52 = sub_array_left[25];
+wire _56;
+assign _56 = rotor_position == 3'd4;
 wire[4:0] _59;
-assign _59 = (_57 == 26) ? 0 : _57; // == mod 26
-wire[4:0] _62;
-assign _62 = rotor_position + 1'd1;
+assign _59 = rotor_position + 1'd1;
+wire[4:0] _61;
+assign _61 = (_59 == 26) ? 0 : _59; // == mod 26
 wire[4:0] _64;
-assign _64 = (_62 == 26) ? 0 : _62; // == mod 26
-wire[4:0] _67;
-assign _67 = rotor_position + 1'd1;
+assign _64 = rotor_position + 1'd1;
+wire[4:0] _66;
+assign _66 = (_64 == 26) ? 0 : _64; // == mod 26
 wire[4:0] _69;
-assign _69 = (_67 == 26) ? 0 : _67; // == mod 26
-wire[5:0] _72;
-assign _72 = letter_index + rotor_position;
-wire[4:0] _74;
-assign _74 = _72 - ((_72 >= 26) ? 26 : 0); // == mod 26
-wire[4:0] _75 = sub_array_left[_74];
-wire[5:0] _78;
-assign _78 = rev_letter_index + rotor_position;
-wire[4:0] _80;
-assign _80 = _78 - ((_78 >= 26) ? 26 : 0); // == mod 26
-wire[4:0] _81 = sub_array_right[_80];
+assign _69 = rotor_position + 1'd1;
+wire[4:0] _71;
+assign _71 = (_69 == 26) ? 0 : _69; // == mod 26
+wire[5:0] _74;
+assign _74 = letter_index + rotor_position;
+wire[4:0] _76;
+assign _76 = _74 - ((_74 >= 26) ? 26 : 0); // == mod 26
+wire[4:0] _77 = sub_array_left[_76];
+wire[5:0] _80;
+assign _80 = rev_letter_index + rotor_position;
+wire[4:0] _82;
+assign _82 = _80 - ((_80 >= 26) ? 26 : 0); // == mod 26
+wire[4:0] _83 = sub_array_right[_82];
 always_ff @(posedge clk) begin // state rotor_position
 	rotor_position <= 1'd0;
 	if(reset) rotor_position <= 1'd0;
 	if(write_rotor) rotor_position <= write_value;
-	if(advance) if(_54) rotor_position <= _59;
-	if(advance) if(!_54) rotor_position <= _64;
-	if(turnover) rotor_position <= _69;
+	if(advance) if(_56) rotor_position <= _61;
+	if(advance) if(!_56) rotor_position <= _66;
+	if(turnover) rotor_position <= _71;
 end
 always_comb begin // combinatorial sub_array_left
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -586,53 +590,55 @@ always_comb begin // combinatorial sub_array_left
 	sub_array_left[22] = 3'd5;
 	sub_array_left[23] = 5'd21;
 	sub_array_left[24] = 4'd14;
+	sub_array_left[25] = 3'd4;
 end
 always_comb begin // combinatorial sub_array_right
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	sub_array_right = '{5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx};
-	sub_array_right[_26] = 1'd0;
-	sub_array_right[_27] = 1'd1;
-	sub_array_right[_28] = 2'd2;
-	sub_array_right[_29] = 2'd3;
-	sub_array_right[_30] = 3'd4;
-	sub_array_right[_31] = 3'd5;
-	sub_array_right[_32] = 3'd6;
-	sub_array_right[_33] = 3'd7;
-	sub_array_right[_34] = 4'd8;
-	sub_array_right[_35] = 4'd9;
-	sub_array_right[_36] = 4'd10;
-	sub_array_right[_37] = 4'd11;
-	sub_array_right[_38] = 4'd12;
-	sub_array_right[_39] = 4'd13;
-	sub_array_right[_40] = 4'd14;
-	sub_array_right[_41] = 4'd15;
-	sub_array_right[_42] = 5'd16;
-	sub_array_right[_43] = 5'd17;
-	sub_array_right[_44] = 5'd18;
-	sub_array_right[_45] = 5'd19;
-	sub_array_right[_46] = 5'd20;
-	sub_array_right[_47] = 5'd21;
-	sub_array_right[_48] = 5'd22;
-	sub_array_right[_49] = 5'd23;
-	sub_array_right[_50] = 5'd24;
+	sub_array_right[_27] = 1'd0;
+	sub_array_right[_28] = 1'd1;
+	sub_array_right[_29] = 2'd2;
+	sub_array_right[_30] = 2'd3;
+	sub_array_right[_31] = 3'd4;
+	sub_array_right[_32] = 3'd5;
+	sub_array_right[_33] = 3'd6;
+	sub_array_right[_34] = 3'd7;
+	sub_array_right[_35] = 4'd8;
+	sub_array_right[_36] = 4'd9;
+	sub_array_right[_37] = 4'd10;
+	sub_array_right[_38] = 4'd11;
+	sub_array_right[_39] = 4'd12;
+	sub_array_right[_40] = 4'd13;
+	sub_array_right[_41] = 4'd14;
+	sub_array_right[_42] = 4'd15;
+	sub_array_right[_43] = 5'd16;
+	sub_array_right[_44] = 5'd17;
+	sub_array_right[_45] = 5'd18;
+	sub_array_right[_46] = 5'd19;
+	sub_array_right[_47] = 5'd20;
+	sub_array_right[_48] = 5'd21;
+	sub_array_right[_49] = 5'd22;
+	sub_array_right[_50] = 5'd23;
+	sub_array_right[_51] = 5'd24;
+	sub_array_right[_52] = 5'd25;
 end
 always_comb begin // combinatorial advance_signal
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	advance_signal = 1'bx;
-	if(advance) if(_54) advance_signal = 1'b1;
-	if(advance) if(!_54) advance_signal = 1'b0;
+	if(advance) if(_56) advance_signal = 1'b1;
+	if(advance) if(!_56) advance_signal = 1'b0;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	advance_signal = advance_signal;
 end
 always_comb begin // combinatorial encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	encode_letter = 5'dx;
-	if(encode_left) encode_letter = _75;
+	if(encode_left) encode_letter = _77;
 end
 always_comb begin // combinatorial rev_encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	rev_encode_letter = 5'dx;
-	if(encode_right) rev_encode_letter = _81;
+	if(encode_right) rev_encode_letter = _83;
 end
 endmodule
 
@@ -656,62 +662,63 @@ module enigma_rotor_initial_position_0_ring_position_0_rotor_number_1(
 /*state*/ logic[4:0] rotor_position;
 /*mux_wire*/ logic[4:0] sub_array_left[25:0];
 /*mux_wire*/ logic[4:0] sub_array_right[25:0];
-wire[4:0] _26 = sub_array_left[0];
-wire[4:0] _27 = sub_array_left[1];
-wire[4:0] _28 = sub_array_left[2];
-wire[4:0] _29 = sub_array_left[3];
-wire[4:0] _30 = sub_array_left[4];
-wire[4:0] _31 = sub_array_left[5];
-wire[4:0] _32 = sub_array_left[6];
-wire[4:0] _33 = sub_array_left[7];
-wire[4:0] _34 = sub_array_left[8];
-wire[4:0] _35 = sub_array_left[9];
-wire[4:0] _36 = sub_array_left[10];
-wire[4:0] _37 = sub_array_left[11];
-wire[4:0] _38 = sub_array_left[12];
-wire[4:0] _39 = sub_array_left[13];
-wire[4:0] _40 = sub_array_left[14];
-wire[4:0] _41 = sub_array_left[15];
-wire[4:0] _42 = sub_array_left[16];
-wire[4:0] _43 = sub_array_left[17];
-wire[4:0] _44 = sub_array_left[18];
-wire[4:0] _45 = sub_array_left[19];
-wire[4:0] _46 = sub_array_left[20];
-wire[4:0] _47 = sub_array_left[21];
-wire[4:0] _48 = sub_array_left[22];
-wire[4:0] _49 = sub_array_left[23];
-wire[4:0] _50 = sub_array_left[24];
-wire _54;
-assign _54 = rotor_position == 5'd16;
-wire[4:0] _57;
-assign _57 = rotor_position + 1'd1;
+wire[4:0] _27 = sub_array_left[0];
+wire[4:0] _28 = sub_array_left[1];
+wire[4:0] _29 = sub_array_left[2];
+wire[4:0] _30 = sub_array_left[3];
+wire[4:0] _31 = sub_array_left[4];
+wire[4:0] _32 = sub_array_left[5];
+wire[4:0] _33 = sub_array_left[6];
+wire[4:0] _34 = sub_array_left[7];
+wire[4:0] _35 = sub_array_left[8];
+wire[4:0] _36 = sub_array_left[9];
+wire[4:0] _37 = sub_array_left[10];
+wire[4:0] _38 = sub_array_left[11];
+wire[4:0] _39 = sub_array_left[12];
+wire[4:0] _40 = sub_array_left[13];
+wire[4:0] _41 = sub_array_left[14];
+wire[4:0] _42 = sub_array_left[15];
+wire[4:0] _43 = sub_array_left[16];
+wire[4:0] _44 = sub_array_left[17];
+wire[4:0] _45 = sub_array_left[18];
+wire[4:0] _46 = sub_array_left[19];
+wire[4:0] _47 = sub_array_left[20];
+wire[4:0] _48 = sub_array_left[21];
+wire[4:0] _49 = sub_array_left[22];
+wire[4:0] _50 = sub_array_left[23];
+wire[4:0] _51 = sub_array_left[24];
+wire[4:0] _52 = sub_array_left[25];
+wire _56;
+assign _56 = rotor_position == 5'd16;
 wire[4:0] _59;
-assign _59 = (_57 == 26) ? 0 : _57; // == mod 26
-wire[4:0] _62;
-assign _62 = rotor_position + 1'd1;
+assign _59 = rotor_position + 1'd1;
+wire[4:0] _61;
+assign _61 = (_59 == 26) ? 0 : _59; // == mod 26
 wire[4:0] _64;
-assign _64 = (_62 == 26) ? 0 : _62; // == mod 26
-wire[4:0] _67;
-assign _67 = rotor_position + 1'd1;
+assign _64 = rotor_position + 1'd1;
+wire[4:0] _66;
+assign _66 = (_64 == 26) ? 0 : _64; // == mod 26
 wire[4:0] _69;
-assign _69 = (_67 == 26) ? 0 : _67; // == mod 26
-wire[5:0] _72;
-assign _72 = letter_index + rotor_position;
-wire[4:0] _74;
-assign _74 = _72 - ((_72 >= 26) ? 26 : 0); // == mod 26
-wire[4:0] _75 = sub_array_left[_74];
-wire[5:0] _78;
-assign _78 = rev_letter_index + rotor_position;
-wire[4:0] _80;
-assign _80 = _78 - ((_78 >= 26) ? 26 : 0); // == mod 26
-wire[4:0] _81 = sub_array_right[_80];
+assign _69 = rotor_position + 1'd1;
+wire[4:0] _71;
+assign _71 = (_69 == 26) ? 0 : _69; // == mod 26
+wire[5:0] _74;
+assign _74 = letter_index + rotor_position;
+wire[4:0] _76;
+assign _76 = _74 - ((_74 >= 26) ? 26 : 0); // == mod 26
+wire[4:0] _77 = sub_array_left[_76];
+wire[5:0] _80;
+assign _80 = rev_letter_index + rotor_position;
+wire[4:0] _82;
+assign _82 = _80 - ((_80 >= 26) ? 26 : 0); // == mod 26
+wire[4:0] _83 = sub_array_right[_82];
 always_ff @(posedge clk) begin // state rotor_position
 	rotor_position <= 1'd0;
 	if(reset) rotor_position <= 1'd0;
 	if(write_rotor) rotor_position <= write_value;
-	if(advance) if(_54) rotor_position <= _59;
-	if(advance) if(!_54) rotor_position <= _64;
-	if(turnover) rotor_position <= _69;
+	if(advance) if(_56) rotor_position <= _61;
+	if(advance) if(!_56) rotor_position <= _66;
+	if(turnover) rotor_position <= _71;
 end
 always_comb begin // combinatorial sub_array_left
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -741,53 +748,55 @@ always_comb begin // combinatorial sub_array_left
 	sub_array_left[22] = 1'd1;
 	sub_array_left[23] = 5'd17;
 	sub_array_left[24] = 2'd2;
+	sub_array_left[25] = 4'd9;
 end
 always_comb begin // combinatorial sub_array_right
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	sub_array_right = '{5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx};
-	sub_array_right[_26] = 1'd0;
-	sub_array_right[_27] = 1'd1;
-	sub_array_right[_28] = 2'd2;
-	sub_array_right[_29] = 2'd3;
-	sub_array_right[_30] = 3'd4;
-	sub_array_right[_31] = 3'd5;
-	sub_array_right[_32] = 3'd6;
-	sub_array_right[_33] = 3'd7;
-	sub_array_right[_34] = 4'd8;
-	sub_array_right[_35] = 4'd9;
-	sub_array_right[_36] = 4'd10;
-	sub_array_right[_37] = 4'd11;
-	sub_array_right[_38] = 4'd12;
-	sub_array_right[_39] = 4'd13;
-	sub_array_right[_40] = 4'd14;
-	sub_array_right[_41] = 4'd15;
-	sub_array_right[_42] = 5'd16;
-	sub_array_right[_43] = 5'd17;
-	sub_array_right[_44] = 5'd18;
-	sub_array_right[_45] = 5'd19;
-	sub_array_right[_46] = 5'd20;
-	sub_array_right[_47] = 5'd21;
-	sub_array_right[_48] = 5'd22;
-	sub_array_right[_49] = 5'd23;
-	sub_array_right[_50] = 5'd24;
+	sub_array_right[_27] = 1'd0;
+	sub_array_right[_28] = 1'd1;
+	sub_array_right[_29] = 2'd2;
+	sub_array_right[_30] = 2'd3;
+	sub_array_right[_31] = 3'd4;
+	sub_array_right[_32] = 3'd5;
+	sub_array_right[_33] = 3'd6;
+	sub_array_right[_34] = 3'd7;
+	sub_array_right[_35] = 4'd8;
+	sub_array_right[_36] = 4'd9;
+	sub_array_right[_37] = 4'd10;
+	sub_array_right[_38] = 4'd11;
+	sub_array_right[_39] = 4'd12;
+	sub_array_right[_40] = 4'd13;
+	sub_array_right[_41] = 4'd14;
+	sub_array_right[_42] = 4'd15;
+	sub_array_right[_43] = 5'd16;
+	sub_array_right[_44] = 5'd17;
+	sub_array_right[_45] = 5'd18;
+	sub_array_right[_46] = 5'd19;
+	sub_array_right[_47] = 5'd20;
+	sub_array_right[_48] = 5'd21;
+	sub_array_right[_49] = 5'd22;
+	sub_array_right[_50] = 5'd23;
+	sub_array_right[_51] = 5'd24;
+	sub_array_right[_52] = 5'd25;
 end
 always_comb begin // combinatorial advance_signal
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	advance_signal = 1'bx;
-	if(advance) if(_54) advance_signal = 1'b1;
-	if(advance) if(!_54) advance_signal = 1'b0;
+	if(advance) if(_56) advance_signal = 1'b1;
+	if(advance) if(!_56) advance_signal = 1'b0;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	advance_signal = advance_signal;
 end
 always_comb begin // combinatorial encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	encode_letter = 5'dx;
-	if(encode_left) encode_letter = _75;
+	if(encode_left) encode_letter = _77;
 end
 always_comb begin // combinatorial rev_encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	rev_encode_letter = 5'dx;
-	if(encode_right) rev_encode_letter = _81;
+	if(encode_right) rev_encode_letter = _83;
 end
 endmodule
 
