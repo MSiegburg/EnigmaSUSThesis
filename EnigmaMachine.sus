@@ -1,10 +1,16 @@
+module main{
+    input int#(FROM: 0,TO: 26) in_letter
+    output int#(FROM: 0,TO: 26) out_letter
+    enigma_machine#(rotors_used: [1,2,3],initial_plugboard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],rotor_settings: [0,0,0], ring_settings: [0,0,0]) test
+    out_letter=test.parse_letter(in_letter)
+}
+
 module enigma_machine#(int#(FROM: 0,TO: 6)[3]rotors_used, int#(FROM: 0,TO: 26)[26]initial_plugboard, int#(FROM: 0,TO: 26)[3] rotor_settings,
     int#(FROM: 0,TO: 26)[3] ring_settings){
     // input Rotors used 0-4 (Rotor I-V)
     // initial plugboard settings
     // rotor settings array 3 values int#(FROM: 0,TO: 26)
     // ring settings array of values int#(FROM: 0,TO: 26), 
-    state int#(FROM: 0,TO: 26) cur_letter       // state right choice for this ?
     state bool right_rotor_advance
     state bool middle_rotor_advance
     state bool left_rotor_advance               // not used but need to save advance signal for now
@@ -17,7 +23,7 @@ module enigma_machine#(int#(FROM: 0,TO: 6)[3]rotors_used, int#(FROM: 0,TO: 26)[2
     enigma_rotor#(initial_position: rotor_settings[2],ring_position: ring_settings[2],rotor_number: rotors_used[2]) rotor_left
 
     action parse_letter: int#(FROM: 0,TO: 26) input_letter -> int#(FROM: 0,TO: 26) encode_letter{
-        cur_letter=input_letter
+        //cur_letter=input_letter
 
         // execute advance checking for advance signal 
         // if rotor_right.advance==true
@@ -38,6 +44,7 @@ module enigma_machine#(int#(FROM: 0,TO: 6)[3]rotors_used, int#(FROM: 0,TO: 26)[2
         }
 
         // go through the encoding process via actions
+        /*
         cur_letter=plugboard_used.pass_letter(cur_letter)
         
         cur_letter=rotor_right.encode_left(cur_letter)
@@ -53,8 +60,14 @@ module enigma_machine#(int#(FROM: 0,TO: 6)[3]rotors_used, int#(FROM: 0,TO: 26)[2
         cur_letter=plugboard_used.pass_letter(cur_letter)
 
         encode_letter=cur_letter
+        */
+
+        encode_letter=plugboard_used.pass_letter(rotor_right.encode_right(rotor_middle.encode_right(rotor_left.encode_right(reflector(rotor_left.encode_left(rotor_middle.encode_left(rotor_right.encode_left(plugboard_used.pass_letter(input_letter)))))))))
     }
 }
+
+
+
 
 module enigma_rotor#(int initial_position, int ring_position, int rotor_number ){ // setup with inputs for compile time variables 
     // [E,K,M,F,L,G,D,Q,V,Z,N,T,O,W,Y,H,X,U,S,P,A,I,B,R,C,J] Rotor I of Enigma
@@ -77,8 +90,8 @@ module enigma_rotor#(int initial_position, int ring_position, int rotor_number )
     state int#(FROM: 0,TO: 26) rotor_position       // register to save rotor position
     gen int LEN = 25
     gen int[26] Temp_array
-    gen int[26] sub_array_left
-    gen int[26] sub_array_right
+    int[26] sub_array_left
+    int[26] sub_array_right
     gen int modified_turnover_position
     gen int turnover_position
 
@@ -122,7 +135,7 @@ module enigma_rotor#(int initial_position, int ring_position, int rotor_number )
     action reset{                                                                                           // reset action to set rotor to 0
         rotor_position=0
     }
-    action write_rotor: int#(FROM: 0,TO: 26) write_value -> int#(FROM: 0,TO: 26) new_rotor_position{        // write new value to rotor
+    action write_rotor: int#(FROM: 0,TO: 26) write_value{                                                   // write new value to rotor
         rotor_position=write_value
     }   
     action advance:-> bool advance_signal{                                                                  // advance signal checking for turnover 
@@ -157,7 +170,7 @@ module reflector{
 
 module plugboard#(int[26] plugboard_config){
     gen int LEN = 25
-    gen int[26] plugboard_settings
+    int[26] plugboard_settings
     // setting the plugboard to the given array | missing plugs will be set to themselves
     for int I in 0..LEN{
         plugboard_settings[I]=plugboard_config[I]
@@ -166,6 +179,8 @@ module plugboard#(int[26] plugboard_config){
             output_letter=plugboard_settings[input_letter]
     }
 }
+
+
 
 /* Deprecated initial idea for hardcoded rotors instead of instantiated ones
 /*module enigma_rotor_I{
