@@ -1,13 +1,45 @@
-module enigma_machine#(
-int#(FROM: 0,TO: 6)[3]rotors_used, int#(FROM: 0,TO: 26)[26]initial_plugboard, int#(FROM: 0,TO: 26)[3] rotor_settings,
-int#(FROM: 0,TO: 26)[3] ring_settings, int#(FROM: 0,TO: 26) message_letter){
+module enigma_machine#(int#(FROM: 0,TO: 6)[3]rotors_used, int#(FROM: 0,TO: 26)[26]initial_plugboard, int#(FROM: 0,TO: 26)[3] rotor_settings,
+    int#(FROM: 0,TO: 26)[3] ring_settings){
     // input Rotors used 0-4
     // initial plugboard settings
     // rotor settings array 3 values int#(FROM: 0,TO: 26)
     // ring settings array of values int#(FROM: 0,TO: 26), 
-    // input message    
-    // output message -> int#(FROM: 0,TO: 26)[] message_out
-    
+    state int#(FROM: 0,TO: 26) cur_letter       // state right choice for this ?
+
+    // instantiate plugboard
+    plugboard#(plugboard_config: initial_plugboard) plugboard_used
+    // instantiate rotors via enigma rotor module 
+    enigma_rotor#(initial_position: rotor_settings[0],ring_position: ring_settings[0],rotor_number: rotors_used[0]) rotor_right
+    enigma_rotor#(initial_position: rotor_settings[1],ring_position: ring_settings[1],rotor_number: rotors_used[1]) rotor_middle
+    enigma_rotor#(initial_position: rotor_settings[2],ring_position: ring_settings[2],rotor_number: rotors_used[2]) rotor_left
+
+    action parse_letter: int#(FROM: 0,TO: 26) input_letter -> int#(FROM: 0,TO: 26) encode_letter{
+        cur_letter=input_letter
+        // execute advance checking for advance signal 
+        // if rotor_right.advance==true
+        //
+        // execute turnover on advance signal 
+
+        // go through the encoding process via actions
+        cur_letter=plugboard_used.pass_letter(cur_letter)
+        
+        cur_letter=rotor_right.encode_left(cur_letter)
+        cur_letter=rotor_middle.encode_left(cur_letter)
+        cur_letter=rotor_left.encode_left(cur_letter)
+        
+        cur_letter=reflector(cur_letter)
+        
+        cur_letter=rotor_left.encode_right(cur_letter)
+        cur_letter=rotor_middle.encode_right(cur_letter)
+        cur_letter=rotor_right.encode_right(cur_letter)
+        
+        cur_letter=plugboard_used.pass_letter(cur_letter)
+
+        encode_letter=cur_letter
+    }
+}
+
+module enigma_rotor#(int initial_position, int ring_position, int rotor_number ){ // setup with inputs for compile time variables 
     // [E,K,M,F,L,G,D,Q,V,Z,N,T,O,W,Y,H,X,U,S,P,A,I,B,R,C,J] Rotor I of Enigma
     gen int[26] rotor_one = [4,10,12,5,11,6,3,16,21,25,13,19,14,22,24,7,23,20,18,15,0,8,1,17,2,9]
     gen int turnover_position_one = 16          // fixed turnover position for Rotor I turnover at Q -> R
@@ -24,96 +56,51 @@ int#(FROM: 0,TO: 26)[3] ring_settings, int#(FROM: 0,TO: 26) message_letter){
     gen int[26] rotor_five = [21,25,1,17,6,8,19,24,20,15,18,3,13,7,11,23,0,22,12,9,16,14,5,4,2,10]
     gen int turnover_position_five = 25         // fixed turnover position for Rotor IV turnover at Z -> A
 
-    state int#(FROM: 0,TO: 26) cur_letter       // state or gen int ?
-    cur_letter=message_letter
 
-    // instantiate plugboard
-    plugboard#(plugboard_config: initial_plugboard) plugboard_used
-
-    // instantiate rotors via enigma rotor module | cant use for becasue we need to name them individually ?
-
-
-    if rotors_used[1]==1{
-        enigma_rotor#(wire_assign: rotor_one,turnover_position: turnover_position_one,initial_position: rotor_settings[1],ring_position: ring_settings[1]) rotor_right
-    }else if rotors_used[1]==2{
-        enigma_rotor#(wire_assign: rotor_two,turnover_position: turnover_position_two,initial_position: rotor_settings[1],ring_position: ring_settings[1]) rotor_right
-    }else if rotors_used[1]==3{
-        enigma_rotor#(wire_assign: rotor_three,turnover_position: turnover_position_three,initial_position: rotor_settings[1],ring_position: ring_settings[1]) rotor_right
-    }else if rotors_used[1]==4{
-        enigma_rotor#(wire_assign: rotor_four,turnover_position: turnover_position_four,initial_position: rotor_settings[1],ring_position: ring_settings[1]) rotor_right
-    }else if rotors_used[1]==5{
-        enigma_rotor#(wire_assign: rotor_five,turnover_position: turnover_position_five,initial_position: rotor_settings[1],ring_position: ring_settings[1]) rotor_right
-    }
-
-    if rotors_used[2]==1{
-        enigma_rotor#(wire_assign: rotor_one,turnover_position: turnover_position_one,initial_position: rotor_settings[2],ring_position: ring_settings[2]) rotor_middle
-    }else if rotors_used[2]==2{
-        enigma_rotor#(wire_assign: rotor_two,turnover_position: turnover_position_two,initial_position: rotor_settings[2],ring_position: ring_settings[2]) rotor_middle
-    }else if rotors_used[2]==3{
-        enigma_rotor#(wire_assign: rotor_three,turnover_position: turnover_position_three,initial_position: rotor_settings[2],ring_position: ring_settings[2]) rotor_middle
-    }else if rotors_used[2]==4{
-        enigma_rotor#(wire_assign: rotor_four,turnover_position: turnover_position_four,initial_position: rotor_settings[2],ring_position: ring_settings[2]) rotor_middle
-    }else if rotors_used[2]==5{
-        enigma_rotor#(wire_assign: rotor_five,turnover_position: turnover_position_five,initial_position: rotor_settings[2],ring_position: ring_settings[2]) rotor_middle
-    }
-
-    if rotors_used[3]==1{
-        enigma_rotor#(wire_assign: rotor_one,turnover_position: turnover_position_one,initial_position: rotor_settings[3],ring_position: ring_settings[3]) rotor_left
-    }else if rotors_used[3]==2{
-        enigma_rotor#(wire_assign: rotor_two,turnover_position: turnover_position_two,initial_position: rotor_settings[3],ring_position: ring_settings[3]) rotor_left
-    }else if rotors_used[3]==3{
-        enigma_rotor#(wire_assign: rotor_three,turnover_position: turnover_position_three,initial_position: rotor_settings[3],ring_position: ring_settings[3]) rotor_left
-    }else if rotors_used[3]==4{
-        enigma_rotor#(wire_assign: rotor_four,turnover_position: turnover_position_four,initial_position: rotor_settings[3],ring_position: ring_settings[3]) rotor_left
-    }else if rotors_used[3]==5{
-        enigma_rotor#(wire_assign: rotor_five,turnover_position: turnover_position_five,initial_position: rotor_settings[3],ring_position: ring_settings[3]) rotor_left
-    }
-
-
-        
-    // execute advance checking for advance signal 
-    // if rotor_right.advance==true
-    //
-    // execute turnover on advance signal 
-
-
-    // go through the encoding process via actions
-    cur_letter=plugboard_used.pass_letter(cur_letter)
-    /*
-    rotor_right.encode_left(cur_letter)
-    rotor_middle.encode_left(cur_letter)
-    rotor_left.encode_left(cur_letter)
-    
-    cur_letter=reflector(cur_letter)
-    /*
-    rotor_left.encode_right(cur_letter)
-    rotor_middle.encode_right(cur_letter)
-    rotor_right.encode_right(cur_letter)
-    */
-    cur_letter=plugboard_used.pass_letter(cur_letter)
-
-
-    // save result in output
-}
-
-module enigma_rotor#(int[26] wire_assign, int turnover_position, int initial_position, int ring_position ){ // setup with inputs for compile time variables 
     state int#(FROM: 0,TO: 26) rotor_position       // register to save rotor position
     gen int LEN = 25
+    gen int[26] Temp_array
     gen int[26] sub_array_left
     gen int[26] sub_array_right
     gen int modified_turnover_position
+    gen int turnover_position
+
+    // instantiate the rotor with the given position and ring setting as well as assigning the correct arrays for the given rotor number
+
+    if rotor_number==1{
+        Temp_array=rotor_one
+        turnover_position=turnover_position_one
+    }
+    if rotor_number==2{
+        Temp_array=rotor_two
+        turnover_position=turnover_position_two
+    }
+    if rotor_number==3{
+        Temp_array=rotor_three
+        turnover_position=turnover_position_three
+    }
+    if rotor_number==4{
+        Temp_array=rotor_four
+        turnover_position=turnover_position_four
+    }
+    if rotor_number==5{
+        Temp_array=rotor_five
+        turnover_position=turnover_position_five
+    }
 
     rotor_position=initial_position                 // setup rotor
 
     modified_turnover_position=(turnover_position+ring_position) mod 26
     
     for int I in 0..LEN{
-        sub_array_left[I]=wire_assign[I]+ring_position        
+        sub_array_left[I]=Temp_array[I]+ring_position        
     }
     for int I in 0..LEN{
         sub_array_right[sub_array_left[I]]=I
     }
+
     // setup for both arrays is done here
+
 
     action reset{                                                                                           // reset action to set rotor to 0
         rotor_position=0
