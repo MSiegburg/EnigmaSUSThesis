@@ -88,7 +88,7 @@ module enigma_rotor#(int initial_position, int ring_position, int rotor_number )
 
 
     state int#(FROM: 0,TO: 26) rotor_position       // register to save rotor position
-    gen int LEN = 25
+    gen int LEN = 26
     gen int[26] Temp_array
     int[26] sub_array_left
     int[26] sub_array_right
