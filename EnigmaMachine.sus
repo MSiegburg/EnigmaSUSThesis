@@ -1,10 +1,13 @@
 module enigma_machine#(int#(FROM: 0,TO: 6)[3]rotors_used, int#(FROM: 0,TO: 26)[26]initial_plugboard, int#(FROM: 0,TO: 26)[3] rotor_settings,
     int#(FROM: 0,TO: 26)[3] ring_settings){
-    // input Rotors used 0-4
+    // input Rotors used 0-4 (Rotor I-V)
     // initial plugboard settings
     // rotor settings array 3 values int#(FROM: 0,TO: 26)
     // ring settings array of values int#(FROM: 0,TO: 26), 
     state int#(FROM: 0,TO: 26) cur_letter       // state right choice for this ?
+    state bool right_rotor_advance
+    state bool middle_rotor_advance
+    state bool left_rotor_advance               // not used but need to save advance signal for now
 
     // instantiate plugboard
     plugboard#(plugboard_config: initial_plugboard) plugboard_used
@@ -15,10 +18,24 @@ module enigma_machine#(int#(FROM: 0,TO: 6)[3]rotors_used, int#(FROM: 0,TO: 26)[2
 
     action parse_letter: int#(FROM: 0,TO: 26) input_letter -> int#(FROM: 0,TO: 26) encode_letter{
         cur_letter=input_letter
+
         // execute advance checking for advance signal 
         // if rotor_right.advance==true
-        //
-        // execute turnover on advance signal 
+        // execute turnover on next rotor in line 
+
+        rotor_right.turnover()
+        right_rotor_advance=rotor_right.advance()
+        when right_rotor_advance{                               // check if middle rotor needs to advance
+            rotor_middle.turnover()
+            middle_rotor_advance=rotor_middle.advance()
+            when middle_rotor_advance{                          // check if left rotor needs to advance
+                rotor_left.turnover()
+                left_rotor_advance=rotor_left.advance()
+            }
+        }else when middle_rotor_advance{                        // double stepping
+            rotor_middle.turnover()
+            middle_rotor_advance=false
+        }
 
         // go through the encoding process via actions
         cur_letter=plugboard_used.pass_letter(cur_letter)
