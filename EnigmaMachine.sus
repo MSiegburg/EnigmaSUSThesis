@@ -1,3 +1,173 @@
+
+module enigma_machine_runtime{
+    state int#(FROM: 0,TO: 5) left_rotor_used
+    state int#(FROM: 0,TO: 5) middle_rotor_used
+    state int#(FROM: 0,TO: 5) right_rotor_used 
+
+    bool right_rotor_advance
+    bool middle_rotor_advance
+    bool left_rotor_advance 
+
+    int#(FROM: 0,TO: 26) plugboard1
+    int#(FROM: 0,TO: 26) rrotor1
+    int#(FROM: 0,TO: 26) mrotor1
+    int#(FROM: 0,TO: 26) lrotor1
+    int#(FROM: 0,TO: 26) reflectout
+    int#(FROM: 0,TO: 26) lrotor2
+    int#(FROM: 0,TO: 26) mrotor2
+    int#(FROM: 0,TO: 26) rrotor2
+    int#(FROM: 0,TO: 26) plugboard2
+
+    enigma_rotor_runtime right_rotor_inst
+    enigma_rotor_runtime middle_rotor_inst
+    enigma_rotor_runtime left_rotor_inst
+
+    reflector reflector_inst
+
+    plugboard#(plugboard_config:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]) plugboard_inst
+
+
+    action setup:int#(FROM: 0,TO: 5)[3] rotor_setup, int#(FROM: 0,TO: 26)[3] rotor_positions,int#(FROM: 0,TO: 26)[3] ring_positions{    // setup of states in rotors with input variables
+        right_rotor_used=rotor_setup[0]
+        middle_rotor_used=rotor_setup[1]
+        left_rotor_used=rotor_setup[2]
+
+        right_rotor_inst.setup(rotor_setup[0], rotor_positions[0], ring_positions[0])
+        middle_rotor_inst.setup(rotor_setup[1], rotor_positions[1], ring_positions[1])
+        left_rotor_inst.setup(rotor_setup[2], rotor_positions[2], ring_positions[2])
+    }
+
+    action change_plugs:int#(FROM: 0,TO: 26)[2]plug_pair{       // change plugs in plugboard one pair at a time
+        plugboard_inst.set_plug(plug_pair[0], plug_pair[1])
+    }
+
+    action prep_message_encode{
+        right_rotor_inst.turnover()
+        right_rotor_advance=right_rotor_inst.advance()
+        when right_rotor_advance{                               // check if middle rotor needs to advance
+            middle_rotor_inst.turnover()
+            middle_rotor_advance=middle_rotor_inst.advance()
+            when middle_rotor_advance{                          // check if left rotor needs to advance
+                left_rotor_inst.turnover()
+                left_rotor_advance=left_rotor_inst.advance()
+            }
+        }else when middle_rotor_advance{                        // double stepping
+            middle_rotor_inst.turnover()
+            middle_rotor_advance=false
+        }
+    }
+
+    action parse_letter:int#(FROM: 0,TO: 26) input_letter -> int#(FROM: 0,TO: 26) encode_letter{
+        right_rotor_inst.turnover()
+        right_rotor_advance=right_rotor_inst.advance()
+        when right_rotor_advance{                               // check if middle rotor needs to advance
+            middle_rotor_inst.turnover()
+            middle_rotor_advance=middle_rotor_inst.advance()
+            when middle_rotor_advance{                          // check if left rotor needs to advance
+                left_rotor_inst.turnover()
+                left_rotor_advance=left_rotor_inst.advance()
+            }
+        }else when middle_rotor_advance{                        // double stepping
+            middle_rotor_inst.turnover()
+            middle_rotor_advance=false
+        }
+
+        // go through the encoding process via actions
+        plugboard1=plugboard_inst.pass_letter(input_letter)
+        rrotor1=right_rotor_inst.encode_left(plugboard1)
+        mrotor1=middle_rotor_inst.encode_left(rrotor1)
+        lrotor1=left_rotor_inst.encode_left(mrotor1)
+        reflectout=reflector_inst(lrotor1)
+        lrotor2=left_rotor_inst.encode_right(reflectout)
+        mrotor2=middle_rotor_inst.encode_right(lrotor2)
+        rrotor2=right_rotor_inst.encode_right(mrotor2)
+        plugboard2=plugboard_inst.pass_letter(rrotor2)
+        encode_letter=plugboard2
+    }
+    action cur_settings:->int#(FROM: 0,TO: 5)[3] cur_rotors{
+        cur_rotors[0]=right_rotor_used
+        cur_rotors[1]=middle_rotor_used
+        cur_rotors[2]=left_rotor_used
+    }
+}
+
+
+module enigma_rotor_runtime#(){
+    state int#(FROM: 0,TO: 5) rotor_in_use
+    gen int#(FROM: 0,TO: 26)[26][10] rotors
+    rotors[0][:] = [4,10,12,5,11,6,3,16,21,25,13,19,14,22,24,7,23,20,18,15,0,8,1,17,2,9]
+    rotors[1][:] = [0,9,3,10,18,8,17,20,23,1,11,7,22,19,12,2,16,6,25,13,15,24,5,21,14,4]
+    rotors[2][:] = [1,3,5,7,9,11,2,15,17,19,23,21,25,13,24,4,8,22,6,0,10,12,20,18,16,14]
+    rotors[3][:] = [4,18,14,21,15,25,9,0,24,16,20,8,17,7,23,11,13,5,19,6,10,3,2,12,22,1]
+    rotors[4][:] = [21,25,1,17,6,8,19,24,20,15,18,3,13,7,11,23,0,22,12,9,16,14,5,4,2,10]
+
+    for int I in 0..5{
+        for int J in 0..26{
+            rotors[I+5][rotors[I][J]]=J
+        }
+    }
+    gen int#(FROM: 0,TO: 26)[5] turnover_positions =[16,4,21,9,25]
+    state int#(FROM: 0,TO: 26) ring_position
+    state int#(FROM: 0,TO: 26) rotor_position
+
+    /*
+    action reset{                                                                                           // reset action to set rotor to 0
+        rotor_position=0
+    }
+    action write_rotor: int#(FROM: 0,TO: 26) write_value{                                                  // write new value to rotor
+        rotor_position=write_value
+    }
+    */
+    action turnover{                                                                                        // initiate a turnover of the rotor
+        rotor_position=(rotor_position+1)mod 26
+    }
+    action setup:int#(FROM: 0,TO: 5)rotor_to_use, int#(FROM: 0,TO: 26)rotor_starting_position,int#(FROM: 0,TO: 26)ring_position_in_use{     // setup the registers in a given rotor
+        rotor_in_use=rotor_to_use
+        rotor_position=rotor_starting_position
+        ring_position=ring_position_in_use
+    }
+    action advance:-> bool advance_signal{                                                                  // advance signal checking for turnover 
+        when (rotor_position==(turnover_positions[rotor_in_use]+ring_position)mod 26){
+            rotor_position=(rotor_position+1)mod 26
+            advance_signal=true
+        } else {
+            rotor_position=(rotor_position+1)mod 26
+            advance_signal=false
+        }
+    }
+    action encode_left: int#(FROM: 0,TO: 26) letter_index -> int#(FROM: 0,TO: 26) encode_letter{            // encode letter adding offset to value of ring position
+        encode_letter=rotors[rotor_in_use][(letter_index+rotor_position)mod 26]+ring_position mod 26
+    }
+    action encode_right: int#(FROM: 0,TO: 26) rev_letter_index -> int#(FROM: 0,TO: 26) rev_encode_letter{   // encode letter adding offset to index of ring position
+        rev_encode_letter=rotors[rotor_in_use+5][(rev_letter_index+rotor_position+ring_position)mod 26]    
+    }
+}
+
+module reflector{
+    action reflector : int#(FROM: 0,TO: 26) input_letter -> int#(FROM: 0,TO: 26) output_letter {
+        // (AY) (BR) (CU) (DH) (EQ) (FS) (GL) (IP) (JX) (KN) (MO) (TZ) (VW) Reflector B 
+        gen int[26] reflector_table = [24, 17, 20, 7, 16, 18, 11, 3, 15, 23, 13, 6, 14, 10, 12, 8, 4, 1, 5, 25, 2, 22, 21, 9, 0, 19]
+        output_letter=reflector_table[input_letter]
+    }
+}
+
+module plugboard#(int[26] plugboard_config){
+    gen int LEN = 26
+    int[26] plugboard_settings
+    // setting the plugboard to the given array | missing plugs will be set to themselves
+    for int I in 0..LEN{
+        plugboard_settings[I]=plugboard_config[I]
+    }
+    action set_plug:int#(FROM: 0,TO: 26) plug_one, int#(FROM: 0,TO: 26) plug_two{
+        plugboard_settings[plug_one]=plug_two
+        plugboard_settings[plug_two]=plug_one
+    }
+
+    action pass_letter: int#(FROM: 0,TO: 26) input_letter -> int#(FROM: 0,TO: 26) output_letter{
+            output_letter=plugboard_settings[input_letter]
+    }
+}
+
 module main{
     input int#(FROM: 0,TO: 26) in_letter
     output int#(FROM: 0,TO: 26) out_letter
@@ -11,9 +181,9 @@ module enigma_machine#(int#(FROM: 0,TO: 6)[3]rotors_used, int#(FROM: 0,TO: 26)[2
     // initial plugboard settings
     // rotor settings array 3 values int#(FROM: 0,TO: 26)
     // ring settings array of values int#(FROM: 0,TO: 26), 
-    state bool right_rotor_advance
-    state bool middle_rotor_advance
-    state bool left_rotor_advance               // not used but need to save advance signal for now
+    bool right_rotor_advance
+    bool middle_rotor_advance
+    bool left_rotor_advance               // not used but need to save advance signal for now
 
     // instantiate plugboard
     plugboard#(plugboard_config: initial_plugboard) plugboard_used
@@ -65,10 +235,6 @@ module enigma_machine#(int#(FROM: 0,TO: 6)[3]rotors_used, int#(FROM: 0,TO: 26)[2
         encode_letter=plugboard_used.pass_letter(rotor_right.encode_right(rotor_middle.encode_right(rotor_left.encode_right(reflector(rotor_left.encode_left(rotor_middle.encode_left(rotor_right.encode_left(plugboard_used.pass_letter(input_letter)))))))))
     }
 }
-
-
-
-
 module enigma_rotor#(int initial_position, int ring_position, int rotor_number ){ // setup with inputs for compile time variables 
     // [E,K,M,F,L,G,D,Q,V,Z,N,T,O,W,Y,H,X,U,S,P,A,I,B,R,C,J] Rotor I of Enigma
     gen int[26] rotor_one = [4,10,12,5,11,6,3,16,21,25,13,19,14,22,24,7,23,20,18,15,0,8,1,17,2,9]
@@ -131,13 +297,14 @@ module enigma_rotor#(int initial_position, int ring_position, int rotor_number )
 
     // setup for both arrays is done here
 
-
+/*
     action reset{                                                                                           // reset action to set rotor to 0
         rotor_position=0
     }
     action write_rotor: int#(FROM: 0,TO: 26) write_value{                                                   // write new value to rotor
         rotor_position=write_value
     }   
+    */
     action advance:-> bool advance_signal{                                                                  // advance signal checking for turnover 
         when (rotor_position==modified_turnover_position){
             rotor_position=(rotor_position+1)mod 26
@@ -155,30 +322,28 @@ module enigma_rotor#(int initial_position, int ring_position, int rotor_number )
     }
     action encode_right: int#(FROM: 0,TO: 26) rev_letter_index -> int#(FROM: 0,TO: 26) rev_encode_letter{
         rev_encode_letter=sub_array_right[(rev_letter_index+rotor_position)mod 26]
-    }
+    }        /*
+        cur_letter=plugboard_used.pass_letter(cur_letter)
+        
+        
+        cur_letter=rotor_right.encode_left(cur_letter)
+        cur_letter=rotor_middle.encode_left(cur_letter)
+        cur_letter=rotor_left.encode_left(cur_letter)
+        
+        cur_letter=reflector(cur_letter)
+        
+        cur_letter=rotor_left.encode_right(cur_letter)
+        cur_letter=rotor_middle.encode_right(cur_letter)
+        cur_letter=rotor_right.encode_right(cur_letter)
+        
+        cur_letter=plugboard_used.pass_letter(cur_letter)
+
+        encode_letter=cur_letter
+        */
 
 }
 
-// int new_char = reflector(old_char)
-module reflector{
-    action reflector : int#(FROM: 0,TO: 26) input_letter -> int#(FROM: 0,TO: 26) output_letter {
-        // (AY) (BR) (CU) (DH) (EQ) (FS) (GL) (IP) (JX) (KN) (MO) (TZ) (VW) Reflector B 
-        gen int[26] reflector_table = [24, 17, 20, 7, 16, 18, 11, 3, 15, 23, 13, 6, 14, 10, 12, 8, 4, 1, 5, 25, 2, 22, 21, 9, 0, 19]
-        output_letter=reflector_table[input_letter]
-    }
-}
 
-module plugboard#(int[26] plugboard_config){
-    gen int LEN = 26
-    int[26] plugboard_settings
-    // setting the plugboard to the given array | missing plugs will be set to themselves
-    for int I in 0..LEN{
-        plugboard_settings[I]=plugboard_config[I]
-    }
-    action pass_letter: int#(FROM: 0,TO: 26) input_letter -> int#(FROM: 0,TO: 26) output_letter{
-            output_letter=plugboard_settings[input_letter]
-    }
-}
 
 
 
