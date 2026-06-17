@@ -1,4 +1,4 @@
-// THIS IS A GENERATED FILE (Generated at 2026-06-05T15:40:45+02:00)
+// THIS IS A GENERATED FILE (Generated at 2026-06-17T09:52:13+02:00)
 // This file was generated with SUS Compiler 0.3.10
 // main #()
 module main(
@@ -44,9 +44,9 @@ module enigma_machine_rotors_used_1_2_3_initial_plugboard_0_1_2_3_4_5_6_7_8_9_10
 	output /*mux_wire*/ logic[4:0] encode_letter
 );
 
-/*state*/ logic right_rotor_advance;
-/*state*/ logic middle_rotor_advance;
-/*state*/ logic left_rotor_advance;
+/*mux_wire*/ logic right_rotor_advance;
+/*mux_wire*/ logic middle_rotor_advance;
+/*mux_wire*/ logic left_rotor_advance;
 /*mux_wire*/ logic _rotor_right_turnover;
 /*mux_wire*/ logic _rotor_right_advance;
 wire _rotor_right_advance_signal;
@@ -82,15 +82,15 @@ wire[4:0] _rotor_middle_rev_encode_letter;
 wire[4:0] _rotor_right_rev_encode_letter;
 plugboard_plugboard_config_0_1_2_3_4_5_6_7_8_9_10_11_12_13_14_15_16_17_18_19_20_21_22_23_24_25 plugboard_used(
 	.clk(clk),
+	.set_plug(),
+	.plug_one(),
+	.plug_two(),
 	.pass_letter(_plugboard_used_pass_letter),
 	.input_letter(_plugboard_used_input_letter),
 	.output_letter(_plugboard_used_output_letter)
 );
 enigma_rotor_initial_position_0_ring_position_0_rotor_number_1 rotor_right(
 	.clk(clk),
-	.reset(),
-	.write_rotor(),
-	.write_value(),
 	.advance(_rotor_right_advance),
 	.advance_signal(_rotor_right_advance_signal),
 	.turnover(_rotor_right_turnover),
@@ -103,9 +103,6 @@ enigma_rotor_initial_position_0_ring_position_0_rotor_number_1 rotor_right(
 );
 enigma_rotor_initial_position_0_ring_position_0_rotor_number_2 rotor_middle(
 	.clk(clk),
-	.reset(),
-	.write_rotor(),
-	.write_value(),
 	.advance(_rotor_middle_advance),
 	.advance_signal(_rotor_middle_advance_signal),
 	.turnover(_rotor_middle_turnover),
@@ -118,9 +115,6 @@ enigma_rotor_initial_position_0_ring_position_0_rotor_number_2 rotor_middle(
 );
 enigma_rotor_initial_position_0_ring_position_0_rotor_number_3 rotor_left(
 	.clk(clk),
-	.reset(),
-	.write_rotor(),
-	.write_value(),
 	.advance(_rotor_left_advance),
 	.advance_signal(_rotor_left_advance_signal),
 	.turnover(_rotor_left_turnover),
@@ -137,15 +131,27 @@ reflector reflector(
 	.input_letter(_reflector_input_letter),
 	.output_letter(_reflector_output_letter)
 );
-always_ff @(posedge clk) begin // state right_rotor_advance
-	if(parse_letter) right_rotor_advance <= _rotor_right_advance_signal;
+always_comb begin // combinatorial right_rotor_advance
+	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
+	right_rotor_advance = 1'bx;
+	if(parse_letter) right_rotor_advance = _rotor_right_advance_signal;
+	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
+	right_rotor_advance = right_rotor_advance;
 end
-always_ff @(posedge clk) begin // state middle_rotor_advance
-	if(parse_letter) if(right_rotor_advance) middle_rotor_advance <= _rotor_middle_advance_signal;
-	if(parse_letter) if(!right_rotor_advance) if(middle_rotor_advance) middle_rotor_advance <= 1'b0;
+always_comb begin // combinatorial middle_rotor_advance
+	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
+	middle_rotor_advance = 1'bx;
+	if(parse_letter) if(right_rotor_advance) middle_rotor_advance = _rotor_middle_advance_signal;
+	if(parse_letter) if(!right_rotor_advance) if(middle_rotor_advance) middle_rotor_advance = 1'b0;
+	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
+	middle_rotor_advance = middle_rotor_advance;
 end
-always_ff @(posedge clk) begin // state left_rotor_advance
-	if(parse_letter) if(right_rotor_advance) if(middle_rotor_advance) left_rotor_advance <= _rotor_left_advance_signal;
+always_comb begin // combinatorial left_rotor_advance
+	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
+	left_rotor_advance = 1'bx;
+	if(parse_letter) if(right_rotor_advance) if(middle_rotor_advance) left_rotor_advance = _rotor_left_advance_signal;
+	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
+	left_rotor_advance = left_rotor_advance;
 end
 always_comb begin // combinatorial encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -329,9 +335,6 @@ endmodule
 // enigma_rotor #(initial_position: 0, ring_position: 0, rotor_number: 3)
 module enigma_rotor_initial_position_0_ring_position_0_rotor_number_3(
 	input clk,
-	input wire reset,
-	input wire write_rotor,
-	input wire[4:0] write_value,
 	input wire advance,
 	output /*mux_wire*/ logic advance_signal,
 	input wire turnover,
@@ -372,37 +375,35 @@ wire[4:0] _49 = sub_array_left[22];
 wire[4:0] _50 = sub_array_left[23];
 wire[4:0] _51 = sub_array_left[24];
 wire[4:0] _52 = sub_array_left[25];
-wire _56;
-assign _56 = rotor_position == 5'd21;
+wire _54;
+assign _54 = rotor_position == 5'd21;
+wire[4:0] _57;
+assign _57 = rotor_position + 1'd1;
 wire[4:0] _59;
-assign _59 = rotor_position + 1'd1;
-wire[4:0] _61;
-assign _61 = (_59 == 26) ? 0 : _59; // == mod 26
+assign _59 = (_57 == 26) ? 0 : _57; // == mod 26
+wire[4:0] _62;
+assign _62 = rotor_position + 1'd1;
 wire[4:0] _64;
-assign _64 = rotor_position + 1'd1;
-wire[4:0] _66;
-assign _66 = (_64 == 26) ? 0 : _64; // == mod 26
+assign _64 = (_62 == 26) ? 0 : _62; // == mod 26
+wire[4:0] _67;
+assign _67 = rotor_position + 1'd1;
 wire[4:0] _69;
-assign _69 = rotor_position + 1'd1;
-wire[4:0] _71;
-assign _71 = (_69 == 26) ? 0 : _69; // == mod 26
-wire[5:0] _74;
-assign _74 = letter_index + rotor_position;
-wire[4:0] _76;
-assign _76 = _74 - ((_74 >= 26) ? 26 : 0); // == mod 26
-wire[4:0] _77 = sub_array_left[_76];
-wire[5:0] _80;
-assign _80 = rev_letter_index + rotor_position;
-wire[4:0] _82;
-assign _82 = _80 - ((_80 >= 26) ? 26 : 0); // == mod 26
-wire[4:0] _83 = sub_array_right[_82];
+assign _69 = (_67 == 26) ? 0 : _67; // == mod 26
+wire[5:0] _72;
+assign _72 = letter_index + rotor_position;
+wire[4:0] _74;
+assign _74 = _72 - ((_72 >= 26) ? 26 : 0); // == mod 26
+wire[4:0] _75 = sub_array_left[_74];
+wire[5:0] _78;
+assign _78 = rev_letter_index + rotor_position;
+wire[4:0] _80;
+assign _80 = _78 - ((_78 >= 26) ? 26 : 0); // == mod 26
+wire[4:0] _81 = sub_array_right[_80];
 always_ff @(posedge clk) begin // state rotor_position
 	rotor_position <= 1'd0;
-	if(reset) rotor_position <= 1'd0;
-	if(write_rotor) rotor_position <= write_value;
-	if(advance) if(_56) rotor_position <= _61;
-	if(advance) if(!_56) rotor_position <= _66;
-	if(turnover) rotor_position <= _71;
+	if(advance) if(_54) rotor_position <= _59;
+	if(advance) if(!_54) rotor_position <= _64;
+	if(turnover) rotor_position <= _69;
 end
 always_comb begin // combinatorial sub_array_left
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -467,29 +468,26 @@ end
 always_comb begin // combinatorial advance_signal
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	advance_signal = 1'bx;
-	if(advance) if(_56) advance_signal = 1'b1;
-	if(advance) if(!_56) advance_signal = 1'b0;
+	if(advance) if(_54) advance_signal = 1'b1;
+	if(advance) if(!_54) advance_signal = 1'b0;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	advance_signal = advance_signal;
 end
 always_comb begin // combinatorial encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	encode_letter = 5'dx;
-	if(encode_left) encode_letter = _77;
+	if(encode_left) encode_letter = _75;
 end
 always_comb begin // combinatorial rev_encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	rev_encode_letter = 5'dx;
-	if(encode_right) rev_encode_letter = _83;
+	if(encode_right) rev_encode_letter = _81;
 end
 endmodule
 
 // enigma_rotor #(initial_position: 0, ring_position: 0, rotor_number: 2)
 module enigma_rotor_initial_position_0_ring_position_0_rotor_number_2(
 	input clk,
-	input wire reset,
-	input wire write_rotor,
-	input wire[4:0] write_value,
 	input wire advance,
 	output /*mux_wire*/ logic advance_signal,
 	input wire turnover,
@@ -530,37 +528,35 @@ wire[4:0] _49 = sub_array_left[22];
 wire[4:0] _50 = sub_array_left[23];
 wire[4:0] _51 = sub_array_left[24];
 wire[4:0] _52 = sub_array_left[25];
-wire _56;
-assign _56 = rotor_position == 3'd4;
+wire _54;
+assign _54 = rotor_position == 3'd4;
+wire[4:0] _57;
+assign _57 = rotor_position + 1'd1;
 wire[4:0] _59;
-assign _59 = rotor_position + 1'd1;
-wire[4:0] _61;
-assign _61 = (_59 == 26) ? 0 : _59; // == mod 26
+assign _59 = (_57 == 26) ? 0 : _57; // == mod 26
+wire[4:0] _62;
+assign _62 = rotor_position + 1'd1;
 wire[4:0] _64;
-assign _64 = rotor_position + 1'd1;
-wire[4:0] _66;
-assign _66 = (_64 == 26) ? 0 : _64; // == mod 26
+assign _64 = (_62 == 26) ? 0 : _62; // == mod 26
+wire[4:0] _67;
+assign _67 = rotor_position + 1'd1;
 wire[4:0] _69;
-assign _69 = rotor_position + 1'd1;
-wire[4:0] _71;
-assign _71 = (_69 == 26) ? 0 : _69; // == mod 26
-wire[5:0] _74;
-assign _74 = letter_index + rotor_position;
-wire[4:0] _76;
-assign _76 = _74 - ((_74 >= 26) ? 26 : 0); // == mod 26
-wire[4:0] _77 = sub_array_left[_76];
-wire[5:0] _80;
-assign _80 = rev_letter_index + rotor_position;
-wire[4:0] _82;
-assign _82 = _80 - ((_80 >= 26) ? 26 : 0); // == mod 26
-wire[4:0] _83 = sub_array_right[_82];
+assign _69 = (_67 == 26) ? 0 : _67; // == mod 26
+wire[5:0] _72;
+assign _72 = letter_index + rotor_position;
+wire[4:0] _74;
+assign _74 = _72 - ((_72 >= 26) ? 26 : 0); // == mod 26
+wire[4:0] _75 = sub_array_left[_74];
+wire[5:0] _78;
+assign _78 = rev_letter_index + rotor_position;
+wire[4:0] _80;
+assign _80 = _78 - ((_78 >= 26) ? 26 : 0); // == mod 26
+wire[4:0] _81 = sub_array_right[_80];
 always_ff @(posedge clk) begin // state rotor_position
 	rotor_position <= 1'd0;
-	if(reset) rotor_position <= 1'd0;
-	if(write_rotor) rotor_position <= write_value;
-	if(advance) if(_56) rotor_position <= _61;
-	if(advance) if(!_56) rotor_position <= _66;
-	if(turnover) rotor_position <= _71;
+	if(advance) if(_54) rotor_position <= _59;
+	if(advance) if(!_54) rotor_position <= _64;
+	if(turnover) rotor_position <= _69;
 end
 always_comb begin // combinatorial sub_array_left
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -625,29 +621,26 @@ end
 always_comb begin // combinatorial advance_signal
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	advance_signal = 1'bx;
-	if(advance) if(_56) advance_signal = 1'b1;
-	if(advance) if(!_56) advance_signal = 1'b0;
+	if(advance) if(_54) advance_signal = 1'b1;
+	if(advance) if(!_54) advance_signal = 1'b0;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	advance_signal = advance_signal;
 end
 always_comb begin // combinatorial encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	encode_letter = 5'dx;
-	if(encode_left) encode_letter = _77;
+	if(encode_left) encode_letter = _75;
 end
 always_comb begin // combinatorial rev_encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	rev_encode_letter = 5'dx;
-	if(encode_right) rev_encode_letter = _83;
+	if(encode_right) rev_encode_letter = _81;
 end
 endmodule
 
 // enigma_rotor #(initial_position: 0, ring_position: 0, rotor_number: 1)
 module enigma_rotor_initial_position_0_ring_position_0_rotor_number_1(
 	input clk,
-	input wire reset,
-	input wire write_rotor,
-	input wire[4:0] write_value,
 	input wire advance,
 	output /*mux_wire*/ logic advance_signal,
 	input wire turnover,
@@ -688,37 +681,35 @@ wire[4:0] _49 = sub_array_left[22];
 wire[4:0] _50 = sub_array_left[23];
 wire[4:0] _51 = sub_array_left[24];
 wire[4:0] _52 = sub_array_left[25];
-wire _56;
-assign _56 = rotor_position == 5'd16;
+wire _54;
+assign _54 = rotor_position == 5'd16;
+wire[4:0] _57;
+assign _57 = rotor_position + 1'd1;
 wire[4:0] _59;
-assign _59 = rotor_position + 1'd1;
-wire[4:0] _61;
-assign _61 = (_59 == 26) ? 0 : _59; // == mod 26
+assign _59 = (_57 == 26) ? 0 : _57; // == mod 26
+wire[4:0] _62;
+assign _62 = rotor_position + 1'd1;
 wire[4:0] _64;
-assign _64 = rotor_position + 1'd1;
-wire[4:0] _66;
-assign _66 = (_64 == 26) ? 0 : _64; // == mod 26
+assign _64 = (_62 == 26) ? 0 : _62; // == mod 26
+wire[4:0] _67;
+assign _67 = rotor_position + 1'd1;
 wire[4:0] _69;
-assign _69 = rotor_position + 1'd1;
-wire[4:0] _71;
-assign _71 = (_69 == 26) ? 0 : _69; // == mod 26
-wire[5:0] _74;
-assign _74 = letter_index + rotor_position;
-wire[4:0] _76;
-assign _76 = _74 - ((_74 >= 26) ? 26 : 0); // == mod 26
-wire[4:0] _77 = sub_array_left[_76];
-wire[5:0] _80;
-assign _80 = rev_letter_index + rotor_position;
-wire[4:0] _82;
-assign _82 = _80 - ((_80 >= 26) ? 26 : 0); // == mod 26
-wire[4:0] _83 = sub_array_right[_82];
+assign _69 = (_67 == 26) ? 0 : _67; // == mod 26
+wire[5:0] _72;
+assign _72 = letter_index + rotor_position;
+wire[4:0] _74;
+assign _74 = _72 - ((_72 >= 26) ? 26 : 0); // == mod 26
+wire[4:0] _75 = sub_array_left[_74];
+wire[5:0] _78;
+assign _78 = rev_letter_index + rotor_position;
+wire[4:0] _80;
+assign _80 = _78 - ((_78 >= 26) ? 26 : 0); // == mod 26
+wire[4:0] _81 = sub_array_right[_80];
 always_ff @(posedge clk) begin // state rotor_position
 	rotor_position <= 1'd0;
-	if(reset) rotor_position <= 1'd0;
-	if(write_rotor) rotor_position <= write_value;
-	if(advance) if(_56) rotor_position <= _61;
-	if(advance) if(!_56) rotor_position <= _66;
-	if(turnover) rotor_position <= _71;
+	if(advance) if(_54) rotor_position <= _59;
+	if(advance) if(!_54) rotor_position <= _64;
+	if(turnover) rotor_position <= _69;
 end
 always_comb begin // combinatorial sub_array_left
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -783,33 +774,36 @@ end
 always_comb begin // combinatorial advance_signal
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	advance_signal = 1'bx;
-	if(advance) if(_56) advance_signal = 1'b1;
-	if(advance) if(!_56) advance_signal = 1'b0;
+	if(advance) if(_54) advance_signal = 1'b1;
+	if(advance) if(!_54) advance_signal = 1'b0;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	advance_signal = advance_signal;
 end
 always_comb begin // combinatorial encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	encode_letter = 5'dx;
-	if(encode_left) encode_letter = _77;
+	if(encode_left) encode_letter = _75;
 end
 always_comb begin // combinatorial rev_encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	rev_encode_letter = 5'dx;
-	if(encode_right) rev_encode_letter = _83;
+	if(encode_right) rev_encode_letter = _81;
 end
 endmodule
 
 // plugboard #(plugboard_config: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25])
 module plugboard_plugboard_config_0_1_2_3_4_5_6_7_8_9_10_11_12_13_14_15_16_17_18_19_20_21_22_23_24_25(
 	input clk,
+	input wire set_plug,
+	input wire[4:0] plug_one,
+	input wire[4:0] plug_two,
 	input wire pass_letter,
 	input wire[4:0] input_letter,
 	output /*mux_wire*/ logic[4:0] output_letter
 );
 
 /*mux_wire*/ logic[4:0] plugboard_settings[25:0];
-wire[4:0] _2 = plugboard_settings[input_letter];
+wire[4:0] _6 = plugboard_settings[input_letter];
 always_comb begin // combinatorial plugboard_settings
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	plugboard_settings = '{5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx};
@@ -839,11 +833,13 @@ always_comb begin // combinatorial plugboard_settings
 	plugboard_settings[23] = 5'd23;
 	plugboard_settings[24] = 5'd24;
 	plugboard_settings[25] = 5'd25;
+	if(set_plug) plugboard_settings[plug_one] = plug_two;
+	if(set_plug) plugboard_settings[plug_two] = plug_one;
 end
 always_comb begin // combinatorial output_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	output_letter = 5'dx;
-	if(pass_letter) output_letter = _2;
+	if(pass_letter) output_letter = _6;
 end
 endmodule
 
