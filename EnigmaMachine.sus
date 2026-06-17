@@ -84,7 +84,7 @@ module enigma_machine_runtime{
         plugboard2=plugboard_inst.pass_letter(rrotor2)
         encode_letter=plugboard2
     }
-    action cur_settings:->int#(FROM: 0,TO: 5)[3] cur_rotors{
+    action cur_settings:->int#(FROM: 0,TO: 5)[3] cur_rotors{    // give feedback onwhich rotor is used atm
         cur_rotors[0]=right_rotor_used
         cur_rotors[1]=middle_rotor_used
         cur_rotors[2]=left_rotor_used
@@ -101,7 +101,7 @@ module enigma_rotor_runtime#(){
     rotors[3][:] = [4,18,14,21,15,25,9,0,24,16,20,8,17,7,23,11,13,5,19,6,10,3,2,12,22,1]
     rotors[4][:] = [21,25,1,17,6,8,19,24,20,15,18,3,13,7,11,23,0,22,12,9,16,14,5,4,2,10]
 
-    for int I in 0..5{
+    for int I in 0..5{                                                                                      // generate reverse arrays
         for int J in 0..26{
             rotors[I+5][rotors[I][J]]=J
         }
@@ -110,11 +110,11 @@ module enigma_rotor_runtime#(){
     state int#(FROM: 0,TO: 26) ring_position
     state int#(FROM: 0,TO: 26) rotor_position
 
-    /*
+    /*                                                                                                      // not needed for now
     action reset{                                                                                           // reset action to set rotor to 0
         rotor_position=0
     }
-    action write_rotor: int#(FROM: 0,TO: 26) write_value{                                                  // write new value to rotor
+    action write_rotor: int#(FROM: 0,TO: 26) write_value{                                                   // write new value to rotor
         rotor_position=write_value
     }
     */
@@ -154,16 +154,16 @@ module reflector{
 module plugboard#(int[26] plugboard_config){
     gen int LEN = 26
     int#(FROM: 0,TO: 26)[26] plugboard_settings
-    // setting the plugboard to the given array | missing plugs will be set to themselves
+    // setting the plugboard to the given array 
     for int I in 0..LEN{
         plugboard_settings[I]=plugboard_config[I]
     }
-    action set_plug:int#(FROM: 0,TO: 26) plug_one, int#(FROM: 0,TO: 26) plug_two{
+    action set_plug:int#(FROM: 0,TO: 26) plug_one, int#(FROM: 0,TO: 26) plug_two{                           // setup a letter pair 
         plugboard_settings[plug_one]=plug_two
         plugboard_settings[plug_two]=plug_one
     }
 
-    action pass_letter: int#(FROM: 0,TO: 26) input_letter -> int#(FROM: 0,TO: 26) output_letter{
+    action pass_letter: int#(FROM: 0,TO: 26) input_letter -> int#(FROM: 0,TO: 26) output_letter{            // encode letter 
             output_letter=plugboard_settings[input_letter]
     }
 }
