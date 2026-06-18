@@ -1,4 +1,4 @@
-// THIS IS A GENERATED FILE (Generated at 2026-06-17T09:51:06+02:00)
+// THIS IS A GENERATED FILE (Generated at 2026-06-18T10:20:45+02:00)
 // This file was generated with SUS Compiler 0.3.10
 // enigma_machine_runtime #()
 module enigma_machine_runtime(
@@ -8,7 +8,8 @@ module enigma_machine_runtime(
 	input wire[4:0] rotor_positions[2:0],
 	input wire[4:0] ring_positions[2:0],
 	input wire change_plugs,
-	input wire[4:0] plug_pair[1:0],
+	input wire[4:0] plug,
+	input wire[4:0] value,
 	input wire prep_message_encode,
 	input wire parse_letter,
 	input wire[4:0] input_letter,
@@ -56,11 +57,9 @@ wire[4:0] _16 = ring_positions[2];
 /*mux_wire*/ logic[2:0] _left_rotor_inst_rotor_to_use;
 /*mux_wire*/ logic[4:0] _left_rotor_inst_rotor_starting_position;
 /*mux_wire*/ logic[4:0] _left_rotor_inst_ring_position_in_use;
-wire[4:0] _19 = plug_pair[0];
-wire[4:0] _20 = plug_pair[1];
 /*mux_wire*/ logic _plugboard_inst_set_plug;
-/*mux_wire*/ logic[4:0] _plugboard_inst_plug_one;
-/*mux_wire*/ logic[4:0] _plugboard_inst_plug_two;
+/*mux_wire*/ logic[4:0] _plugboard_inst_plug;
+/*mux_wire*/ logic[4:0] _plugboard_inst_value;
 /*mux_wire*/ logic _right_rotor_inst_turnover;
 /*mux_wire*/ logic _right_rotor_inst_advance;
 wire _right_rotor_inst_advance_signal;
@@ -151,8 +150,8 @@ reflector reflector_inst(
 plugboard_plugboard_config_0_1_2_3_4_5_6_7_8_9_10_11_12_13_14_15_16_17_18_19_20_21_22_23_24_25 plugboard_inst(
 	.clk(clk),
 	.set_plug(_plugboard_inst_set_plug),
-	.plug_one(_plugboard_inst_plug_one),
-	.plug_two(_plugboard_inst_plug_two),
+	.plug(_plugboard_inst_plug),
+	.value(_plugboard_inst_value),
 	.pass_letter(_plugboard_inst_pass_letter),
 	.input_letter(_plugboard_inst_input_letter),
 	.output_letter(_plugboard_inst_output_letter)
@@ -314,15 +313,15 @@ always_comb begin // combinatorial _plugboard_inst_set_plug
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_plugboard_inst_set_plug = _plugboard_inst_set_plug;
 end
-always_comb begin // combinatorial _plugboard_inst_plug_one
+always_comb begin // combinatorial _plugboard_inst_plug
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	_plugboard_inst_plug_one = 5'dx;
-	if(change_plugs) _plugboard_inst_plug_one = _19;
+	_plugboard_inst_plug = 5'dx;
+	if(change_plugs) _plugboard_inst_plug = plug;
 end
-always_comb begin // combinatorial _plugboard_inst_plug_two
+always_comb begin // combinatorial _plugboard_inst_value
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	_plugboard_inst_plug_two = 5'dx;
-	if(change_plugs) _plugboard_inst_plug_two = _20;
+	_plugboard_inst_value = 5'dx;
+	if(change_plugs) _plugboard_inst_value = value;
 end
 always_comb begin // combinatorial _right_rotor_inst_turnover
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -504,15 +503,15 @@ endmodule
 module plugboard_plugboard_config_0_1_2_3_4_5_6_7_8_9_10_11_12_13_14_15_16_17_18_19_20_21_22_23_24_25(
 	input clk,
 	input wire set_plug,
-	input wire[4:0] plug_one,
-	input wire[4:0] plug_two,
+	input wire[4:0] plug,
+	input wire[4:0] value,
 	input wire pass_letter,
 	input wire[4:0] input_letter,
 	output /*mux_wire*/ logic[4:0] output_letter
 );
 
 /*mux_wire*/ logic[4:0] plugboard_settings[25:0];
-wire[4:0] _6 = plugboard_settings[input_letter];
+wire[4:0] _4 = plugboard_settings[input_letter];
 always_comb begin // combinatorial plugboard_settings
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	plugboard_settings = '{5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx};
@@ -542,13 +541,12 @@ always_comb begin // combinatorial plugboard_settings
 	plugboard_settings[23] = 5'd23;
 	plugboard_settings[24] = 5'd24;
 	plugboard_settings[25] = 5'd25;
-	if(set_plug) plugboard_settings[plug_one] = plug_two;
-	if(set_plug) plugboard_settings[plug_two] = plug_one;
+	if(set_plug) plugboard_settings[plug] = value;
 end
 always_comb begin // combinatorial output_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	output_letter = 5'dx;
-	if(pass_letter) output_letter = _6;
+	if(pass_letter) output_letter = _4;
 end
 endmodule
 
