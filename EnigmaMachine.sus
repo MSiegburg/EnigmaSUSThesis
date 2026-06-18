@@ -37,8 +37,8 @@ module enigma_machine_runtime{
         left_rotor_inst.setup(rotor_setup[2], rotor_positions[2], ring_positions[2])
     }
 
-    action change_plugs:int#(FROM: 0,TO: 26)[2]plug_pair{       // change plugs in plugboard one pair at a time
-        plugboard_inst.set_plug(plug_pair[0], plug_pair[1])
+    action change_plugs:int#(FROM: 0,TO: 26)plug, int#(FROM: 0,TO: 26) value{       // change plug in plugboard one plug at a time
+        plugboard_inst.set_plug(plug,value)
     }
 
     action prep_message_encode{
@@ -84,7 +84,7 @@ module enigma_machine_runtime{
         plugboard2=plugboard_inst.pass_letter(rrotor2)
         encode_letter=plugboard2
     }
-    action cur_settings:->int#(FROM: 0,TO: 5)[3] cur_rotors{    // give feedback onwhich rotor is used atm
+    action cur_settings:->int#(FROM: 0,TO: 5)[3] cur_rotors{    // give feedback on which rotor is used atm
         cur_rotors[0]=right_rotor_used
         cur_rotors[1]=middle_rotor_used
         cur_rotors[2]=left_rotor_used
@@ -158,9 +158,8 @@ module plugboard#(int[26] plugboard_config){
     for int I in 0..LEN{
         plugboard_settings[I]=plugboard_config[I]
     }
-    action set_plug:int#(FROM: 0,TO: 26) plug_one, int#(FROM: 0,TO: 26) plug_two{                           // setup a letter pair 
-        plugboard_settings[plug_one]=plug_two
-        plugboard_settings[plug_two]=plug_one
+    action set_plug:int#(FROM: 0,TO: 26) plug, int#(FROM: 0,TO: 26) value{                           // setup a letter pair 
+        plugboard_settings[plug]=value
     }
 
     action pass_letter: int#(FROM: 0,TO: 26) input_letter -> int#(FROM: 0,TO: 26) output_letter{            // encode letter 
