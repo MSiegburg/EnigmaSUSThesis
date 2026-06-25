@@ -1,4 +1,4 @@
-// THIS IS A GENERATED FILE (Generated at 2026-06-18T10:20:45+02:00)
+// THIS IS A GENERATED FILE (Generated at 2026-06-25T10:32:14+02:00)
 // This file was generated with SUS Compiler 0.3.10
 // enigma_machine_runtime #()
 module enigma_machine_runtime(
@@ -69,9 +69,9 @@ wire _middle_rotor_inst_advance_signal;
 /*mux_wire*/ logic _left_rotor_inst_turnover;
 /*mux_wire*/ logic _left_rotor_inst_advance;
 wire _left_rotor_inst_advance_signal;
-/*mux_wire*/ logic _plugboard_inst_pass_letter;
-/*mux_wire*/ logic[4:0] _plugboard_inst_input_letter;
-wire[4:0] _plugboard_inst_output_letter;
+/*mux_wire*/ logic _plugboard_inst_pass_letter_forward;
+/*mux_wire*/ logic[4:0] _plugboard_inst_input_letter1;
+wire[4:0] _plugboard_inst_output_letter1;
 /*mux_wire*/ logic _right_rotor_inst_encode_left;
 /*mux_wire*/ logic[4:0] _right_rotor_inst_letter_index;
 wire[4:0] _right_rotor_inst_encode_letter;
@@ -93,6 +93,9 @@ wire[4:0] _middle_rotor_inst_rev_encode_letter;
 /*mux_wire*/ logic _right_rotor_inst_encode_right;
 /*mux_wire*/ logic[4:0] _right_rotor_inst_rev_letter_index;
 wire[4:0] _right_rotor_inst_rev_encode_letter;
+/*mux_wire*/ logic _plugboard_inst_pass_letter_backward;
+/*mux_wire*/ logic[4:0] _plugboard_inst_input_letter2;
+wire[4:0] _plugboard_inst_output_letter2;
 enigma_rotor_runtime right_rotor_inst(
 	.clk(clk),
 	.turnover(_right_rotor_inst_turnover),
@@ -152,9 +155,12 @@ plugboard_plugboard_config_0_1_2_3_4_5_6_7_8_9_10_11_12_13_14_15_16_17_18_19_20_
 	.set_plug(_plugboard_inst_set_plug),
 	.plug(_plugboard_inst_plug),
 	.value(_plugboard_inst_value),
-	.pass_letter(_plugboard_inst_pass_letter),
-	.input_letter(_plugboard_inst_input_letter),
-	.output_letter(_plugboard_inst_output_letter)
+	.pass_letter_forward(_plugboard_inst_pass_letter_forward),
+	.input_letter1(_plugboard_inst_input_letter1),
+	.output_letter1(_plugboard_inst_output_letter1),
+	.pass_letter_backward(_plugboard_inst_pass_letter_backward),
+	.input_letter2(_plugboard_inst_input_letter2),
+	.output_letter2(_plugboard_inst_output_letter2)
 );
 always_ff @(posedge clk) begin // state left_rotor_used
 	if(setup) left_rotor_used <= _3;
@@ -194,7 +200,7 @@ end
 always_comb begin // combinatorial plugboard1
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	plugboard1 = 5'dx;
-	if(parse_letter) plugboard1 = _plugboard_inst_output_letter;
+	if(parse_letter) plugboard1 = _plugboard_inst_output_letter1;
 end
 always_comb begin // combinatorial rrotor1
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -234,7 +240,7 @@ end
 always_comb begin // combinatorial plugboard2
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	plugboard2 = 5'dx;
-	if(parse_letter) plugboard2 = _plugboard_inst_output_letter;
+	if(parse_letter) plugboard2 = _plugboard_inst_output_letter2;
 end
 always_comb begin // combinatorial _right_rotor_inst_setup
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -384,20 +390,18 @@ always_comb begin // combinatorial encode_letter
 	encode_letter = 5'dx;
 	if(parse_letter) encode_letter = plugboard2;
 end
-always_comb begin // combinatorial _plugboard_inst_pass_letter
+always_comb begin // combinatorial _plugboard_inst_pass_letter_forward
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	_plugboard_inst_pass_letter = 1'bx;
-	_plugboard_inst_pass_letter = 1'b0;
-	if(parse_letter) _plugboard_inst_pass_letter = 1'b1;
-	if(parse_letter) _plugboard_inst_pass_letter = 1'b1;
+	_plugboard_inst_pass_letter_forward = 1'bx;
+	_plugboard_inst_pass_letter_forward = 1'b0;
+	if(parse_letter) _plugboard_inst_pass_letter_forward = 1'b1;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
-	_plugboard_inst_pass_letter = _plugboard_inst_pass_letter;
+	_plugboard_inst_pass_letter_forward = _plugboard_inst_pass_letter_forward;
 end
-always_comb begin // combinatorial _plugboard_inst_input_letter
+always_comb begin // combinatorial _plugboard_inst_input_letter1
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	_plugboard_inst_input_letter = 5'dx;
-	if(parse_letter) _plugboard_inst_input_letter = input_letter;
-	if(parse_letter) _plugboard_inst_input_letter = rrotor2;
+	_plugboard_inst_input_letter1 = 5'dx;
+	if(parse_letter) _plugboard_inst_input_letter1 = input_letter;
 end
 always_comb begin // combinatorial _right_rotor_inst_encode_left
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -490,6 +494,19 @@ always_comb begin // combinatorial _right_rotor_inst_rev_letter_index
 	_right_rotor_inst_rev_letter_index = 5'dx;
 	if(parse_letter) _right_rotor_inst_rev_letter_index = mrotor2;
 end
+always_comb begin // combinatorial _plugboard_inst_pass_letter_backward
+	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
+	_plugboard_inst_pass_letter_backward = 1'bx;
+	_plugboard_inst_pass_letter_backward = 1'b0;
+	if(parse_letter) _plugboard_inst_pass_letter_backward = 1'b1;
+	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
+	_plugboard_inst_pass_letter_backward = _plugboard_inst_pass_letter_backward;
+end
+always_comb begin // combinatorial _plugboard_inst_input_letter2
+	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
+	_plugboard_inst_input_letter2 = 5'dx;
+	if(parse_letter) _plugboard_inst_input_letter2 = rrotor2;
+end
 always_comb begin // combinatorial cur_rotors
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	cur_rotors = '{3'dx, 3'dx, 3'dx};
@@ -505,13 +522,17 @@ module plugboard_plugboard_config_0_1_2_3_4_5_6_7_8_9_10_11_12_13_14_15_16_17_18
 	input wire set_plug,
 	input wire[4:0] plug,
 	input wire[4:0] value,
-	input wire pass_letter,
-	input wire[4:0] input_letter,
-	output /*mux_wire*/ logic[4:0] output_letter
+	input wire pass_letter_forward,
+	input wire[4:0] input_letter1,
+	output /*mux_wire*/ logic[4:0] output_letter1,
+	input wire pass_letter_backward,
+	input wire[4:0] input_letter2,
+	output /*mux_wire*/ logic[4:0] output_letter2
 );
 
 /*mux_wire*/ logic[4:0] plugboard_settings[25:0];
-wire[4:0] _4 = plugboard_settings[input_letter];
+wire[4:0] _4 = plugboard_settings[input_letter1];
+wire[4:0] _6 = plugboard_settings[input_letter2];
 always_comb begin // combinatorial plugboard_settings
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	plugboard_settings = '{5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx};
@@ -543,10 +564,15 @@ always_comb begin // combinatorial plugboard_settings
 	plugboard_settings[25] = 5'd25;
 	if(set_plug) plugboard_settings[plug] = value;
 end
-always_comb begin // combinatorial output_letter
+always_comb begin // combinatorial output_letter1
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	output_letter = 5'dx;
-	if(pass_letter) output_letter = _4;
+	output_letter1 = 5'dx;
+	if(pass_letter_forward) output_letter1 = _4;
+end
+always_comb begin // combinatorial output_letter2
+	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
+	output_letter2 = 5'dx;
+	if(pass_letter_backward) output_letter2 = _6;
 end
 endmodule
 
