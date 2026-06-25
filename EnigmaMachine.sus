@@ -57,7 +57,7 @@ module enigma_machine_runtime{
         }
     }
 
-    action parse_letter:int#(FROM: 0,TO: 26) input_letter -> int#(FROM: 0,TO: 26) encode_letter{
+    action parse_letter:int#(FROM: 0,TO: 26) input_letter -> int#(FROM: 0,TO: 26) encode_letter_final{
         right_rotor_inst.turnover()
         right_rotor_advance=right_rotor_inst.advance()
         when right_rotor_advance{                               // check if middle rotor needs to advance
@@ -82,7 +82,7 @@ module enigma_machine_runtime{
         mrotor2=middle_rotor_inst.encode_right(lrotor2)
         rrotor2=right_rotor_inst.encode_right(mrotor2)
         plugboard2=plugboard_inst.pass_letter_backward(rrotor2)
-        encode_letter=plugboard2
+        encode_letter_final=plugboard2
     }
     action cur_settings:->int#(FROM: 0,TO: 5)[3] cur_rotors{    // give feedback on which rotor is used atm
         cur_rotors[0]=right_rotor_used
