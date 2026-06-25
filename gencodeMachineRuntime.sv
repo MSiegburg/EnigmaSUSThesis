@@ -1,4 +1,4 @@
-// THIS IS A GENERATED FILE (Generated at 2026-06-25T10:32:14+02:00)
+// THIS IS A GENERATED FILE (Generated at 2026-06-25T11:09:37+02:00)
 // This file was generated with SUS Compiler 0.3.10
 // enigma_machine_runtime #()
 module enigma_machine_runtime(
@@ -13,7 +13,7 @@ module enigma_machine_runtime(
 	input wire prep_message_encode,
 	input wire parse_letter,
 	input wire[4:0] input_letter,
-	output /*mux_wire*/ logic[4:0] encode_letter,
+	output /*mux_wire*/ logic[4:0] encode_letter_final,
 	input wire cur_settings,
 	output /*mux_wire*/ logic[2:0] cur_rotors[2:0]
 );
@@ -385,10 +385,10 @@ always_comb begin // combinatorial _left_rotor_inst_advance
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_left_rotor_inst_advance = _left_rotor_inst_advance;
 end
-always_comb begin // combinatorial encode_letter
+always_comb begin // combinatorial encode_letter_final
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	encode_letter = 5'dx;
-	if(parse_letter) encode_letter = plugboard2;
+	encode_letter_final = 5'dx;
+	if(parse_letter) encode_letter_final = plugboard2;
 end
 always_comb begin // combinatorial _plugboard_inst_pass_letter_forward
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
