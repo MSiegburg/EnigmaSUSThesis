@@ -1,0 +1,3 @@
+[submodule "sus-xrt"]
+	path = sus-xrt
+	url = https://github.com/pc2/sus-xrt.git
