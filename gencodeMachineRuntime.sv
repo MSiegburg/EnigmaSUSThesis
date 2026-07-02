@@ -1,4 +1,4 @@
-// THIS IS A GENERATED FILE (Generated at 2026-07-02T14:24:18+02:00)
+// THIS IS A GENERATED FILE (Generated at 2026-07-02T16:37:38+02:00)
 // This file was generated with SUS Compiler 0.4.0
 // enigma_machine_runtime #()
 module enigma_machine_runtime(
@@ -634,6 +634,7 @@ wire[4:0] _24;
 assign _24 = rotor_position + 1'd1;
 wire[4:0] _26;
 assign _26 = (_24 == 26) ? 0 : _24; // == mod 26
+/*mux_wire*/ logic[4:0] substitution_result_left;
 wire[5:0] _30;
 assign _30 = letter_index + rotor_position;
 wire[4:0] _32;
@@ -644,16 +645,21 @@ wire[5:0] _35;
 assign _35 = _33 + ring_position;
 wire[4:0] _37;
 assign _37 = _35 - ((_35 >= 26) ? 26 : 0); // == mod 26
-wire[3:0] _40;
-assign _40 = rotor_in_use + 3'd5;
-wire[5:0] _43;
-assign _43 = rev_letter_index + rotor_position;
-wire[6:0] _45;
-assign _45 = _43 + ring_position;
-wire[4:0] _47;
-assign _47 = _45 % 26; // == mod 26
+wire signed[5:0] _40;
+assign _40 = substitution_result_left - rotor_position;
+wire[4:0] _42;
+assign _42 = _40 + ((_40 < 0) ? 26 : 0); // == mod 26
+/*mux_wire*/ logic[4:0] substitution_result_right;
+wire[3:0] _45;
+assign _45 = rotor_in_use + 3'd5;
+wire[5:0] _48;
+assign _48 = rev_letter_index + rotor_position;
+wire[6:0] _50;
+assign _50 = _48 + ring_position;
+wire[4:0] _52;
+assign _52 = _50 % 26; // == mod 26
 localparam[4:0] rotors_2[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
-wire[4:0] _48 = rotors_2[_40][_47];
+wire[4:0] _53 = rotors_2[_45][_52];
 always_ff @(posedge clk) begin // state rotor_in_use
 	if(setup) rotor_in_use <= rotor_to_use;
 end
@@ -677,12 +683,22 @@ end
 always_comb begin // combinatorial encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	encode_letter = 5'dx;
-	if(encode_left) encode_letter = _37;
+	if(encode_left) encode_letter = _42;
+end
+always_comb begin // combinatorial substitution_result_left
+	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
+	substitution_result_left = 5'dx;
+	if(encode_left) substitution_result_left = _37;
 end
 always_comb begin // combinatorial rev_encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	rev_encode_letter = 5'dx;
-	if(encode_right) rev_encode_letter = _48;
+	if(encode_right) rev_encode_letter = substitution_result_right;
+end
+always_comb begin // combinatorial substitution_result_right
+	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
+	substitution_result_right = 5'dx;
+	if(encode_right) substitution_result_right = _53;
 end
 endmodule // enigma_rotor_runtime #()
 
