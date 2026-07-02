@@ -1,4 +1,4 @@
-// THIS IS A GENERATED FILE (Generated at 2026-07-02T16:37:38+02:00)
+// THIS IS A GENERATED FILE (Generated at 2026-07-02T16:45:34+02:00)
 // This file was generated with SUS Compiler 0.4.0
 // enigma_machine_runtime #()
 module enigma_machine_runtime(
@@ -660,6 +660,10 @@ wire[4:0] _52;
 assign _52 = _50 % 26; // == mod 26
 localparam[4:0] rotors_2[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
 wire[4:0] _53 = rotors_2[_45][_52];
+wire signed[5:0] _56;
+assign _56 = substitution_result_right - rotor_position;
+wire[4:0] _58;
+assign _58 = _56 + ((_56 < 0) ? 26 : 0); // == mod 26
 always_ff @(posedge clk) begin // state rotor_in_use
 	if(setup) rotor_in_use <= rotor_to_use;
 end
@@ -693,7 +697,7 @@ end
 always_comb begin // combinatorial rev_encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	rev_encode_letter = 5'dx;
-	if(encode_right) rev_encode_letter = substitution_result_right;
+	if(encode_right) rev_encode_letter = _58;
 end
 always_comb begin // combinatorial substitution_result_right
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches

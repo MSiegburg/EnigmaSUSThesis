@@ -143,7 +143,7 @@ module enigma_rotor_runtime#(){
     action encode_right: int#(FROM: 0,TO: 26) rev_letter_index -> int#(FROM: 0,TO: 26) rev_encode_letter{   // encode letter adding offset to index of ring position
         int#(FROM: 0,TO: 26) substitution_result_right
         substitution_result_right=rotors[rotor_in_use+5][(rev_letter_index+rotor_position+ring_position)mod 26]    
-        rev_encode_letter=substitution_result_right
+        rev_encode_letter=substitution_result_right-rotor_position mod 26
     }
 }
 
