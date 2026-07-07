@@ -72,6 +72,7 @@ module enigma_machine_runtime{
             middle_rotor_inst.turnover()
             middle_rotor_advance=middle_rotor_inst.advance()
             when middle_rotor_advance{                          // check if left rotor needs to advance
+                doublestepping = true
                 left_rotor_inst.turnover()
                 left_rotor_advance=left_rotor_inst.advance()
             }
@@ -136,7 +137,7 @@ module enigma_rotor_runtime#(){
         ring_position=ring_position_in_use
     }
     action advance:-> bool advance_signal{                                                                  // advance signal checking for turnover 
-        when (rotor_position==(turnover_positions[rotor_in_use]+ring_position)mod 26){
+        when (rotor_position+1==(turnover_positions[rotor_in_use]+ring_position)mod 26){
             advance_signal=true
         } else {
             advance_signal=false
