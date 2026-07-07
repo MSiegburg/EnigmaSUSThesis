@@ -1,4 +1,4 @@
-// THIS IS A GENERATED FILE (Generated at 2026-07-07T15:43:42+02:00)
+// THIS IS A GENERATED FILE (Generated at 2026-07-07T15:56:47+02:00)
 // This file was generated with SUS Compiler 0.4.0
 // enigma_machine_runtime #()
 module enigma_machine_runtime(
@@ -65,8 +65,8 @@ wire[4:0] _16 = ring_positions[2];
 /*mux_wire*/ logic _right_rotor_inst_advance;
 wire _right_rotor_inst_advance_signal;
 /*mux_wire*/ logic _middle_rotor_inst_turnover;
-/*mux_wire*/ logic _middle_rotor_inst_advance;
-wire _middle_rotor_inst_advance_signal;
+/*mux_wire*/ logic _middle_rotor_inst_testDoublestep;
+wire _middle_rotor_inst_doublestep;
 /*mux_wire*/ logic _left_rotor_inst_turnover;
 /*mux_wire*/ logic _left_rotor_inst_advance;
 wire _left_rotor_inst_advance_signal;
@@ -100,6 +100,8 @@ wire[4:0] _plugboard_inst_output_letter2;
 enigma_rotor_runtime right_rotor_inst(
 	.clk(clk),
 	.turnover(_right_rotor_inst_turnover),
+	.testDoublestep(),
+	.doublestep(),
 	.setup(_right_rotor_inst_setup),
 	.rotor_to_use(_right_rotor_inst_rotor_to_use),
 	.rotor_starting_position(_right_rotor_inst_rotor_starting_position),
@@ -116,12 +118,14 @@ enigma_rotor_runtime right_rotor_inst(
 enigma_rotor_runtime middle_rotor_inst(
 	.clk(clk),
 	.turnover(_middle_rotor_inst_turnover),
+	.testDoublestep(_middle_rotor_inst_testDoublestep),
+	.doublestep(_middle_rotor_inst_doublestep),
 	.setup(_middle_rotor_inst_setup),
 	.rotor_to_use(_middle_rotor_inst_rotor_to_use),
 	.rotor_starting_position(_middle_rotor_inst_rotor_starting_position),
 	.ring_position_in_use(_middle_rotor_inst_ring_position_in_use),
-	.advance(_middle_rotor_inst_advance),
-	.advance_signal(_middle_rotor_inst_advance_signal),
+	.advance(),
+	.advance_signal(),
 	.encode_left(_middle_rotor_inst_encode_left),
 	.letter_index(_middle_rotor_inst_letter_index),
 	.encode_letter(_middle_rotor_inst_encode_letter),
@@ -132,6 +136,8 @@ enigma_rotor_runtime middle_rotor_inst(
 enigma_rotor_runtime left_rotor_inst(
 	.clk(clk),
 	.turnover(_left_rotor_inst_turnover),
+	.testDoublestep(),
+	.doublestep(),
 	.setup(_left_rotor_inst_setup),
 	.rotor_to_use(_left_rotor_inst_rotor_to_use),
 	.rotor_starting_position(_left_rotor_inst_rotor_starting_position),
@@ -183,8 +189,8 @@ end
 always_comb begin // combinatorial middle_rotor_advance
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	middle_rotor_advance = 1'bx;
-	if(prep_message_encode) middle_rotor_advance = _middle_rotor_inst_advance_signal;
-	if(parse_letter) middle_rotor_advance = _middle_rotor_inst_advance_signal;
+	if(prep_message_encode) middle_rotor_advance = _middle_rotor_inst_doublestep;
+	if(parse_letter) middle_rotor_advance = _middle_rotor_inst_doublestep;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	middle_rotor_advance = middle_rotor_advance;
 end
@@ -363,14 +369,14 @@ always_comb begin // combinatorial _middle_rotor_inst_turnover
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_middle_rotor_inst_turnover = _middle_rotor_inst_turnover;
 end
-always_comb begin // combinatorial _middle_rotor_inst_advance
+always_comb begin // combinatorial _middle_rotor_inst_testDoublestep
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	_middle_rotor_inst_advance = 1'bx;
-	_middle_rotor_inst_advance = 1'b0;
-	if(prep_message_encode) _middle_rotor_inst_advance = 1'b1;
-	if(parse_letter) _middle_rotor_inst_advance = 1'b1;
+	_middle_rotor_inst_testDoublestep = 1'bx;
+	_middle_rotor_inst_testDoublestep = 1'b0;
+	if(prep_message_encode) _middle_rotor_inst_testDoublestep = 1'b1;
+	if(parse_letter) _middle_rotor_inst_testDoublestep = 1'b1;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
-	_middle_rotor_inst_advance = _middle_rotor_inst_advance;
+	_middle_rotor_inst_testDoublestep = _middle_rotor_inst_testDoublestep;
 end
 always_comb begin // combinatorial _left_rotor_inst_turnover
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -602,6 +608,8 @@ endmodule // reflector #()
 module enigma_rotor_runtime(
 	/* clock */ input clk,
 	input wire turnover,
+	input wire testDoublestep,
+	output /*mux_wire*/ logic doublestep,
 	input wire setup,
 	input wire[2:0] rotor_to_use,
 	input wire[4:0] rotor_starting_position,
@@ -623,44 +631,54 @@ wire[4:0] _3;
 assign _3 = rotor_position + 1'd1;
 wire[4:0] _5;
 assign _5 = (_3 == 26) ? 0 : _3; // == mod 26
+wire[4:0] _8;
+assign _8 = rotor_position + 1'd1;
 localparam[4:0] turnover_positions[0:4] = '{5'd16, 5'd4, 5'd21, 5'd9, 5'd25};
-wire[4:0] _11 = turnover_positions[rotor_in_use];
-wire[5:0] _13;
-assign _13 = _11 + ring_position;
-wire[4:0] _15;
-assign _15 = _13 - ((_13 >= 26) ? 26 : 0); // == mod 26
-wire _16;
-assign _16 = rotor_position == _15;
+wire[4:0] _10 = turnover_positions[rotor_in_use];
+wire[5:0] _12;
+assign _12 = _10 + ring_position;
+wire[4:0] _14;
+assign _14 = _12 - ((_12 >= 26) ? 26 : 0); // == mod 26
+wire _15;
+assign _15 = _8 == _14;
+localparam[4:0] turnover_positions_2[0:4] = '{5'd16, 5'd4, 5'd21, 5'd9, 5'd25};
+wire[4:0] _21 = turnover_positions_2[rotor_in_use];
+wire[5:0] _23;
+assign _23 = _21 + ring_position;
+wire[4:0] _25;
+assign _25 = _23 - ((_23 >= 26) ? 26 : 0); // == mod 26
+wire _26;
+assign _26 = rotor_position == _25;
 /*mux_wire*/ logic[4:0] substitution_result_left;
-wire[5:0] _20;
-assign _20 = letter_index + rotor_position;
-wire[4:0] _22;
-assign _22 = _20 - ((_20 >= 26) ? 26 : 0); // == mod 26
-localparam[4:0] rotors[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
-wire[4:0] _23 = rotors[rotor_in_use][_22];
-wire[5:0] _25;
-assign _25 = _23 + ring_position;
-wire[4:0] _27;
-assign _27 = _25 - ((_25 >= 26) ? 26 : 0); // == mod 26
-wire signed[5:0] _30;
-assign _30 = substitution_result_left - rotor_position;
+wire[5:0] _30;
+assign _30 = letter_index + rotor_position;
 wire[4:0] _32;
-assign _32 = _30 + ((_30 < 0) ? 26 : 0); // == mod 26
-/*mux_wire*/ logic[4:0] substitution_result_right;
-wire[3:0] _35;
-assign _35 = rotor_in_use + 3'd5;
-wire[5:0] _38;
-assign _38 = rev_letter_index + rotor_position;
-wire signed[6:0] _40;
-assign _40 = _38 - ring_position;
+assign _32 = _30 - ((_30 >= 26) ? 26 : 0); // == mod 26
+localparam[4:0] rotors[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
+wire[4:0] _33 = rotors[rotor_in_use][_32];
+wire[5:0] _35;
+assign _35 = _33 + ring_position;
+wire[4:0] _37;
+assign _37 = _35 - ((_35 >= 26) ? 26 : 0); // == mod 26
+wire signed[5:0] _40;
+assign _40 = substitution_result_left - rotor_position;
 wire[4:0] _42;
-assign _42 = $unsigned(_40 % 26) + ((_40 % 26 < 0) ? 26 : 0); // == mod 26
+assign _42 = _40 + ((_40 < 0) ? 26 : 0); // == mod 26
+/*mux_wire*/ logic[4:0] substitution_result_right;
+wire[3:0] _45;
+assign _45 = rotor_in_use + 3'd5;
+wire[5:0] _48;
+assign _48 = rev_letter_index + rotor_position;
+wire signed[6:0] _50;
+assign _50 = _48 - ring_position;
+wire[4:0] _52;
+assign _52 = $unsigned(_50 % 26) + ((_50 % 26 < 0) ? 26 : 0); // == mod 26
 localparam[4:0] rotors_2[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
-wire[4:0] _43 = rotors_2[_35][_42];
-wire signed[5:0] _46;
-assign _46 = substitution_result_right - rotor_position;
-wire[4:0] _48;
-assign _48 = _46 + ((_46 < 0) ? 26 : 0); // == mod 26
+wire[4:0] _53 = rotors_2[_45][_52];
+wire signed[5:0] _56;
+assign _56 = substitution_result_right - rotor_position;
+wire[4:0] _58;
+assign _58 = _56 + ((_56 < 0) ? 26 : 0); // == mod 26
 always_ff @(posedge clk) begin // state rotor_in_use
 	if(setup) rotor_in_use <= rotor_to_use;
 end
@@ -671,33 +689,41 @@ always_ff @(posedge clk) begin // state rotor_position
 	if(turnover) rotor_position <= _5;
 	if(setup) rotor_position <= rotor_starting_position;
 end
+always_comb begin // combinatorial doublestep
+	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
+	doublestep = 1'bx;
+	if(testDoublestep) if(_15) doublestep = 1'b1;
+	if(testDoublestep) if(!_15) doublestep = 1'b0;
+	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
+	doublestep = doublestep;
+end
 always_comb begin // combinatorial advance_signal
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	advance_signal = 1'bx;
-	if(advance) if(_16) advance_signal = 1'b1;
-	if(advance) if(!_16) advance_signal = 1'b0;
+	if(advance) if(_26) advance_signal = 1'b1;
+	if(advance) if(!_26) advance_signal = 1'b0;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	advance_signal = advance_signal;
 end
 always_comb begin // combinatorial encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	encode_letter = 5'dx;
-	if(encode_left) encode_letter = _32;
+	if(encode_left) encode_letter = _42;
 end
 always_comb begin // combinatorial substitution_result_left
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	substitution_result_left = 5'dx;
-	if(encode_left) substitution_result_left = _27;
+	if(encode_left) substitution_result_left = _37;
 end
 always_comb begin // combinatorial rev_encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	rev_encode_letter = 5'dx;
-	if(encode_right) rev_encode_letter = _48;
+	if(encode_right) rev_encode_letter = _58;
 end
 always_comb begin // combinatorial substitution_result_right
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	substitution_result_right = 5'dx;
-	if(encode_right) substitution_result_right = _43;
+	if(encode_right) substitution_result_right = _53;
 end
 endmodule // enigma_rotor_runtime #()
 
