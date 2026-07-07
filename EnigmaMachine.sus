@@ -54,7 +54,8 @@ module enigma_machine_runtime{
                 left_rotor_inst.turnover()
                 left_rotor_advance=left_rotor_inst.advance()
             }
-        }else when doublestepping{                              // double stepping check and resolution
+        }
+        when doublestepping{                              // double stepping check and resolution
             middle_rotor_inst.turnover()
             doublestepping=false
         }
@@ -74,7 +75,8 @@ module enigma_machine_runtime{
                 left_rotor_inst.turnover()
                 left_rotor_advance=left_rotor_inst.advance()
             }
-        }else when doublestepping{                              // double stepping check and resolution
+        }
+        when doublestepping{                              // double stepping check and resolution
             middle_rotor_inst.turnover()
             doublestepping=false
         }
