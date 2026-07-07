@@ -9,6 +9,7 @@ module enigma_machine_runtime{
     bool left_rotor_advance 
 
     state bool doublestepping
+    initial doublestepping = true
 
     int#(FROM: 0,TO: 26) plugboard1
     int#(FROM: 0,TO: 26) rrotor1
