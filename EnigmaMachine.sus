@@ -132,7 +132,7 @@ module enigma_rotor_runtime#(){
         rotor_position=(rotor_position+1)mod 26
     }
     action testDoublestep:-> bool doublestep{
-        when (rotor_position+1==(turnover_positions[rotor_in_use]+ring_position)mod 26){
+        when (rotor_position==(turnover_positions[rotor_in_use]+ring_position)mod 26){
             doublestep=true
         } else {
             doublestep=false
