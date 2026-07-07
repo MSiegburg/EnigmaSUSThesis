@@ -1,4 +1,4 @@
-// THIS IS A GENERATED FILE (Generated at 2026-07-07T15:36:04+02:00)
+// THIS IS A GENERATED FILE (Generated at 2026-07-07T15:43:42+02:00)
 // This file was generated with SUS Compiler 0.4.0
 // enigma_machine_runtime #()
 module enigma_machine_runtime(
@@ -183,7 +183,7 @@ end
 always_comb begin // combinatorial middle_rotor_advance
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	middle_rotor_advance = 1'bx;
-	if(prep_message_encode) if(right_rotor_advance) middle_rotor_advance = _middle_rotor_inst_advance_signal;
+	if(prep_message_encode) middle_rotor_advance = _middle_rotor_inst_advance_signal;
 	if(parse_letter) middle_rotor_advance = _middle_rotor_inst_advance_signal;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	middle_rotor_advance = middle_rotor_advance;
@@ -191,13 +191,13 @@ end
 always_comb begin // combinatorial left_rotor_advance
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	left_rotor_advance = 1'bx;
-	if(prep_message_encode) if(right_rotor_advance) if(middle_rotor_advance) left_rotor_advance = _left_rotor_inst_advance_signal;
+	if(prep_message_encode) if(middle_rotor_advance) left_rotor_advance = _left_rotor_inst_advance_signal;
 	if(parse_letter) if(middle_rotor_advance) left_rotor_advance = _left_rotor_inst_advance_signal;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	left_rotor_advance = left_rotor_advance;
 end
 always_ff @(posedge clk) begin // state doublestepping
-	if(prep_message_encode) if(right_rotor_advance) if(middle_rotor_advance) doublestepping <= 1'b1;
+	if(prep_message_encode) if(middle_rotor_advance) doublestepping <= 1'b1;
 	if(prep_message_encode) if(doublestepping) doublestepping <= 1'b0;
 	if(parse_letter) if(middle_rotor_advance) doublestepping <= 1'b1;
 	if(parse_letter) if(doublestepping) doublestepping <= 1'b0;
@@ -367,7 +367,7 @@ always_comb begin // combinatorial _middle_rotor_inst_advance
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_middle_rotor_inst_advance = 1'bx;
 	_middle_rotor_inst_advance = 1'b0;
-	if(prep_message_encode) if(right_rotor_advance) _middle_rotor_inst_advance = 1'b1;
+	if(prep_message_encode) _middle_rotor_inst_advance = 1'b1;
 	if(parse_letter) _middle_rotor_inst_advance = 1'b1;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_middle_rotor_inst_advance = _middle_rotor_inst_advance;
@@ -376,7 +376,7 @@ always_comb begin // combinatorial _left_rotor_inst_turnover
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_left_rotor_inst_turnover = 1'bx;
 	_left_rotor_inst_turnover = 1'b0;
-	if(prep_message_encode) if(right_rotor_advance) if(middle_rotor_advance) _left_rotor_inst_turnover = 1'b1;
+	if(prep_message_encode) if(middle_rotor_advance) _left_rotor_inst_turnover = 1'b1;
 	if(parse_letter) if(middle_rotor_advance) _left_rotor_inst_turnover = 1'b1;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_left_rotor_inst_turnover = _left_rotor_inst_turnover;
@@ -385,7 +385,7 @@ always_comb begin // combinatorial _left_rotor_inst_advance
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_left_rotor_inst_advance = 1'bx;
 	_left_rotor_inst_advance = 1'b0;
-	if(prep_message_encode) if(right_rotor_advance) if(middle_rotor_advance) _left_rotor_inst_advance = 1'b1;
+	if(prep_message_encode) if(middle_rotor_advance) _left_rotor_inst_advance = 1'b1;
 	if(parse_letter) if(middle_rotor_advance) _left_rotor_inst_advance = 1'b1;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_left_rotor_inst_advance = _left_rotor_inst_advance;
