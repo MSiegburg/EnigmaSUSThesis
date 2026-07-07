@@ -1,4 +1,4 @@
-// THIS IS A GENERATED FILE (Generated at 2026-07-07T20:08:16+02:00)
+// THIS IS A GENERATED FILE (Generated at 2026-07-07T20:17:57+02:00)
 // This file was generated with SUS Compiler 0.4.0
 // enigma_machine_runtime #()
 module enigma_machine_runtime(
@@ -653,20 +653,20 @@ assign _26 = rotor_position == _25;
 /*mux_wire*/ logic[4:0] shift;
 wire signed[5:0] _29;
 assign _29 = rotor_position - ring_position;
-wire[4:0] _31;
-assign _31 = _29 + ((_29 < 0) ? 26 : 0); // == mod 26
-wire[5:0] _35;
-assign _35 = letter_index + shift;
-wire[4:0] _37;
-assign _37 = _35 - ((_35 >= 26) ? 26 : 0); // == mod 26
+wire[5:0] _31;
+assign _31 = _29 + $signed({1'b0, 5'd26});
+wire[4:0] _33;
+assign _33 = _31 - ((_31 >= 26) ? 26 : 0); // == mod 26
+wire[5:0] _37;
+assign _37 = letter_index + shift;
+wire[4:0] _39;
+assign _39 = _37 - ((_37 >= 26) ? 26 : 0); // == mod 26
 localparam[4:0] rotors[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
-wire[4:0] _38 = rotors[rotor_in_use][_37];
-wire signed[5:0] _41;
-assign _41 = substitution_result_left - rotor_position;
-wire signed[6:0] _43;
-assign _43 = _41 + $signed({1'b0, ring_position});
+wire[4:0] _40 = rotors[rotor_in_use][_39];
+wire signed[5:0] _43;
+assign _43 = substitution_result_left - shift;
 wire[4:0] _45;
-assign _45 = $unsigned(_43 % 26) + ((_43 % 26 < 0) ? 26 : 0); // == mod 26
+assign _45 = _43 + ((_43 < 0) ? 26 : 0); // == mod 26
 /*mux_wire*/ logic[4:0] substitution_result_right;
 wire[3:0] _48;
 assign _48 = rotor_in_use + 3'd5;
@@ -718,12 +718,12 @@ end
 always_comb begin // combinatorial substitution_result_left
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	substitution_result_left = 5'dx;
-	if(encode_left) substitution_result_left = _38;
+	if(encode_left) substitution_result_left = _40;
 end
 always_comb begin // combinatorial shift
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	shift = 5'dx;
-	if(encode_left) shift = _31;
+	if(encode_left) shift = _33;
 end
 always_comb begin // combinatorial rev_encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
