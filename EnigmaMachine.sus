@@ -49,7 +49,7 @@ module enigma_machine_runtime{
         when right_rotor_advance{                               // check if middle rotor needs to advance
             middle_rotor_inst.turnover()
         }
-        middle_rotor_advance=middle_rotor_inst.testDoublestep()
+        middle_rotor_advance=middle_rotor_inst.advance()
         when middle_rotor_advance{                          // check if left rotor needs to advance
             doublestepping = true
             left_rotor_inst.turnover()
@@ -71,7 +71,7 @@ module enigma_machine_runtime{
         when right_rotor_advance{                               // check if middle rotor needs to advance
             middle_rotor_inst.turnover()
         }
-        middle_rotor_advance=middle_rotor_inst.testDoublestep()
+        middle_rotor_advance=middle_rotor_inst.advance()
         when middle_rotor_advance{                          // check if left rotor needs to advance
             doublestepping = true
             left_rotor_inst.turnover()
@@ -131,13 +131,13 @@ module enigma_rotor_runtime#(){
     action turnover{                                                                                        // initiate a turnover of the rotor
         rotor_position=(rotor_position+1)mod 26
     }
-    action testDoublestep:-> bool doublestep{
+    /*action testDoublestep:-> bool doublestep{
         when (rotor_position==(turnover_positions[rotor_in_use]+ring_position)mod 26){
             doublestep=true
         } else {
             doublestep=false
         }
-    }
+    }*/
     action setup:int#(FROM: 0,TO: 5)rotor_to_use, int#(FROM: 0,TO: 26)rotor_starting_position,int#(FROM: 0,TO: 26)ring_position_in_use{     // setup the registers in a given rotor
         rotor_in_use=rotor_to_use
         rotor_position=rotor_starting_position
