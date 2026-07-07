@@ -1,4 +1,4 @@
-// THIS IS A GENERATED FILE (Generated at 2026-07-07T20:20:37+02:00)
+// THIS IS A GENERATED FILE (Generated at 2026-07-07T20:31:09+02:00)
 // This file was generated with SUS Compiler 0.4.0
 // enigma_machine_runtime #()
 module enigma_machine_runtime(
@@ -190,7 +190,7 @@ always_comb begin // combinatorial middle_rotor_advance
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	middle_rotor_advance = 1'bx;
 	if(prep_message_encode) middle_rotor_advance = _middle_rotor_inst_doublestep;
-	if(parse_letter) middle_rotor_advance = _middle_rotor_inst_doublestep;
+	if(parse_letter) if(right_rotor_advance) middle_rotor_advance = _middle_rotor_inst_doublestep;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	middle_rotor_advance = middle_rotor_advance;
 end
@@ -374,7 +374,7 @@ always_comb begin // combinatorial _middle_rotor_inst_testDoublestep
 	_middle_rotor_inst_testDoublestep = 1'bx;
 	_middle_rotor_inst_testDoublestep = 1'b0;
 	if(prep_message_encode) _middle_rotor_inst_testDoublestep = 1'b1;
-	if(parse_letter) _middle_rotor_inst_testDoublestep = 1'b1;
+	if(parse_letter) if(right_rotor_advance) _middle_rotor_inst_testDoublestep = 1'b1;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_middle_rotor_inst_testDoublestep = _middle_rotor_inst_testDoublestep;
 end

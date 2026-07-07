@@ -70,8 +70,8 @@ module enigma_machine_runtime{
         right_rotor_advance=right_rotor_inst.advance()
         when right_rotor_advance{                               // check if middle rotor needs to advance
             middle_rotor_inst.turnover()
+            middle_rotor_advance=middle_rotor_inst.testDoublestep()
         }
-        middle_rotor_advance=middle_rotor_inst.testDoublestep()
         when middle_rotor_advance{                          // check if left rotor needs to advance
             doublestepping = true
             left_rotor_inst.turnover()
