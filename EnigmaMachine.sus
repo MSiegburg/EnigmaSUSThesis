@@ -144,7 +144,9 @@ module enigma_rotor_runtime#(){
         ring_position=ring_position_in_use
     }
     action advance:-> bool advance_signal{                                                                  // advance signal checking for turnover 
-        when (rotor_position==(turnover_positions[rotor_in_use]+ring_position)mod 26){
+        int#(FROM: 0,TO: 26) modified_advance_position
+        modified_advance_position=turnover_positions[rotor_in_use]+ring_position mod 26
+        when (rotor_position==(modified_advance_position)){
             advance_signal=true
         } else {
             advance_signal=false
