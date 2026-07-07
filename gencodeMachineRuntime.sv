@@ -1,4 +1,4 @@
-// THIS IS A GENERATED FILE (Generated at 2026-07-07T21:16:18+02:00)
+// THIS IS A GENERATED FILE (Generated at 2026-07-07T21:35:29+02:00)
 // This file was generated with SUS Compiler 0.4.0
 // enigma_machine_runtime #()
 module enigma_machine_runtime(
@@ -197,10 +197,10 @@ always_comb begin // combinatorial left_rotor_advance
 	left_rotor_advance = left_rotor_advance;
 end
 always_ff @(posedge clk) begin // state doublestepping
-	if(prep_message_encode) if(middle_rotor_advance) doublestepping <= 1'b1;
-	if(prep_message_encode) if(doublestepping) doublestepping <= 1'b0;
-	if(parse_letter) if(middle_rotor_advance) doublestepping <= 1'b1;
-	if(parse_letter) if(doublestepping) doublestepping <= 1'b0;
+	if(prep_message_encode) if(right_rotor_advance) doublestepping <= 1'b1;
+	if(prep_message_encode) if(middle_rotor_advance) if(doublestepping) doublestepping <= 1'b0;
+	if(parse_letter) if(right_rotor_advance) doublestepping <= 1'b1;
+	if(parse_letter) if(middle_rotor_advance) if(doublestepping) doublestepping <= 1'b0;
 end
 always_comb begin // combinatorial plugboard1
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -357,9 +357,9 @@ always_comb begin // combinatorial _middle_rotor_inst_turnover
 	_middle_rotor_inst_turnover = 1'bx;
 	_middle_rotor_inst_turnover = 1'b0;
 	if(prep_message_encode) if(right_rotor_advance) _middle_rotor_inst_turnover = 1'b1;
-	if(prep_message_encode) if(doublestepping) _middle_rotor_inst_turnover = 1'b1;
+	if(prep_message_encode) if(middle_rotor_advance) if(doublestepping) _middle_rotor_inst_turnover = 1'b1;
 	if(parse_letter) if(right_rotor_advance) _middle_rotor_inst_turnover = 1'b1;
-	if(parse_letter) if(doublestepping) _middle_rotor_inst_turnover = 1'b1;
+	if(parse_letter) if(middle_rotor_advance) if(doublestepping) _middle_rotor_inst_turnover = 1'b1;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_middle_rotor_inst_turnover = _middle_rotor_inst_turnover;
 end

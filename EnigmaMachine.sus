@@ -48,16 +48,16 @@ module enigma_machine_runtime{
         right_rotor_advance=right_rotor_inst.advance()
         when right_rotor_advance{                               // check if middle rotor needs to advance
             middle_rotor_inst.turnover()
+            doublestepping = true
         }
         middle_rotor_advance=middle_rotor_inst.advance()
         when middle_rotor_advance{                          // check if left rotor needs to advance
-            doublestepping = true
             left_rotor_inst.turnover()
             left_rotor_advance=left_rotor_inst.advance()
-        }
-        when doublestepping{                              // double stepping check and resolution
-            middle_rotor_inst.turnover()
-            doublestepping=false
+            when doublestepping{                              // double stepping check and resolution
+                middle_rotor_inst.turnover()
+                doublestepping=false
+            }
         }
         /*}else when middle_rotor_advance{                        
             middle_rotor_inst.turnover()
@@ -70,16 +70,16 @@ module enigma_machine_runtime{
         right_rotor_advance=right_rotor_inst.advance()
         when right_rotor_advance{                               // check if middle rotor needs to advance
             middle_rotor_inst.turnover()
+            doublestepping = true
         }
         middle_rotor_advance=middle_rotor_inst.advance()
         when middle_rotor_advance{                          // check if left rotor needs to advance
-            doublestepping = true
             left_rotor_inst.turnover()
             left_rotor_advance=left_rotor_inst.advance()
-        }
-        when doublestepping{                              // double stepping check and resolution
-            middle_rotor_inst.turnover()
-            doublestepping=false
+            when doublestepping{                              // double stepping check and resolution
+                middle_rotor_inst.turnover()
+                doublestepping=false
+            }
         }
 
         // go through the encoding process via actions
