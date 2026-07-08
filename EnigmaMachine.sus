@@ -8,8 +8,7 @@ module enigma_machine_runtime{
     bool middle_rotor_advance
     bool left_rotor_advance 
 
-    state bool doublestepping
-    initial doublestepping = true
+    state bool doublestepping    
 
     int#(FROM: 0,TO: 26) plugboard1
     int#(FROM: 0,TO: 26) rrotor1
@@ -38,6 +37,8 @@ module enigma_machine_runtime{
         right_rotor_inst.setup(rotor_setup[0], rotor_positions[0], ring_positions[0])
         middle_rotor_inst.setup(rotor_setup[1], rotor_positions[1], ring_positions[1])
         left_rotor_inst.setup(rotor_setup[2], rotor_positions[2], ring_positions[2])
+
+        doublestepping=true
     }
 
     action change_plugs:int#(FROM: 0,TO: 26)plug, int#(FROM: 0,TO: 26) value{       // change plug in plugboard one plug at a time

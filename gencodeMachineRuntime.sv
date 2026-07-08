@@ -1,4 +1,4 @@
-// THIS IS A GENERATED FILE (Generated at 2026-07-07T21:35:29+02:00)
+// THIS IS A GENERATED FILE (Generated at 2026-07-08T10:51:56+02:00)
 // This file was generated with SUS Compiler 0.4.0
 // enigma_machine_runtime #()
 module enigma_machine_runtime(
@@ -197,6 +197,7 @@ always_comb begin // combinatorial left_rotor_advance
 	left_rotor_advance = left_rotor_advance;
 end
 always_ff @(posedge clk) begin // state doublestepping
+	if(setup) doublestepping <= 1'b1;
 	if(prep_message_encode) if(right_rotor_advance) doublestepping <= 1'b1;
 	if(prep_message_encode) if(middle_rotor_advance) if(doublestepping) doublestepping <= 1'b0;
 	if(parse_letter) if(right_rotor_advance) doublestepping <= 1'b1;
