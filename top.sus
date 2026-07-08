@@ -128,6 +128,8 @@ module enigma_top#(int AXI_WIDTH) {
     state int num_cycles_running
     SlowState#(T: type int#(FROM: 0, TO: pow2#(E: 64))) cur_experiment_addr
 
+// what does the above part do ?
+
     state bool[32] hash
     when ctrl.start {
         num_repeats_remaining = num_repeats
@@ -137,10 +139,10 @@ module enigma_top#(int AXI_WIDTH) {
         num_cycles_running = 0
         cycles_since_reset_at_start = cycles_since_reset_bits
         hash = 32'h00000000
-        reader.initialize_max_in_flight(BitsToUInt(config_bits_r[16:32]))
+        reader.initialize_max_in_flight(BitsToUInt(config_bits_r[16:32]))       // what is given as max in flight here ?
     }
 
-    when num_repeats_remaining != 0 & reader.may_request_new_read {
+    when num_repeats_remaining != 0 & reader.may_request_new_read {             // as long as we have repeats remaining we keep reading 
         when cur_experiment_addr.is_stable : int cur_addr {
             reader.request_new_read(cur_addr, num_to_transfer)
             reg int new_addr = cur_addr + repeat_offset mod pow2#(E: 64)
@@ -154,7 +156,7 @@ module enigma_top#(int AXI_WIDTH) {
     }
 
     when reader.chunk_valid : bool[ELEM_BITWIDTH][NUM_PARALLEL_ELEMENTS] elements, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS+1) chunk_length, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS) chunk_offset, bool last {
-        reg reg bool[NUM_PARALLEL_ELEMENTS] mask = MakeStrobe(chunk_length, chunk_offset)
+        reg reg bool[NUM_PARALLEL_ELEMENTS] mask = MakeStrobe(chunk_length, chunk_offset)       // what is MakeStrobe ?
         bool[ELEM_BITWIDTH][NUM_PARALLEL_ELEMENTS] masked_elements
         for int i in 0..NUM_PARALLEL_ELEMENTS {
             when mask[i] {
@@ -172,13 +174,14 @@ module enigma_top#(int AXI_WIDTH) {
         when last_d {
             when num_repeats_remaining_to_finish == 1 {
                 running = false
+                // ctrl.finish ends the xrt control modules work and finishes the execution of code ?
                 ctrl.finish([new_hash, UIntToBits(num_cycles_running), cycles_since_reset_at_start[:32], cycles_since_reset_at_start[32:], cycles_since_reset_bits[:32], cycles_since_reset_bits[32:]])
             }
             num_repeats_remaining_to_finish = IntNarrow#(FROM: 0, TO: pow2#(E: 32))(num_repeats_remaining_to_finish - 1)
         }
         hash = new_hash
     }
-    when !aresetn {
+    when !aresetn {             // setting the nessecary variables on reset
         running = false
         num_cycles_running = 0
         cycles_since_reset = 0
