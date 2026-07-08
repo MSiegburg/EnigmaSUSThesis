@@ -7,10 +7,10 @@ $(TMPDIR):
 U280/%: PART := xcu280-fsvh2892-2L-e
 U280/%: PLATFORM := xilinx_u280_gen3x16_xdma_1_202211_1
 
-sus_codegen.sv: sus-xrt/axi_memory.sus sus-xrt/xrt.sus EnigmaMachine.sus
-	sus_compiler sus-xrt/axi_memory.sus sus-xrt/xrt.sus EnigmaMachine.sus -o sus_codegen.sv --top all_read_benchmarks_axi4
+gencodeMachineRuntime.sv: sus-xrt/axi_memory.sus sus-xrt/xrt.sus EnigmaMachine.sus
+	sus_compiler sus-xrt/axi_memory.sus sus-xrt/xrt.sus EnigmaMachine.sus -o gencodeMachineRuntime.sv --top enigma_machine_runtime
 
-U280/EnigmaMachine.xo: pack_kernel.tcl sus_codegen.sv
+U280/EnigmaMachine.xo: pack_kernel.tcl gencodeMachineRuntime.sv
 	mkdir -p U280
 	rm -f U280/burst_reader_$*.xo
 	rm -rf U280/pack_prj$*
@@ -61,7 +61,7 @@ U280/run: _run
 .PHONY: clean cleantmp
 clean: cleantmp
 	rm -rf U280
-	rm -f sus_codegen.sv
+	rm -f gencodeMachineRuntime.sv
 	rm -f main.x
 	
 cleantmp:
