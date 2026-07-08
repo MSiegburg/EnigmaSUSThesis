@@ -169,10 +169,10 @@ module reflector{
 
 module plugboard#(int[26] plugboard_config){
     gen int LEN = 26
-    int#(FROM: 0,TO: 26)[26] plugboard_settings
+    state int#(FROM: 0,TO: 26)[26] plugboard_settings
     // setting the plugboard to the given array 
     for int I in 0..LEN{
-        plugboard_settings[I]=plugboard_config[I]
+        initial plugboard_settings[I]=plugboard_config[I]
     }
     action set_plug:int#(FROM: 0,TO: 26) plug, int#(FROM: 0,TO: 26) value{                           // setup a letter pair 
         plugboard_settings[plug]=value
