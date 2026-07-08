@@ -43,8 +43,8 @@ module enigma_top#(int AXI_WIDTH) {
     ctrl.arvalid =         s_axi_control_arvalid
     ctrl.rready  =         s_axi_control_rready
 
-    axi4_burst_reader_benchmarker#(AXI_WIDTH, ADDR_WIDTH: MEM_ADDR_WIDTH, ADDR_ALIGN: 4, COUNT_TO: pow2#(E: 32)) reader
-    axi4_writer_tie_off#(ADDR_WIDTH: MEM_ADDR_WIDTH) writer
+    axi4_burst_reader#(AXI_WIDTH, ADDR_WIDTH: MEM_ADDR_WIDTH, ADDR_ALIGN: 4) reader   // , COUNT_TO: pow2#(E: 32) extra from benchmarker ?
+    axi4_burst_writer#(AXI_WIDTH, ADDR_WIDTH: MEM_ADDR_WIDTH, ADDR_ALIGN: 4) writer
 
     domain mem_write
     output bool                     m_axi_awvalid = writer.awvalid
@@ -70,6 +70,7 @@ module enigma_top#(int AXI_WIDTH) {
     writer.wready =                 m_axi_wready
     writer.bvalid =                 m_axi_bvalid
     writer.bresp =                  m_axi_bresp
+
     domain mem_read
     output bool                     m_axi_arvalid'0 = reader.arvalid
     input  bool                     m_axi_arready
@@ -99,8 +100,8 @@ module enigma_top#(int AXI_WIDTH) {
     addr_a_bits[32:] = ctrl.input_regs[1]
 
     int start_addr = BitsToUInt(addr_a_bits)
-    int num_to_transfer = BitsToUInt(ctrl.input_regs[2])
-    int offset = BitsToUInt(ctrl.input_regs[3])
+    int num_to_transfer = BitsToUInt(ctrl.input_regs[2])        // does this refer to number of transfers without a length so just how many times something would be transfered ?
+    int offset = BitsToUInt(ctrl.input_regs[3])                 // 
     int num_repeats = BitsToUInt(ctrl.input_regs[4])
     int repeat_offset = BitsToUInt(ctrl.input_regs[5])
 
@@ -122,7 +123,7 @@ module enigma_top#(int AXI_WIDTH) {
 
     state bool[64] cycles_since_reset_at_start
 
-    state bool running
+    state bool running                                                                  // these are aprt of the benchmark or are any of these 5 nessecary ?
     state int#(FROM: 0, TO: pow2#(E: 32)) num_repeats_remaining
     state int#(FROM: 0, TO: pow2#(E: 32)) num_repeats_remaining_to_finish
     state int num_cycles_running
@@ -131,7 +132,7 @@ module enigma_top#(int AXI_WIDTH) {
 // what does the above part do ?
 
     state bool[32] hash
-    when ctrl.start {
+    when ctrl.start {                                                           // setting initial values when xrt control starts ?
         num_repeats_remaining = num_repeats
         num_repeats_remaining_to_finish = num_repeats
         cur_experiment_addr.set_fast(start_addr + offset mod pow2#(E: 64))
@@ -139,7 +140,7 @@ module enigma_top#(int AXI_WIDTH) {
         num_cycles_running = 0
         cycles_since_reset_at_start = cycles_since_reset_bits
         hash = 32'h00000000
-        reader.initialize_max_in_flight(BitsToUInt(config_bits_r[16:32]))       // what is given as max in flight here ?
+        reader.initialize_max_in_flight(BitsToUInt(config_bits_r[16:32]))       // what is given as max in flight here ? some extra property of the benchmarker variation ?
     }
 
     when num_repeats_remaining != 0 & reader.may_request_new_read {             // as long as we have repeats remaining we keep reading 
@@ -151,14 +152,14 @@ module enigma_top#(int AXI_WIDTH) {
         }
     }
 
-    when running {
+    when running {                                                               // a counter to look at how many cycles its been running 
         num_cycles_running = num_cycles_running + 1 mod pow2#(E: 32)
     }
 
     when reader.chunk_valid : bool[ELEM_BITWIDTH][NUM_PARALLEL_ELEMENTS] elements, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS+1) chunk_length, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS) chunk_offset, bool last {
         reg reg bool[NUM_PARALLEL_ELEMENTS] mask = MakeStrobe(chunk_length, chunk_offset)       // what is MakeStrobe ?
         bool[ELEM_BITWIDTH][NUM_PARALLEL_ELEMENTS] masked_elements
-        for int i in 0..NUM_PARALLEL_ELEMENTS {
+        for int i in 0..NUM_PARALLEL_ELEMENTS {                                                 // what do we do with for loops here ?
             when mask[i] {
                 reg masked_elements[i] = elements[i]
             } else {
@@ -177,7 +178,7 @@ module enigma_top#(int AXI_WIDTH) {
                 // ctrl.finish ends the xrt control modules work and finishes the execution of code ?
                 ctrl.finish([new_hash, UIntToBits(num_cycles_running), cycles_since_reset_at_start[:32], cycles_since_reset_at_start[32:], cycles_since_reset_bits[:32], cycles_since_reset_bits[32:]])
             }
-            num_repeats_remaining_to_finish = IntNarrow#(FROM: 0, TO: pow2#(E: 32))(num_repeats_remaining_to_finish - 1)
+            num_repeats_remaining_to_finish = IntNarrow#(FROM: 0, TO: pow2#(E: 32))(num_repeats_remaining_to_finish - 1)  // decreasese number of repeats
         }
         hash = new_hash
     }
