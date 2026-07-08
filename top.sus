@@ -181,6 +181,15 @@ module enigma_top#(int AXI_WIDTH) {
         }
         hash = new_hash
     }
+
+    state int current_state
+    // current_state = 000  initial state waiting for setup data exactly 9 elements to be received by burst reader
+    // current_state = 001  setup data received execute setup on enigma machine
+    // current_state = 010  setup finished receiving plugboard info exactly 26 elements from burst reader writing to plugboard once each cycle
+    // current_state = 011  plugboard values received and setup done waiting for message to be encoded execute prep message encode to prepare for first step
+    // current_state = 100  received first letter of message continuous 1 byte input form burst reader and execution of parse letter with the given value until last and simmultanious writing via burst writer of result to memory
+    // current_state = 101  message fully encoded and saved to memory operation done 
+
     when !aresetn {             // setting the nessecary variables on reset
         running = false
         num_cycles_running = 0
@@ -190,7 +199,16 @@ module enigma_top#(int AXI_WIDTH) {
         writer.rst()
         ctrl.rst()
         cur_experiment_addr.rst()
+        current_state=0
     }
+    
+    
+//Testing
+    
+    
+
+
+
 }
 /*
 module all_read_benchmarks_axi4 {
@@ -200,3 +218,4 @@ module all_read_benchmarks_axi4 {
     bench_burst_reader_axi4#(AXI_WIDTH: 256) burst256
     bench_burst_reader_axi4#(AXI_WIDTH: 512) burst512
 }*/
+
