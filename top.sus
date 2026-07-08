@@ -1,6 +1,6 @@
 
 
-module bench_burst_reader_axi4#(int AXI_WIDTH) {
+module enigma_top#(int AXI_WIDTH) {
     clock aclk
     input bool aresetn
 
@@ -8,11 +8,11 @@ module bench_burst_reader_axi4#(int AXI_WIDTH) {
     gen int CTRL_ADDR_WIDTH = 12
     gen int MEM_ADDR_WIDTH = 64
 
-    gen int ELEM_BYTE_SIZE = 4
+    gen int ELEM_BYTE_SIZE = 1
     gen int ELEM_BITWIDTH = ELEM_BYTE_SIZE * 8
     gen int NUM_PARALLEL_ELEMENTS = AXI_WIDTH / ELEM_BITWIDTH
 
-    xrt_ctrl_slave #(NUM_INPUT_REGS: 7, NUM_OUTPUT_REGS: 6, ADDR_WIDTH: CTRL_ADDR_WIDTH, AXI_WIDTH: CTRL_AXI_WIDTH) ctrl
+    xrt_ctrl_slave #(NUM_INPUT_REGS: 7, NUM_OUTPUT_REGS: 6, ADDR_WIDTH: CTRL_ADDR_WIDTH, AXI_WIDTH: CTRL_AXI_WIDTH) ctrl  // what does numinput/output regs do ?
 
     // Export AXI4-Lite interface
     domain axi_control
@@ -112,6 +112,8 @@ module bench_burst_reader_axi4#(int AXI_WIDTH) {
     output bool                     m_axi_arlock'0 = config_bits_r[11]
     output int#(FROM: 0, TO: 16)    m_axi_arregion'0 = BitsToUInt(config_bits_r[12:16])
 
+    // setup ends here ?
+
     state int cycles_since_reset
     cycles_since_reset = cycles_since_reset + 1 mod pow2#(E: 64)
 
@@ -187,11 +189,11 @@ module bench_burst_reader_axi4#(int AXI_WIDTH) {
         cur_experiment_addr.rst()
     }
 }
-
+/*
 module all_read_benchmarks_axi4 {
     bench_burst_reader_axi4#(AXI_WIDTH: 32) burst32
     bench_burst_reader_axi4#(AXI_WIDTH: 64) burst64
     bench_burst_reader_axi4#(AXI_WIDTH: 128) burst128
     bench_burst_reader_axi4#(AXI_WIDTH: 256) burst256
     bench_burst_reader_axi4#(AXI_WIDTH: 512) burst512
-}
+}*/

@@ -8,6 +8,8 @@ module enigma_machine_runtime{
     bool middle_rotor_advance
     bool left_rotor_advance 
 
+    state bool doublestepping    
+
     int#(FROM: 0,TO: 26) plugboard1
     int#(FROM: 0,TO: 26) rrotor1
     int#(FROM: 0,TO: 26) mrotor1
@@ -35,6 +37,8 @@ module enigma_machine_runtime{
         right_rotor_inst.setup(rotor_setup[0], rotor_positions[0], ring_positions[0])
         middle_rotor_inst.setup(rotor_setup[1], rotor_positions[1], ring_positions[1])
         left_rotor_inst.setup(rotor_setup[2], rotor_positions[2], ring_positions[2])
+
+        doublestepping=true
     }
 
     action change_plugs:int#(FROM: 0,TO: 26)plug, int#(FROM: 0,TO: 26) value{       // change plug in plugboard one plug at a time
@@ -46,15 +50,21 @@ module enigma_machine_runtime{
         right_rotor_advance=right_rotor_inst.advance()
         when right_rotor_advance{                               // check if middle rotor needs to advance
             middle_rotor_inst.turnover()
-            middle_rotor_advance=middle_rotor_inst.advance()
-            when middle_rotor_advance{                          // check if left rotor needs to advance
-                left_rotor_inst.turnover()
-                left_rotor_advance=left_rotor_inst.advance()
+            doublestepping = true
+        }
+        middle_rotor_advance=middle_rotor_inst.advance()
+        when middle_rotor_advance{                          // check if left rotor needs to advance
+            left_rotor_inst.turnover()
+            left_rotor_advance=left_rotor_inst.advance()
+            when doublestepping{                              // double stepping check and resolution
+                middle_rotor_inst.turnover()
+                doublestepping=false
             }
-        }else when middle_rotor_advance{                        // double stepping
+        }
+        /*}else when middle_rotor_advance{                        
             middle_rotor_inst.turnover()
             middle_rotor_advance=false
-        }
+        }*/
     }
 
     action parse_letter:int#(FROM: 0,TO: 26) input_letter -> int#(FROM: 0,TO: 26) encode_letter_final{
@@ -62,14 +72,16 @@ module enigma_machine_runtime{
         right_rotor_advance=right_rotor_inst.advance()
         when right_rotor_advance{                               // check if middle rotor needs to advance
             middle_rotor_inst.turnover()
-            middle_rotor_advance=middle_rotor_inst.advance()
-            when middle_rotor_advance{                          // check if left rotor needs to advance
-                left_rotor_inst.turnover()
-                left_rotor_advance=left_rotor_inst.advance()
+            doublestepping = true
+        }
+        middle_rotor_advance=middle_rotor_inst.advance()
+        when middle_rotor_advance{                          // check if left rotor needs to advance
+            left_rotor_inst.turnover()
+            left_rotor_advance=left_rotor_inst.advance()
+            when doublestepping{                              // double stepping check and resolution
+                middle_rotor_inst.turnover()
+                doublestepping=false
             }
-        }else when middle_rotor_advance{                        // double stepping
-            middle_rotor_inst.turnover()
-            middle_rotor_advance=false
         }
 
         // go through the encoding process via actions
@@ -121,25 +133,40 @@ module enigma_rotor_runtime#(){
     action turnover{                                                                                        // initiate a turnover of the rotor
         rotor_position=(rotor_position+1)mod 26
     }
+    /*action testDoublestep:-> bool doublestep{
+        when (rotor_position==(turnover_positions[rotor_in_use]+ring_position)mod 26){
+            doublestep=true
+        } else {
+            doublestep=false
+        }
+    }*/
     action setup:int#(FROM: 0,TO: 5)rotor_to_use, int#(FROM: 0,TO: 26)rotor_starting_position,int#(FROM: 0,TO: 26)ring_position_in_use{     // setup the registers in a given rotor
         rotor_in_use=rotor_to_use
         rotor_position=rotor_starting_position
         ring_position=ring_position_in_use
     }
     action advance:-> bool advance_signal{                                                                  // advance signal checking for turnover 
-        when (rotor_position==(turnover_positions[rotor_in_use]+ring_position)mod 26){
-            rotor_position=(rotor_position+1)mod 26
+        int#(FROM: 0,TO: 26) modified_advance_position
+        modified_advance_position=turnover_positions[rotor_in_use]+ring_position mod 26
+        when (rotor_position==(modified_advance_position)){
             advance_signal=true
         } else {
-            rotor_position=(rotor_position+1)mod 26
             advance_signal=false
         }
     }
     action encode_left: int#(FROM: 0,TO: 26) letter_index -> int#(FROM: 0,TO: 26) encode_letter{            // encode letter adding offset to value of ring position
-        encode_letter=rotors[rotor_in_use][(letter_index+rotor_position)mod 26]+ring_position mod 26
+        int#(FROM: 0,TO: 26) substitution_result_left
+        int#(FROM: 0,TO: 26) shift                                                                          // for debugging
+        shift=rotor_position-ring_position+26 mod 26
+        substitution_result_left=rotors[rotor_in_use][(letter_index+shift)mod 26]
+        encode_letter=substitution_result_left-shift mod 26
     }
     action encode_right: int#(FROM: 0,TO: 26) rev_letter_index -> int#(FROM: 0,TO: 26) rev_encode_letter{   // encode letter adding offset to index of ring position
-        rev_encode_letter=rotors[rotor_in_use+5][(rev_letter_index+rotor_position+ring_position)mod 26]    
+        int#(FROM: 0,TO: 26) substitution_result_right
+        int#(FROM: 0,TO: 26) shift                                                                          // for debugging
+        shift=rotor_position-ring_position+26 mod 26
+        substitution_result_right=rotors[rotor_in_use+5][(rev_letter_index+shift )mod 26]   
+        rev_encode_letter=substitution_result_right-shift mod 26
     }
 }
 

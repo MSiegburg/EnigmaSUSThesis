@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="enigma_testbench_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="enigma_testbench" />
+            <top_module name="glbl" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="683.850 ns"></ZoomStartTime>
+      <ZoomEndTime time="752.401 ns"></ZoomEndTime>
+      <Cursor1Time time="745.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="242"></NameColumnWidth>
+      <ValueColumnWidth column_width="58"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="9" />
+   <wvobject fp_name="group401" type="group">
+      <obj_property name="label">Enigma Machine</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/enigma_testbench/value" type="array">
+         <obj_property name="ElementShortName">value[4:0]</obj_property>
+         <obj_property name="ObjectShortName">value[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/setup" type="logic">
+         <obj_property name="ElementShortName">setup</obj_property>
+         <obj_property name="ObjectShortName">setup</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/rotor_setup" type="array">
+         <obj_property name="ElementShortName">rotor_setup[0:2][2:0]</obj_property>
+         <obj_property name="ObjectShortName">rotor_setup[0:2][2:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/rotor_positions" type="array">
+         <obj_property name="ElementShortName">rotor_positions[0:2][4:0]</obj_property>
+         <obj_property name="ObjectShortName">rotor_positions[0:2][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/ring_positions" type="array">
+         <obj_property name="ElementShortName">ring_positions[0:2][4:0]</obj_property>
+         <obj_property name="ObjectShortName">ring_positions[0:2][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/prep_message_encode" type="logic">
+         <obj_property name="ElementShortName">prep_message_encode</obj_property>
+         <obj_property name="ObjectShortName">prep_message_encode</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/parse_letter" type="logic">
+         <obj_property name="ElementShortName">parse_letter</obj_property>
+         <obj_property name="ObjectShortName">parse_letter</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/plug" type="array">
+         <obj_property name="ElementShortName">plug[4:0]</obj_property>
+         <obj_property name="ObjectShortName">plug[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/input_letter" type="array">
+         <obj_property name="ElementShortName">input_letter[4:0]</obj_property>
+         <obj_property name="ObjectShortName">input_letter[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/encode_letter_final" type="array">
+         <obj_property name="ElementShortName">encode_letter_final[4:0]</obj_property>
+         <obj_property name="ObjectShortName">encode_letter_final[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/cur_settings" type="logic">
+         <obj_property name="ElementShortName">cur_settings</obj_property>
+         <obj_property name="ObjectShortName">cur_settings</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/cur_rotors" type="array">
+         <obj_property name="ElementShortName">cur_rotors[0:2][2:0]</obj_property>
+         <obj_property name="ObjectShortName">cur_rotors[0:2][2:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/clk" type="logic">
+         <obj_property name="ElementShortName">clk</obj_property>
+         <obj_property name="ObjectShortName">clk</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/change_plugs" type="logic">
+         <obj_property name="ElementShortName">change_plugs</obj_property>
+         <obj_property name="ObjectShortName">change_plugs</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_advance" type="logic">
+         <obj_property name="ElementShortName">right_rotor_advance</obj_property>
+         <obj_property name="ObjectShortName">right_rotor_advance</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_advance" type="logic">
+         <obj_property name="ElementShortName">middle_rotor_advance</obj_property>
+         <obj_property name="ObjectShortName">middle_rotor_advance</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_advance" type="logic">
+         <obj_property name="ElementShortName">left_rotor_advance</obj_property>
+         <obj_property name="ObjectShortName">left_rotor_advance</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/doublestepping" type="logic">
+         <obj_property name="ElementShortName">doublestepping</obj_property>
+         <obj_property name="ObjectShortName">doublestepping</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/rotors" type="array">
+      <obj_property name="ElementShortName">rotors[0:9][0:25][4:0]</obj_property>
+      <obj_property name="ObjectShortName">rotors[0:9][0:25][4:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/enigma_testbench/encode_letter_final" type="array">
+      <obj_property name="ElementShortName">encode_letter_final[4:0]</obj_property>
+      <obj_property name="ObjectShortName">encode_letter_final[4:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/enigma_testbench/dut/encode_letter_final" type="array">
+      <obj_property name="ElementShortName">encode_letter_final[4:0]</obj_property>
+      <obj_property name="ObjectShortName">encode_letter_final[4:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="group54" type="group">
+      <obj_property name="label">Plugboard</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/enigma_testbench/dut/plugboard_inst/value" type="array">
+         <obj_property name="ElementShortName">value[4:0]</obj_property>
+         <obj_property name="ObjectShortName">value[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/plugboard_inst/set_plug" type="logic">
+         <obj_property name="ElementShortName">set_plug</obj_property>
+         <obj_property name="ObjectShortName">set_plug</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/plugboard_inst/plugboard_settings" type="array">
+         <obj_property name="ElementShortName">plugboard_settings[0:25][4:0]</obj_property>
+         <obj_property name="ObjectShortName">plugboard_settings[0:25][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/plugboard_inst/plug" type="array">
+         <obj_property name="ElementShortName">plug[4:0]</obj_property>
+         <obj_property name="ObjectShortName">plug[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/plugboard_inst/pass_letter_forward" type="logic">
+         <obj_property name="ElementShortName">pass_letter_forward</obj_property>
+         <obj_property name="ObjectShortName">pass_letter_forward</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/plugboard_inst/pass_letter_backward" type="logic">
+         <obj_property name="ElementShortName">pass_letter_backward</obj_property>
+         <obj_property name="ObjectShortName">pass_letter_backward</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/plugboard_inst/input_letter1" type="array">
+         <obj_property name="ElementShortName">input_letter1[4:0]</obj_property>
+         <obj_property name="ObjectShortName">input_letter1[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/plugboard_inst/output_letter1" type="array">
+         <obj_property name="ElementShortName">output_letter1[4:0]</obj_property>
+         <obj_property name="ObjectShortName">output_letter1[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/plugboard_inst/input_letter2" type="array">
+         <obj_property name="ElementShortName">input_letter2[4:0]</obj_property>
+         <obj_property name="ObjectShortName">input_letter2[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/plugboard_inst/output_letter2" type="array">
+         <obj_property name="ElementShortName">output_letter2[4:0]</obj_property>
+         <obj_property name="ObjectShortName">output_letter2[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/plugboard_inst/clk" type="logic">
+         <obj_property name="ElementShortName">clk</obj_property>
+         <obj_property name="ObjectShortName">clk</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group51" type="group">
+      <obj_property name="label">Rotor Right</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/turnover" type="logic">
+         <obj_property name="ElementShortName">turnover</obj_property>
+         <obj_property name="ObjectShortName">turnover</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/setup" type="logic">
+         <obj_property name="ElementShortName">setup</obj_property>
+         <obj_property name="ObjectShortName">setup</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/rotor_to_use" type="array">
+         <obj_property name="ElementShortName">rotor_to_use[2:0]</obj_property>
+         <obj_property name="ObjectShortName">rotor_to_use[2:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/rotor_starting_position" type="array">
+         <obj_property name="ElementShortName">rotor_starting_position[4:0]</obj_property>
+         <obj_property name="ObjectShortName">rotor_starting_position[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/rotor_position" type="array">
+         <obj_property name="ElementShortName">rotor_position[4:0]</obj_property>
+         <obj_property name="ObjectShortName">rotor_position[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/rotor_in_use" type="array">
+         <obj_property name="ElementShortName">rotor_in_use[2:0]</obj_property>
+         <obj_property name="ObjectShortName">rotor_in_use[2:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/ring_position_in_use" type="array">
+         <obj_property name="ElementShortName">ring_position_in_use[4:0]</obj_property>
+         <obj_property name="ObjectShortName">ring_position_in_use[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/ring_position" type="array">
+         <obj_property name="ElementShortName">ring_position[4:0]</obj_property>
+         <obj_property name="ObjectShortName">ring_position[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/letter_index" type="array">
+         <obj_property name="ElementShortName">letter_index[4:0]</obj_property>
+         <obj_property name="ObjectShortName">letter_index[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/shift" type="array">
+         <obj_property name="ElementShortName">shift[4:0]</obj_property>
+         <obj_property name="ObjectShortName">shift[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/substitution_result_left" type="array">
+         <obj_property name="ElementShortName">substitution_result_left[4:0]</obj_property>
+         <obj_property name="ObjectShortName">substitution_result_left[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/encode_letter" type="array">
+         <obj_property name="ElementShortName">encode_letter[4:0]</obj_property>
+         <obj_property name="ObjectShortName">encode_letter[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/rev_letter_index" type="array">
+         <obj_property name="ElementShortName">rev_letter_index[4:0]</obj_property>
+         <obj_property name="ObjectShortName">rev_letter_index[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/substitution_result_right" type="array">
+         <obj_property name="ElementShortName">substitution_result_right[4:0]</obj_property>
+         <obj_property name="ObjectShortName">substitution_result_right[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/rev_encode_letter" type="array">
+         <obj_property name="ElementShortName">rev_encode_letter[4:0]</obj_property>
+         <obj_property name="ObjectShortName">rev_encode_letter[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/encode_right" type="logic">
+         <obj_property name="ElementShortName">encode_right</obj_property>
+         <obj_property name="ObjectShortName">encode_right</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/encode_left" type="logic">
+         <obj_property name="ElementShortName">encode_left</obj_property>
+         <obj_property name="ObjectShortName">encode_left</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/modified_advance_position" type="array">
+         <obj_property name="ElementShortName">modified_advance_position[4:0]</obj_property>
+         <obj_property name="ObjectShortName">modified_advance_position[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/advance_signal" type="logic">
+         <obj_property name="ElementShortName">advance_signal</obj_property>
+         <obj_property name="ObjectShortName">advance_signal</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/right_rotor_inst/advance" type="logic">
+         <obj_property name="ElementShortName">advance</obj_property>
+         <obj_property name="ObjectShortName">advance</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group52" type="group">
+      <obj_property name="label">Rotor MIddle</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/turnover_positions" type="array">
+         <obj_property name="ElementShortName">turnover_positions[0:4][4:0]</obj_property>
+         <obj_property name="ObjectShortName">turnover_positions[0:4][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/turnover" type="logic">
+         <obj_property name="ElementShortName">turnover</obj_property>
+         <obj_property name="ObjectShortName">turnover</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/setup" type="logic">
+         <obj_property name="ElementShortName">setup</obj_property>
+         <obj_property name="ObjectShortName">setup</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/rotors_2" type="array">
+         <obj_property name="ElementShortName">rotors_2[0:9][0:25][4:0]</obj_property>
+         <obj_property name="ObjectShortName">rotors_2[0:9][0:25][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/rotors" type="array">
+         <obj_property name="ElementShortName">rotors[0:9][0:25][4:0]</obj_property>
+         <obj_property name="ObjectShortName">rotors[0:9][0:25][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/rotor_to_use" type="array">
+         <obj_property name="ElementShortName">rotor_to_use[2:0]</obj_property>
+         <obj_property name="ObjectShortName">rotor_to_use[2:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/rotor_starting_position" type="array">
+         <obj_property name="ElementShortName">rotor_starting_position[4:0]</obj_property>
+         <obj_property name="ObjectShortName">rotor_starting_position[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/rotor_position" type="array">
+         <obj_property name="ElementShortName">rotor_position[4:0]</obj_property>
+         <obj_property name="ObjectShortName">rotor_position[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/rotor_in_use" type="array">
+         <obj_property name="ElementShortName">rotor_in_use[2:0]</obj_property>
+         <obj_property name="ObjectShortName">rotor_in_use[2:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/ring_position_in_use" type="array">
+         <obj_property name="ElementShortName">ring_position_in_use[4:0]</obj_property>
+         <obj_property name="ObjectShortName">ring_position_in_use[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/ring_position" type="array">
+         <obj_property name="ElementShortName">ring_position[4:0]</obj_property>
+         <obj_property name="ObjectShortName">ring_position[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/letter_index" type="array">
+         <obj_property name="ElementShortName">letter_index[4:0]</obj_property>
+         <obj_property name="ObjectShortName">letter_index[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/shift" type="array">
+         <obj_property name="ElementShortName">shift[4:0]</obj_property>
+         <obj_property name="ObjectShortName">shift[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/substitution_result_left" type="array">
+         <obj_property name="ElementShortName">substitution_result_left[4:0]</obj_property>
+         <obj_property name="ObjectShortName">substitution_result_left[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/encode_letter" type="array">
+         <obj_property name="ElementShortName">encode_letter[4:0]</obj_property>
+         <obj_property name="ObjectShortName">encode_letter[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/rev_letter_index" type="array">
+         <obj_property name="ElementShortName">rev_letter_index[4:0]</obj_property>
+         <obj_property name="ObjectShortName">rev_letter_index[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/substitution_result_right" type="array">
+         <obj_property name="ElementShortName">substitution_result_right[4:0]</obj_property>
+         <obj_property name="ObjectShortName">substitution_result_right[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/rev_encode_letter" type="array">
+         <obj_property name="ElementShortName">rev_encode_letter[4:0]</obj_property>
+         <obj_property name="ObjectShortName">rev_encode_letter[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/encode_right" type="logic">
+         <obj_property name="ElementShortName">encode_right</obj_property>
+         <obj_property name="ObjectShortName">encode_right</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/encode_left" type="logic">
+         <obj_property name="ElementShortName">encode_left</obj_property>
+         <obj_property name="ObjectShortName">encode_left</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/clk" type="logic">
+         <obj_property name="ElementShortName">clk</obj_property>
+         <obj_property name="ObjectShortName">clk</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/modified_advance_position" type="array">
+         <obj_property name="ElementShortName">modified_advance_position[4:0]</obj_property>
+         <obj_property name="ObjectShortName">modified_advance_position[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/advance_signal" type="logic">
+         <obj_property name="ElementShortName">advance_signal</obj_property>
+         <obj_property name="ObjectShortName">advance_signal</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/middle_rotor_inst/advance" type="logic">
+         <obj_property name="ElementShortName">advance</obj_property>
+         <obj_property name="ObjectShortName">advance</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group53" type="group">
+      <obj_property name="label">Rotor Left</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/turnover_positions" type="array">
+         <obj_property name="ElementShortName">turnover_positions[0:4][4:0]</obj_property>
+         <obj_property name="ObjectShortName">turnover_positions[0:4][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/turnover" type="logic">
+         <obj_property name="ElementShortName">turnover</obj_property>
+         <obj_property name="ObjectShortName">turnover</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/setup" type="logic">
+         <obj_property name="ElementShortName">setup</obj_property>
+         <obj_property name="ObjectShortName">setup</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/rotors_2" type="array">
+         <obj_property name="ElementShortName">rotors_2[0:9][0:25][4:0]</obj_property>
+         <obj_property name="ObjectShortName">rotors_2[0:9][0:25][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/rotors" type="array">
+         <obj_property name="ElementShortName">rotors[0:9][0:25][4:0]</obj_property>
+         <obj_property name="ObjectShortName">rotors[0:9][0:25][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/rotor_to_use" type="array">
+         <obj_property name="ElementShortName">rotor_to_use[2:0]</obj_property>
+         <obj_property name="ObjectShortName">rotor_to_use[2:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/rotor_starting_position" type="array">
+         <obj_property name="ElementShortName">rotor_starting_position[4:0]</obj_property>
+         <obj_property name="ObjectShortName">rotor_starting_position[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/rotor_position" type="array">
+         <obj_property name="ElementShortName">rotor_position[4:0]</obj_property>
+         <obj_property name="ObjectShortName">rotor_position[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/rotor_in_use" type="array">
+         <obj_property name="ElementShortName">rotor_in_use[2:0]</obj_property>
+         <obj_property name="ObjectShortName">rotor_in_use[2:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/ring_position_in_use" type="array">
+         <obj_property name="ElementShortName">ring_position_in_use[4:0]</obj_property>
+         <obj_property name="ObjectShortName">ring_position_in_use[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/ring_position" type="array">
+         <obj_property name="ElementShortName">ring_position[4:0]</obj_property>
+         <obj_property name="ObjectShortName">ring_position[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/letter_index" type="array">
+         <obj_property name="ElementShortName">letter_index[4:0]</obj_property>
+         <obj_property name="ObjectShortName">letter_index[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/shift" type="array">
+         <obj_property name="ElementShortName">shift[4:0]</obj_property>
+         <obj_property name="ObjectShortName">shift[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/substitution_result_left" type="array">
+         <obj_property name="ElementShortName">substitution_result_left[4:0]</obj_property>
+         <obj_property name="ObjectShortName">substitution_result_left[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/encode_letter" type="array">
+         <obj_property name="ElementShortName">encode_letter[4:0]</obj_property>
+         <obj_property name="ObjectShortName">encode_letter[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/rev_letter_index" type="array">
+         <obj_property name="ElementShortName">rev_letter_index[4:0]</obj_property>
+         <obj_property name="ObjectShortName">rev_letter_index[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/substitution_result_right" type="array">
+         <obj_property name="ElementShortName">substitution_result_right[4:0]</obj_property>
+         <obj_property name="ObjectShortName">substitution_result_right[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/rev_encode_letter" type="array">
+         <obj_property name="ElementShortName">rev_encode_letter[4:0]</obj_property>
+         <obj_property name="ObjectShortName">rev_encode_letter[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/encode_right" type="logic">
+         <obj_property name="ElementShortName">encode_right</obj_property>
+         <obj_property name="ObjectShortName">encode_right</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/encode_left" type="logic">
+         <obj_property name="ElementShortName">encode_left</obj_property>
+         <obj_property name="ObjectShortName">encode_left</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/clk" type="logic">
+         <obj_property name="ElementShortName">clk</obj_property>
+         <obj_property name="ObjectShortName">clk</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/modified_advance_position" type="array">
+         <obj_property name="ElementShortName">modified_advance_position[4:0]</obj_property>
+         <obj_property name="ObjectShortName">modified_advance_position[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/advance_signal" type="logic">
+         <obj_property name="ElementShortName">advance_signal</obj_property>
+         <obj_property name="ObjectShortName">advance_signal</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/left_rotor_inst/advance" type="logic">
+         <obj_property name="ElementShortName">advance</obj_property>
+         <obj_property name="ObjectShortName">advance</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group376" type="group">
+      <obj_property name="label">Reflector</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/enigma_testbench/dut/reflector_inst/reflector_table" type="array">
+         <obj_property name="ElementShortName">reflector_table[0:25][4:0]</obj_property>
+         <obj_property name="ObjectShortName">reflector_table[0:25][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/reflector_inst/reflector" type="logic">
+         <obj_property name="ElementShortName">reflector</obj_property>
+         <obj_property name="ObjectShortName">reflector</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/reflector_inst/input_letter" type="array">
+         <obj_property name="ElementShortName">input_letter[4:0]</obj_property>
+         <obj_property name="ObjectShortName">input_letter[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/reflector_inst/output_letter" type="array">
+         <obj_property name="ElementShortName">output_letter[4:0]</obj_property>
+         <obj_property name="ObjectShortName">output_letter[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/enigma_testbench/dut/reflector_inst/clk" type="logic">
+         <obj_property name="ElementShortName">clk</obj_property>
+         <obj_property name="ObjectShortName">clk</obj_property>
+      </wvobject>
+   </wvobject>
+</wave_config>
