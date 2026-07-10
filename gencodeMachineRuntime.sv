@@ -1,4 +1,4 @@
-// THIS IS A GENERATED FILE (Generated at 2026-07-08T10:51:56+02:00)
+// THIS IS A GENERATED FILE (Generated at 2026-07-10T13:33:11+02:00)
 // This file was generated with SUS Compiler 0.4.0
 // enigma_machine_runtime #()
 module enigma_machine_runtime(
@@ -536,39 +536,11 @@ module plugboard_plugboard_config_0_1_2_3_4_5_6_7_8_9_10_11_12_13_14_15_16_17_18
 	output /*mux_wire*/ logic[4:0] output_letter2
 );
 
-/*mux_wire*/ logic[4:0] plugboard_settings[0:25];
+/*state*/ logic[4:0] plugboard_settings[0:25] = '{5'd0, 5'd1, 5'd2, 5'd3, 5'd4, 5'd5, 5'd6, 5'd7, 5'd8, 5'd9, 5'd10, 5'd11, 5'd12, 5'd13, 5'd14, 5'd15, 5'd16, 5'd17, 5'd18, 5'd19, 5'd20, 5'd21, 5'd22, 5'd23, 5'd24, 5'd25};
 wire[4:0] _4 = plugboard_settings[input_letter1];
 wire[4:0] _6 = plugboard_settings[input_letter2];
-always_comb begin // combinatorial plugboard_settings
-	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	plugboard_settings = '{5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx, 5'dx};
-	plugboard_settings[0] = 1'd0;
-	plugboard_settings[1] = 1'd1;
-	plugboard_settings[2] = 2'd2;
-	plugboard_settings[3] = 2'd3;
-	plugboard_settings[4] = 3'd4;
-	plugboard_settings[5] = 3'd5;
-	plugboard_settings[6] = 3'd6;
-	plugboard_settings[7] = 3'd7;
-	plugboard_settings[8] = 4'd8;
-	plugboard_settings[9] = 4'd9;
-	plugboard_settings[10] = 4'd10;
-	plugboard_settings[11] = 4'd11;
-	plugboard_settings[12] = 4'd12;
-	plugboard_settings[13] = 4'd13;
-	plugboard_settings[14] = 4'd14;
-	plugboard_settings[15] = 4'd15;
-	plugboard_settings[16] = 5'd16;
-	plugboard_settings[17] = 5'd17;
-	plugboard_settings[18] = 5'd18;
-	plugboard_settings[19] = 5'd19;
-	plugboard_settings[20] = 5'd20;
-	plugboard_settings[21] = 5'd21;
-	plugboard_settings[22] = 5'd22;
-	plugboard_settings[23] = 5'd23;
-	plugboard_settings[24] = 5'd24;
-	plugboard_settings[25] = 5'd25;
-	if(set_plug) plugboard_settings[plug] = value;
+always_ff @(posedge clk) begin // state plugboard_settings
+	if(set_plug) plugboard_settings[plug] <= value;
 end
 always_comb begin // combinatorial output_letter1
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
