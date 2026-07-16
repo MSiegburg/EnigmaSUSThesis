@@ -1,4 +1,4 @@
-module enigma_top#() {
+module enigma_top {
     clock aclk
     input bool aresetn
 
@@ -109,8 +109,10 @@ module enigma_top#() {
     int read_start_addr = BitsToInt(message_adress)
 
     bool[64] encode_adress
-
+    encode_adress[:32] = ctrl.input_regs[2]
+    encode_adress[32:] = ctrl.input_regs[3]
     int write_start_addr = BitsToInt(encode_adress)
+
 
     state int current_state
     state int#(FROM: 0,TO: 5)[3] rotors_to_use
@@ -119,7 +121,7 @@ module enigma_top#() {
     state int#(FROM: 0,TO: 26)[26] plugboard_config
     state int#(FROM: 0,TO: 26) plugboard_iterator
 
-    state bool last_letter_in_message
+    //state bool last_letter_in_message
     int number_to_transfer
 
     enigma_machine_runtime enigma_machine
@@ -128,10 +130,10 @@ module enigma_top#() {
     when ctrl.start {                                                           // setting initial values when xrt control starts 
         plugboard_iterator=0
         current_state=1
-        last_letter_in_message=false
+        //last_letter_in_message=false
         number_to_transfer=BitsToUInt(ctrl.input_regs[4])
         writer.request_new_write(write_start_addr)
-        reader.request_new_read(read_start_addr, number_to_transfer , [])
+        
         for int i in 0..3{
             rotors_to_use[i]=BitsToInt(ctrl.input_regs[5+i])
             rotor_positions_to_use[i]=BitsToInt(ctrl.input_regs[8+i])
@@ -148,7 +150,7 @@ module enigma_top#() {
     }
     when current_state == 2 & plugboard_iterator<25{
         enigma_machine.change_plugs(plugboard_iterator, plugboard_config[plugboard_iterator])
-        plugboard_iterator=plugboard_iterator+1
+        plugboard_iterator=plugboard_iterator+1 mod 26
     }
     when current_state == 2 & plugboard_iterator==25{
         enigma_machine.change_plugs(plugboard_iterator, plugboard_config[plugboard_iterator])
@@ -157,26 +159,24 @@ module enigma_top#() {
     when current_state == 3{
         enigma_machine.prep_message_encode()
         current_state=4
-    }
-    when current_state == 4 & !last_letter_in_message{
-        when reader.chunk_valid : bool[ELEM_BITWIDTH][NUM_PARALLEL_ELEMENTS] elements, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS+1) chunk_length, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS) chunk_offset, bool last, bool[0] _unused_extra_data{
-            last_letter_in_message=last
-            int#(FROM: 0,TO: 26) letter_to_parse
-            int#(FROM: 0,TO: 26) encoded_letter
-            letter_to_parse=BitsToInt(elements[:][0])
-            encoded_letter=enigma_machine.parse_letter(letter_to_parse)
-            bool[32][0] to_save
-            to_save[:][0]=IntToBits(encoded_letter)
-            writer.write(to_save, chunk_length, chunk_offset, last)
-        }
+        reader.request_new_read(read_start_addr, number_to_transfer , [])
     }
     
-    when current_state == 4 & last_letter_in_message{
-        current_state=5
-        when writer.write_has_been_committed{
-            ctrl.finish([])
-        }
+    when reader.chunk_valid : bool[ELEM_BITWIDTH][NUM_PARALLEL_ELEMENTS] elements, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS+1) chunk_length, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS) chunk_offset, bool last, bool[0] _unused_extra_data{
+        //last_letter_in_message=last
+        int#(FROM: 0,TO: 26) letter_to_parse
+        int#(FROM: 0,TO: 26) encoded_letter
+        letter_to_parse=BitsToInt(elements[:][0])
+        encoded_letter=enigma_machine.parse_letter(letter_to_parse)
+        bool[32][0] to_save
+        to_save[:][0]=IntToBits(encoded_letter)
+        writer.write(to_save, chunk_length, chunk_offset, last)
     }
+    
+    when writer.write_has_been_committed{
+        ctrl.finish([])
+    }
+    
 
     
     // current_state = 000  initial state waiting for setup data read out of input registers
@@ -192,7 +192,7 @@ module enigma_top#() {
         ctrl.rst()
         current_state=0
         plugboard_iterator=0
-        last_letter_in_message=false
+        //last_letter_in_message=false
     }
     
     /*when reader.may_request_new_read{                    

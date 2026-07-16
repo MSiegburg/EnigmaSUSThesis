@@ -7,16 +7,16 @@ $(TMPDIR):
 U280/%: PART := xcu280-fsvh2892-2L-e
 U280/%: PLATFORM := xilinx_u280_gen3x16_xdma_1_202211_1
 
-gencodeMachineRuntime.sv: sus-xrt/axi_memory.sus sus-xrt/xrt.sus EnigmaMachine.sus
-	sus_compiler sus-xrt/axi_memory.sus sus-xrt/xrt.sus EnigmaMachine.sus -o gencodeMachineRuntime.sv --top enigma_machine_runtime
+gencodeMachineRuntime.sv: sus-xrt/axi_memory.sus sus-xrt/xrt.sus EnigmaMachine.sus top.sus
+	sus_compiler sus-xrt/axi_memory.sus sus-xrt/xrt.sus EnigmaMachine.sus top.sus -o gencodeMachineRuntime.sv --top enigma_top
 
 U280/EnigmaMachine.xo: pack_kernel.tcl gencodeMachineRuntime.sv
 	mkdir -p U280
-	rm -f U280/burst_reader_$*.xo
-	rm -rf U280/pack_prj$*
-	mkdir U280/pack_prj$*
-	cd U280/pack_prj$*;\
-	vivado -mode batch -source ../../pack_kernel.tcl -tclargs $(PART) $* ../burst_reader_$*.xo
+	rm -f U280/EnigmaMachine.xo
+	rm -rf U280/pack_prj
+	mkdir U280/pack_prj
+	cd U280/pack_prj;\
+	vivado -mode batch -source ../../pack_kernel.tcl -tclargs $(PART) ../EnigmaMachine.xo
 
 U280/overlay_hw_emu.xclbin: u280_connectivity.cfg U280/EnigmaMachine.xo
 	rm -f U280/overlay_hw_emu.xclbin

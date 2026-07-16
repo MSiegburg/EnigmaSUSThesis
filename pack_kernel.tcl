@@ -1,12 +1,11 @@
 set PART [lindex $argv 0]
-set AXI_WIDTH [lindex $argv 1]
-set XO_FILE [lindex $argv 2]
+set XO_FILE [lindex $argv 1]
 
 # set AXI_WIDTH 32
 # set PART xcvc1902-vsvd1760-2MP-e-S
 
 
-set KERNEL_NAME burst_reader${AXI_WIDTH}
+set KERNEL_NAME enigma_top
 
 create_project ${KERNEL_NAME} ./${KERNEL_NAME} -part $PART
 
@@ -16,7 +15,7 @@ add_files -norecurse \
 }
 
 # ???
-set_property top bench_burst_reader_axi4_AXI_WIDTH_${AXI_WIDTH} [current_fileset]
+set_property top enigma_top [current_fileset]
 
 
 update_compile_order -fileset sources_1
@@ -25,22 +24,11 @@ update_compile_order -fileset sources_1
 #                                             ???                ???           ???               ??? 
 ipx::package_project -root_dir ./${KERNEL_NAME}_ip -vendor pc2-sus-experiments -library sus-xrt -taxonomy /UserIP -import_files
 
-#                                ???
-# ipx::infer_bus_interface aclk  xilinx.com:signal:clock_rtl:1.0 [ipx::current_core]
-# ipx::infer_bus_interface aresetn xilinx.com:signal:reset_rtl:1.0 [ipx::current_core]
-# ipx::associate_bus_interfaces -clock aclk -reset aresetn [ipx::current_core]
-# ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces aclk -of_objects [ipx::current_core]]
-
 set_property ipi_drc {ignore_freq_hz false} [ipx::current_core]
 set_property sdx_kernel true [ipx::current_core]
 set_property sdx_kernel_type rtl [ipx::current_core]
 set_property vitis_drc {ctrl_protocol ap_ctrl_hs} [ipx::current_core]
 set_property ipi_drc {ignore_freq_hz true} [ipx::current_core]
-
-# s_axi_control MUST be named as such
-# ipx::associate_bus_interfaces -busif s_axi_control -clock aclk [ipx::current_core]
-#ipx::associate_bus_interfaces -busif outstream -clock aclk [ipx::current_core]
-# ipx::associate_bus_interfaces -busif m_axi -clock aclk [ipx::current_core]
 
 
 set CTRL_ADDR_BLOCK [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects [ipx::current_core]]]
@@ -51,43 +39,41 @@ set_property description    {Control Signals} [ipx::get_registers CTRL -of_objec
 set_property address_offset {0x00}            [ipx::get_registers CTRL -of_objects $CTRL_ADDR_BLOCK]
 set_property size           {32}              [ipx::get_registers CTRL -of_objects $CTRL_ADDR_BLOCK]
 
-ipx::add_register ADDR_A $CTRL_ADDR_BLOCK
-set_property description    {buffer addr}     [ipx::get_registers ADDR_A  -of_objects $CTRL_ADDR_BLOCK]
-set_property address_offset {0x010}           [ipx::get_registers ADDR_A  -of_objects $CTRL_ADDR_BLOCK]
-set_property size           {64}              [ipx::get_registers ADDR_A  -of_objects $CTRL_ADDR_BLOCK]
+proc add_reg {CTRL_ADDR_BLOCK reg_name size offset} {
+    ipx::add_register reg_name $CTRL_ADDR_BLOCK
+    set_property address_offset $offset             [ipx::get_registers $reg_name  -of_objects $CTRL_ADDR_BLOCK]
+    set_property size           $size               [ipx::get_registers $reg_name  -of_objects $CTRL_ADDR_BLOCK]
+}
 
-ipx::add_register ELEMENT_COUNT $CTRL_ADDR_BLOCK
-set_property description    {number of elements}      [ipx::get_registers ELEMENT_COUNT  -of_objects $CTRL_ADDR_BLOCK]
-set_property address_offset {0x018}                   [ipx::get_registers ELEMENT_COUNT  -of_objects $CTRL_ADDR_BLOCK]
-set_property size           {32}                      [ipx::get_registers ELEMENT_COUNT  -of_objects $CTRL_ADDR_BLOCK]
+add_reg $CTRL_ADDR_BLOCK MESSAGE_ADDR 64 0x010
+add_reg $CTRL_ADDR_BLOCK ENCODE_ADDR 64 0x018
+add_reg $CTRL_ADDR_BLOCK NUMBER_TO_TRANSFER 32 0x020
+add_reg $CTRL_ADDR_BLOCK ROTOR_ONE 32 0x024
+add_reg $CTRL_ADDR_BLOCK ROTOR_TWO 32 0x028
+add_reg $CTRL_ADDR_BLOCK ROTOR_THREE 32 0x02b
+add_reg $CTRL_ADDR_BLOCK ROTOR_POS_ONE 32 0x030
+add_reg $CTRL_ADDR_BLOCK ROTOR_POS_TWO 32 0x034
+add_reg $CTRL_ADDR_BLOCK ROTOR_POS_THREE 32 0x038
+add_reg $CTRL_ADDR_BLOCK RING_POS_ONE 32 0x03b
+add_reg $CTRL_ADDR_BLOCK RING_POS_TWO 32 0x040
+add_reg $CTRL_ADDR_BLOCK RING_POS_THREE 32 0x044
 
-ipx::add_register OFFSET $CTRL_ADDR_BLOCK
-set_property description    {address offset}          [ipx::get_registers OFFSET  -of_objects $CTRL_ADDR_BLOCK]
-set_property address_offset {0x01c}                   [ipx::get_registers OFFSET  -of_objects $CTRL_ADDR_BLOCK]
-set_property size           {32}                      [ipx::get_registers OFFSET  -of_objects $CTRL_ADDR_BLOCK]
-
-ipx::add_register EXPERIMENT_REPEATS $CTRL_ADDR_BLOCK
-set_property description    {number of repeats}       [ipx::get_registers EXPERIMENT_REPEATS  -of_objects $CTRL_ADDR_BLOCK]
-set_property address_offset {0x020}                   [ipx::get_registers EXPERIMENT_REPEATS  -of_objects $CTRL_ADDR_BLOCK]
-set_property size           {32}                      [ipx::get_registers EXPERIMENT_REPEATS  -of_objects $CTRL_ADDR_BLOCK]
-
-ipx::add_register EXPERIMENT_OFFSET $CTRL_ADDR_BLOCK
-set_property description    {per experiment offset in memory}    [ipx::get_registers EXPERIMENT_OFFSET  -of_objects $CTRL_ADDR_BLOCK]
-set_property address_offset {0x024}                              [ipx::get_registers EXPERIMENT_OFFSET  -of_objects $CTRL_ADDR_BLOCK]
-set_property size           {32}                                 [ipx::get_registers EXPERIMENT_OFFSET  -of_objects $CTRL_ADDR_BLOCK]
-
-ipx::add_register WRITE_CONFIG $CTRL_ADDR_BLOCK
-set_property description    {write config bits}     [ipx::get_registers WRITE_CONFIG  -of_objects $CTRL_ADDR_BLOCK]
-set_property address_offset {0x028}                   [ipx::get_registers WRITE_CONFIG  -of_objects $CTRL_ADDR_BLOCK]
-set_property size           {32}                      [ipx::get_registers WRITE_CONFIG  -of_objects $CTRL_ADDR_BLOCK]
+for {set i 0} {i < 26} {incr i} {
+    add_reg $CTRL_ADDR_BLOCK plug_${i} 32 [format "%x" [expr 0x048 + $i * 4]]
+}
 
 
-ipx::add_register_parameter ASSOCIATED_BUSIF [ipx::get_registers ADDR_A -of_objects $CTRL_ADDR_BLOCK]
-set_property value          {m_axi}          [ipx::get_register_parameters ASSOCIATED_BUSIF -of_objects [ipx::get_registers ADDR_A -of_objects $CTRL_ADDR_BLOCK]]
+ipx::add_register_parameter ASSOCIATED_BUSIF [ipx::get_registers MESSAGE_ADDR -of_objects $CTRL_ADDR_BLOCK]
+set_property value          {m_axi}          [ipx::get_register_parameters ASSOCIATED_BUSIF -of_objects [ipx::get_registers MESSAGE_ADDR -of_objects $CTRL_ADDR_BLOCK]]
+
+ipx::add_register_parameter ASSOCIATED_BUSIF [ipx::get_registers ENCODE_ADDR -of_objects $CTRL_ADDR_BLOCK]
+set_property value          {m_axi}          [ipx::get_register_parameters ASSOCIATED_BUSIF -of_objects [ipx::get_registers ENCODE_ADDR -of_objects $CTRL_ADDR_BLOCK]]
+
+
 
 set M_AXI_BUSIF [ipx::get_bus_interfaces m_axi -of_objects [ipx::current_core]]
 ipx::add_bus_parameter DATA_WIDTH $M_AXI_BUSIF
-set_property value           $AXI_WIDTH [ipx::get_bus_parameters DATA_WIDTH -of_objects $M_AXI_BUSIF]
+set_property value           32 [ipx::get_bus_parameters DATA_WIDTH -of_objects $M_AXI_BUSIF]
 
 set_property core_revision 2 [ipx::current_core]
 ipx::create_xgui_files [ipx::current_core]
