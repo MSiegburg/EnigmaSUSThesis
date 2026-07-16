@@ -1,5 +1,3 @@
-
-
 module enigma_top#() {
     clock aclk
     input bool aresetn
@@ -96,47 +94,96 @@ module enigma_top#() {
     reader.rlast =                  m_axi_rlast
 
 
-    bool[64] message_adress
-    message_adress[:32] = ctrl.input_regs[0]
-    message_adress[32:] = ctrl.input_regs[1]
 
-    bool[64] encode_adress
-    encode_adress[:32] = ctrl.input_regs[2]
-    encode_adress[32:] = ctrl.input_regs[3]
-
-
-    int start_addr = BitsToUInt(message_adress)
-    int num_to_transfer = BitsToUInt(ctrl.input_regs[4])        
+    //int start_addr = BitsToUInt(message_adress)
+    /*int num_to_transfer = BitsToUInt(ctrl.input_regs[4])        
     int offset = BitsToUInt(ctrl.input_regs[5])                 
     int num_repeats = BitsToUInt(ctrl.input_regs[6])
     int repeat_offset = BitsToUInt(ctrl.input_regs[7])
-
-    bool[32] config_bits_r = ctrl.input_regs[8]
-
+    bool[32] config_bits_r = ctrl.input_regs[8]*/
     //SlowState#(T: type int#(FROM: 0, TO: pow2#(E: 64))) cur_experiment_addr   
+
+    bool[64] message_adress
+    message_adress[:32] = ctrl.input_regs[0]
+    message_adress[32:] = ctrl.input_regs[1]
+    int read_start_addr = BitsToInt(message_adress)
+
+    bool[64] encode_adress
+
+    int write_start_addr = BitsToInt(encode_adress)
+
     state int current_state
+    state int#(FROM: 0,TO: 5)[3] rotors_to_use
+    state int#(FROM: 0,TO: 26)[3] rotor_positions_to_use
+    state int#(FROM: 0,TO: 26)[3] ring_positions_to_use
+    state int#(FROM: 0,TO: 26)[26] plugboard_config
+    state int#(FROM: 0,TO: 26) plugboard_iterator
+
+    state bool last_letter_in_message
+    int number_to_transfer
+
+    enigma_machine_runtime enigma_machine
+
 
     when ctrl.start {                                                           // setting initial values when xrt control starts 
-       
-    }
-    when reader.chunk_valid : bool[ELEM_BITWIDTH][NUM_PARALLEL_ELEMENTS] elements, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS+1) chunk_length, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS) chunk_offset, bool last {
-        
-    }
-    /*when current_state == 4 & reader.may_request_new_read{                     // as long as we have repeats remaining we keep reading 
-        when cur_experiment_addr.is_stable : int cur_addr {
-            reader.request_new_read(cur_addr, num_to_transfer)
-            reg int new_addr = cur_addr + repeat_offset mod pow2#(E: 64)
-            cur_experiment_addr.set_slow(new_addr)
-            num_repeats_remaining = num_repeats_remaining - 1 mod pow2#(E: 32)
+        plugboard_iterator=0
+        current_state=1
+        last_letter_in_message=false
+        number_to_transfer=BitsToUInt(ctrl.input_regs[4])
+        writer.request_new_write(write_start_addr)
+        reader.request_new_read(read_start_addr, number_to_transfer , [])
+        for int i in 0..3{
+            rotors_to_use[i]=BitsToInt(ctrl.input_regs[5+i])
+            rotor_positions_to_use[i]=BitsToInt(ctrl.input_regs[8+i])
+            ring_positions_to_use[i]=BitsToInt(ctrl.input_regs[11+i])
         }
-    }*/
+        for int j in 0..26{
+            plugboard_config[j]=BitsToInt(ctrl.input_regs[14+j])
+        }
+
+    }
+    when current_state == 1{
+        enigma_machine.setup(rotors_to_use, rotor_positions_to_use, ring_positions_to_use)
+        current_state=2
+    }
+    when current_state == 2 & plugboard_iterator<25{
+        enigma_machine.change_plugs(plugboard_iterator, plugboard_config[plugboard_iterator])
+        plugboard_iterator=plugboard_iterator+1
+    }
+    when current_state == 2 & plugboard_iterator==25{
+        enigma_machine.change_plugs(plugboard_iterator, plugboard_config[plugboard_iterator])
+        current_state=3
+    }
+    when current_state == 3{
+        enigma_machine.prep_message_encode()
+        current_state=4
+    }
+    when current_state == 4 & !last_letter_in_message{
+        when reader.chunk_valid : bool[ELEM_BITWIDTH][NUM_PARALLEL_ELEMENTS] elements, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS+1) chunk_length, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS) chunk_offset, bool last, bool[0] _unused_extra_data{
+            last_letter_in_message=last
+            int#(FROM: 0,TO: 26) letter_to_parse
+            int#(FROM: 0,TO: 26) encoded_letter
+            letter_to_parse=BitsToInt(elements[:][0])
+            encoded_letter=enigma_machine.parse_letter(letter_to_parse)
+            bool[32][0] to_save
+            to_save[:][0]=IntToBits(encoded_letter)
+            writer.write(to_save, chunk_length, chunk_offset, last)
+        }
+    }
+    
+    when current_state == 4 & last_letter_in_message{
+        current_state=5
+        when writer.write_has_been_committed{
+            ctrl.finish([])
+        }
+    }
 
     
-    // current_state = 000  initial state waiting for setup data exactly 9 elements to be received by burst reader
-    // current_state = 001  setup data received execute setup on enigma machine
-    // current_state = 010  setup finished receiving plugboard info exactly 26 elements from burst reader writing to plugboard once each cycle
-    // current_state = 011  plugboard values received and setup done waiting for message to be encoded execute prep message encode to prepare for first step
-    // current_state = 100  received first letter of message continuous 1 byte input form burst reader and execution of parse letter with the given value until last and simmultanious writing via burst writer of result to memory
+    // current_state = 000  initial state waiting for setup data read out of input registers
+    // current_state = 001  setup data read execute setup on enigma machine
+    // current_state = 010  setup finished now iterating over the plugboard config setting plugs one per cycle
+    // current_state = 011  plugboard setup done execute prep message encode to prepare for first step
+    // current_state = 100  received first letter of message continuous input form burst reader and execution of parse letter with the given value until last and simmultanious writing via burst writer of result to memory
     // current_state = 101  message fully encoded and saved to memory operation done 
 
     when !aresetn {             // setting the nessecary variables on reset
@@ -144,14 +191,18 @@ module enigma_top#() {
         writer.rst()
         ctrl.rst()
         current_state=0
+        plugboard_iterator=0
+        last_letter_in_message=false
     }
     
-    
-//Testing
-    
-    
-
-
+    /*when reader.may_request_new_read{                    
+        when cur_experiment_addr.is_stable : int cur_addr {
+            reader.request_new_read(cur_addr, num_to_transfer)
+            reg int new_addr = cur_addr + repeat_offset mod pow2#(E: 64)
+            cur_experiment_addr.set_slow(new_addr)
+            num_repeats_remaining = num_repeats_remaining - 1 mod pow2#(E: 32)
+        }
+    }*/
 
 }
 /*
