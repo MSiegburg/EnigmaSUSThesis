@@ -5,13 +5,13 @@ set XO_FILE [lindex $argv 1]
 # set PART xcvc1902-vsvd1760-2MP-e-S
 
 
-set KERNEL_NAME enigma_top
+set KERNEL_NAME enimga_machine
 
 create_project ${KERNEL_NAME} ./${KERNEL_NAME} -part $PART
 
 add_files -norecurse \
 {
-    ../../sus_codegen.sv \
+    ../../gencodeMachineRuntime.sv \
 }
 
 # ???
@@ -40,9 +40,14 @@ set_property address_offset {0x00}            [ipx::get_registers CTRL -of_objec
 set_property size           {32}              [ipx::get_registers CTRL -of_objects $CTRL_ADDR_BLOCK]
 
 proc add_reg {CTRL_ADDR_BLOCK reg_name size offset} {
-    ipx::add_register reg_name $CTRL_ADDR_BLOCK
-    set_property address_offset $offset             [ipx::get_registers $reg_name  -of_objects $CTRL_ADDR_BLOCK]
-    set_property size           $size               [ipx::get_registers $reg_name  -of_objects $CTRL_ADDR_BLOCK]
+    ipx::add_register $reg_name $CTRL_ADDR_BLOCK
+    puts $size
+    puts $offset
+    set found_reg [ipx::get_registers $reg_name -of_objects $CTRL_ADDR_BLOCK]
+    puts $found_reg
+    set_property description    {A data register}   $found_reg
+    set_property address_offset $offset             $found_reg
+    set_property size           $size               $found_reg
 }
 
 add_reg $CTRL_ADDR_BLOCK MESSAGE_ADDR 64 0x010
@@ -50,16 +55,16 @@ add_reg $CTRL_ADDR_BLOCK ENCODE_ADDR 64 0x018
 add_reg $CTRL_ADDR_BLOCK NUMBER_TO_TRANSFER 32 0x020
 add_reg $CTRL_ADDR_BLOCK ROTOR_ONE 32 0x024
 add_reg $CTRL_ADDR_BLOCK ROTOR_TWO 32 0x028
-add_reg $CTRL_ADDR_BLOCK ROTOR_THREE 32 0x02b
+add_reg $CTRL_ADDR_BLOCK ROTOR_THREE 32 0x02c
 add_reg $CTRL_ADDR_BLOCK ROTOR_POS_ONE 32 0x030
 add_reg $CTRL_ADDR_BLOCK ROTOR_POS_TWO 32 0x034
 add_reg $CTRL_ADDR_BLOCK ROTOR_POS_THREE 32 0x038
-add_reg $CTRL_ADDR_BLOCK RING_POS_ONE 32 0x03b
+add_reg $CTRL_ADDR_BLOCK RING_POS_ONE 32 0x03c
 add_reg $CTRL_ADDR_BLOCK RING_POS_TWO 32 0x040
 add_reg $CTRL_ADDR_BLOCK RING_POS_THREE 32 0x044
 
-for {set i 0} {i < 26} {incr i} {
-    add_reg $CTRL_ADDR_BLOCK plug_${i} 32 [format "%x" [expr 0x048 + $i * 4]]
+for {set i 0} {$i < 26} {incr i} {
+    add_reg $CTRL_ADDR_BLOCK plug_${i} 32 [format "0x0%x" [expr 0x048 + $i * 4]]
 }
 
 

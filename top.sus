@@ -122,7 +122,7 @@ module enigma_top {
     state int#(FROM: 0,TO: 26) plugboard_iterator
 
     //state bool last_letter_in_message
-    int number_to_transfer
+    state int number_to_transfer
 
     enigma_machine_runtime enigma_machine
 

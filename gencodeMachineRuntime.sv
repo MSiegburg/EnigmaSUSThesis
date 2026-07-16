@@ -1,4 +1,4 @@
-// THIS IS A GENERATED FILE (Generated at 2026-07-16T16:18:03+02:00)
+// THIS IS A GENERATED FILE (Generated at 2026-07-16T18:13:27+02:00)
 // This file was generated with SUS Compiler 0.4.0
 // enigma_top #()
 module enigma_top(
@@ -129,7 +129,7 @@ wire[63:0] _BitsToUInt_2_value;
 /*state*/ logic[4:0] ring_positions_to_use[0:2];
 /*state*/ logic[4:0] plugboard_config[0:25];
 /*state*/ logic[4:0] plugboard_iterator;
-/*mux_wire*/ logic[31:0] number_to_transfer;
+/*state*/ logic[31:0] number_to_transfer;
 wire _ctrl_start;
 wire[31:0] _61 = _ctrl_input_regs[4];
 /*mux_wire*/ logic[31:0] _BitsToUInt_3_bits;
@@ -1289,10 +1289,8 @@ always_ff @(posedge aclk) begin // state plugboard_iterator
 	if(_115) plugboard_iterator <= _125;
 	if(_165) plugboard_iterator <= 1'd0;
 end
-always_comb begin // combinatorial number_to_transfer
-	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	number_to_transfer = 32'dx;
-	if(_ctrl_start) number_to_transfer = _BitsToUInt_3_value;
+always_ff @(posedge aclk) begin // state number_to_transfer
+	if(_ctrl_start) number_to_transfer <= _BitsToUInt_3_value;
 end
 always_comb begin // combinatorial _BitsToUInt_3_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
