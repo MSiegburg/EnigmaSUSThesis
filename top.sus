@@ -43,7 +43,7 @@ module enigma_top {
     ctrl.rready  =         s_axi_control_rready
 
     axi4_burst_reader#(AXI_WIDTH, ADDR_WIDTH: MEM_ADDR_WIDTH, ADDR_ALIGN: 4, MAX_IN_FLIGHT: 412) reader
-    axi4_burst_writer#(AXI_WIDTH, ADDR_WIDTH: MEM_ADDR_WIDTH, ADDR_ALIGN: 4) writer
+    axi4_burst_writer#(AXI_WIDTH, ADDR_WIDTH: MEM_ADDR_WIDTH, ADDR_ALIGN: 4, ADDR_MAY_PUSH_LATENCY: 0) writer
 
     domain mem_write
     output bool                     m_axi_awvalid = writer.awvalid
@@ -106,12 +106,12 @@ module enigma_top {
     bool[64] message_adress
     message_adress[:32] = ctrl.input_regs[0]
     message_adress[32:] = ctrl.input_regs[1]
-    int read_start_addr = BitsToInt(message_adress)
+    int read_start_addr = BitsToUInt(message_adress)
 
     bool[64] encode_adress
     encode_adress[:32] = ctrl.input_regs[2]
     encode_adress[32:] = ctrl.input_regs[3]
-    int write_start_addr = BitsToInt(encode_adress)
+    int write_start_addr = BitsToUInt(encode_adress)
 
 
     state int current_state
@@ -135,12 +135,12 @@ module enigma_top {
         writer.request_new_write(write_start_addr)
         
         for int i in 0..3{
-            rotors_to_use[i]=BitsToInt(ctrl.input_regs[5+i])
-            rotor_positions_to_use[i]=BitsToInt(ctrl.input_regs[8+i])
-            ring_positions_to_use[i]=BitsToInt(ctrl.input_regs[11+i])
+            rotors_to_use[i]=IntNarrow#(FROM: 0, TO: 5)(BitsToUInt(ctrl.input_regs[5+i]))
+            rotor_positions_to_use[i]=IntNarrow#(FROM: 0, TO: 26)(BitsToInt(ctrl.input_regs[8+i]))
+            ring_positions_to_use[i]=IntNarrow#(FROM: 0, TO: 26)(BitsToInt(ctrl.input_regs[11+i]))
         }
         for int j in 0..26{
-            plugboard_config[j]=BitsToInt(ctrl.input_regs[14+j])
+            plugboard_config[j]=IntNarrow#(FROM: 0, TO: 26)(BitsToInt(ctrl.input_regs[14+j]))
         }
 
     }
@@ -162,14 +162,15 @@ module enigma_top {
         reader.request_new_read(read_start_addr, number_to_transfer , [])
     }
     
+    reader.ready_for_lots_of_data = writer.may_write
     when reader.chunk_valid : bool[ELEM_BITWIDTH][NUM_PARALLEL_ELEMENTS] elements, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS+1) chunk_length, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS) chunk_offset, bool last, bool[0] _unused_extra_data{
         //last_letter_in_message=last
         int#(FROM: 0,TO: 26) letter_to_parse
         int#(FROM: 0,TO: 26) encoded_letter
-        letter_to_parse=BitsToInt(elements[:][0])
+        letter_to_parse=IntNarrow#(FROM: 0, TO: 26)(BitsToInt(elements[0]))
         encoded_letter=enigma_machine.parse_letter(letter_to_parse)
-        bool[32][0] to_save
-        to_save[:][0]=IntToBits(encoded_letter)
+        bool[32][1] to_save
+        to_save[0]=IntToBits(encoded_letter)
         writer.write(to_save, chunk_length, chunk_offset, last)
     }
     
