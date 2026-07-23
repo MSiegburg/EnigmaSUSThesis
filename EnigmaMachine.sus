@@ -20,13 +20,13 @@ module enigma_machine_runtime{
     int#(FROM: 0,TO: 26) rrotor2
     int#(FROM: 0,TO: 26) plugboard2
 
-    enigma_rotor_runtime right_rotor_inst
-    enigma_rotor_runtime middle_rotor_inst
-    enigma_rotor_runtime left_rotor_inst
+    enigma_rotor_runtime#(backward_lat:5 ) right_rotor_inst
+    enigma_rotor_runtime#(backward_lat:3 ) middle_rotor_inst
+    enigma_rotor_runtime#(backward_lat:1 ) left_rotor_inst
 
     reflector reflector_inst
 
-    plugboard#(plugboard_config:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]) plugboard_inst
+    plugboard#(plugboard_config:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25], backward_lat: 7) plugboard_inst
 
 
     action setup:int#(FROM: 0,TO: 5)[3] rotor_setup, int#(FROM: 0,TO: 26)[3] rotor_positions,int#(FROM: 0,TO: 26)[3] ring_positions{    // setup of states in rotors with input variables
@@ -100,7 +100,7 @@ module enigma_machine_runtime{
 }
 
 
-module enigma_rotor_runtime#(){
+module enigma_rotor_runtime#(int backward_lat){
     state int#(FROM: 0,TO: 5) rotor_in_use
     gen int#(FROM: 0,TO: 26)[26][10] rotors
     rotors[0][:] = [4,10,12,5,11,6,3,16,21,25,13,19,14,22,24,7,23,20,18,15,0,8,1,17,2,9]
@@ -115,8 +115,8 @@ module enigma_rotor_runtime#(){
         }
     }
     gen int#(FROM: 0,TO: 26)[5] turnover_positions =[16,4,21,9,25]
-    state int#(FROM: 0,TO: 26) ring_position
-    state int#(FROM: 0,TO: 26) rotor_position
+    state int#(FROM: 0,TO: 26) ring_position'0
+    state int#(FROM: 0,TO: 26) rotor_position'0
 
     /*                                                                                                      // not needed for now
     action reset{                                                                                           // reset action to set rotor to 0
@@ -129,7 +129,7 @@ module enigma_rotor_runtime#(){
     action turnover{                                                                                        // initiate a turnover of the rotor
         rotor_position=(rotor_position+1)mod 26
     }
-    action setup:int#(FROM: 0,TO: 5)rotor_to_use, int#(FROM: 0,TO: 26)rotor_starting_position,int#(FROM: 0,TO: 26)ring_position_in_use{     // setup the registers in a given rotor
+    action setup:int#(FROM: 0,TO: 5)rotor_to_use'0, int#(FROM: 0,TO: 26)rotor_starting_position'0,int#(FROM: 0,TO: 26)ring_position_in_use'0{     // setup the registers in a given rotor
         rotor_in_use=rotor_to_use
         rotor_position=rotor_starting_position
         ring_position=ring_position_in_use
@@ -143,14 +143,14 @@ module enigma_rotor_runtime#(){
             advance_signal=false
         }
     }
-    action encode_left: int#(FROM: 0,TO: 26) letter_index -> int#(FROM: 0,TO: 26) encode_letter{            // encode letter adding offset to value of ring position
+    action encode_left'0: int#(FROM: 0,TO: 26) letter_index'0 -> int#(FROM: 0,TO: 26) encode_letter'1 {            // encode letter adding offset to value of ring position
         int#(FROM: 0,TO: 26) substitution_result_left
         int#(FROM: 0,TO: 26) shift                                                                          // for debugging
         shift=rotor_position-ring_position+26 mod 26
         substitution_result_left=rotors[rotor_in_use][(letter_index+shift)mod 26]
-        encode_letter=substitution_result_left-shift mod 26
+        reg encode_letter=substitution_result_left-shift mod 26
     }
-    action encode_right: int#(FROM: 0,TO: 26) rev_letter_index -> int#(FROM: 0,TO: 26) rev_encode_letter{   // encode letter adding offset to index of ring position
+    action encode_right: int#(FROM: 0,TO: 26) rev_letter_index'backward_lat -> int#(FROM: 0,TO: 26) rev_encode_letter'backward_lat+1{   // encode letter adding offset to index of ring position
         int#(FROM: 0,TO: 26) substitution_result_right
         int#(FROM: 0,TO: 26) shift                                                                          // for debugging
         shift=rotor_position-ring_position+26 mod 26
@@ -167,7 +167,7 @@ module reflector{
     }
 }
 
-module plugboard#(int[26] plugboard_config){
+module plugboard#(int[26] plugboard_config, int backward_lat){
     gen int LEN = 26
     state int#(FROM: 0,TO: 26)[26] plugboard_settings
     // setting the plugboard to the given array 
@@ -178,11 +178,11 @@ module plugboard#(int[26] plugboard_config){
         plugboard_settings[plug]=value
     }
 
-    action pass_letter_forward: int#(FROM: 0,TO: 26) input_letter1 -> int#(FROM: 0,TO: 26) output_letter1{            // encode letter 
+    action pass_letter_forward'0: int#(FROM: 0,TO: 26) input_letter1'0 -> int#(FROM: 0,TO: 26) output_letter1'0{            // encode letter 
             output_letter1=plugboard_settings[input_letter1]
     }
-    action pass_letter_backward: int#(FROM: 0,TO: 26) input_letter2 -> int#(FROM: 0,TO: 26) output_letter2{            // encode letter 
-        output_letter2=plugboard_settings[input_letter2]
+    action pass_letter_backward'backward_lat: int#(FROM: 0,TO: 26) input_letter2'backward_lat -> int#(FROM: 0,TO: 26) output_letter2'backward_lat+1{            // encode letter 
+        reg output_letter2=plugboard_settings[input_letter2]
     }
 }
 
