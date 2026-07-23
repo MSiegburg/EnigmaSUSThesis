@@ -102,8 +102,8 @@ int main(int argc, const char** argv) {
     xrt::bo message_buffer = xrt::bo(device, sizeof(uint32_t) * BUFFER_CAPACITY, k.group_id(0));
     xrt::bo encoded_buffer = xrt::bo(device, sizeof(uint32_t) * BUFFER_CAPACITY, k.group_id(1));
 
-    //std::string message = std::string("HELLOTHISISSUPERSECRET");
-    std::string message = std::string("MFNCZXEZHZUHPGCSGSIJQM");
+    std::string message = std::string("HELLOTHISISSUPERSECRET");
+    //std::string message = std::string("MFNCZXEZHZUHPGCSGSIJQM");
 
     uint32_t* char_indices = new uint32_t[BUFFER_CAPACITY];
     for(size_t i = 0; i < message.size(); i++) {
