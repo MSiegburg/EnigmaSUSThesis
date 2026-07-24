@@ -1,0 +1,107 @@
+module ioc_calc{
+    state int#(FROM: 0,TO: 60)[26] Letter_count
+    state int#(FROM: 0,TO: 5000) message_length
+    state bool done_with_current_decode
+
+    action letter_input'0: int#(FROM: 0,TO: 26) decoded_letter'0, bool last'0{
+        message_length=message_length+1 mod 5000
+        Letter_count[decoded_letter]=Letter_count[decoded_letter]+1 mod 26
+        when last{
+            done_with_current_decode=true
+        }
+    }
+    action ioc_calc_message_mult'0:int#(FROM: 0,TO: 5000) cur_message_length'0 -> int#(FROM: 1,TO: 25000)cur_message_length_multiply'1{
+        cur_message_length_multiply=(cur_message_length*(cur_message_length-1) mod 24999) +1        // was there a way to not scuff this so much ?
+    }
+    action ioc_calc_individual_letter'0: int#(FROM: 0,TO: 60) letter_amount->int#(FROM: 0,TO: 5000) mult_result{
+        when letter_amount==0{
+            mult_result=0
+        }else when letter_amount==1{
+            mult_result=0
+        }else when letter_amount==2{
+            mult_result=0
+        }else{
+            mult_result=letter_amount*(letter_amount-1) mod 5000
+        } 
+    }
+    action ioc_calc_div'0:int#(FROM: 0,TO: 25000) letter_mult_result, int#(FROM: 1,TO: 25000) message_length_mult_result -> int#(FROM: 0,TO: 25000) div_result{
+        div_result=letter_mult_result/message_length_mult_result
+    }
+    state int#(FROM: 0,TO: 25000) div_result_last = 0   
+    action ioc_calc_sum_result'0:int#(FROM: 0,TO: 25000) cur_div_result -> int#(FROM: 0,TO: 50000) sum_result {
+        sum_result=cur_div_result+div_result_last
+    
+    }
+    state int#(FROM: 0,TO: 5000) message_length_for_calc
+    state int#(FROM: 0,TO: 5000) inc=0
+    action ioc_calc'0 {
+        when inc<message_length_for_calc{
+            inc=inc+1 mod 5000
+
+        }
+    }
+
+}
+
+module best_settings{                                                                       // instantiate as many as i wanna save best settings for each machine variant and have them be sitting in a row passing along the data down the line
+    state float best_IOC_score
+    state int#(FROM: 0,TO: 26)[6] score_settings_saved
+    initial best_IOC_score =0.0
+    initial score_settings_saved[0] = 0
+    initial score_settings_saved[1] = 0
+    initial score_settings_saved[2] = 0
+    initial score_settings_saved[3] = 0
+    initial score_settings_saved[4] = 0
+    initial score_settings_saved[5] = 0
+    state int#(FROM: 0,TO: 6)incr_state_update
+    initial incr_state_update=0
+    state bool update_needed
+    initial update_needed=false
+    
+    
+    action update_check'0: float IOC_score'0, int#(FROM: 0,TO: 26)[6] score_settings'0->int#(FROM: 0,TO: 26)[6] score_settings_passing'0, float IOC_score_passing'0{
+        int#(FROM: 0,TO: 200) temp_new_score
+        int#(FROM: 0,TO: 200) temp_cur_score
+        //temp_new_score=IOC_score*100
+        //temp_cur_score=best_IOC_score*100    cast from float to int how ?
+        
+        when temp_new_score> temp_cur_score{
+            IOC_score_passing=best_IOC_score
+            best_IOC_score=IOC_score
+            score_settings_passing=score_settings_saved
+            update_needed=true
+        }else{
+        score_settings_passing=score_settings
+        IOC_score_passing=IOC_score
+        }
+    }
+    action update_states'0:int#(FROM: 0,TO: 26)[6] score_settings_to_copy'0{                    // fsm updating states we never expect new settings in less then 7 cycles anyway 
+        when incr_state_update==0&update_needed{
+            score_settings_saved[incr_state_update]=score_settings_to_copy[incr_state_update]
+            incr_state_update=1
+        }else when incr_state_update==1&update_needed{
+            score_settings_saved[incr_state_update]=score_settings_to_copy[incr_state_update]
+            incr_state_update=2
+        }else when incr_state_update==2&update_needed{
+            score_settings_saved[incr_state_update]=score_settings_to_copy[incr_state_update]
+            incr_state_update=3
+        }else when incr_state_update==3&update_needed{
+            score_settings_saved[incr_state_update]=score_settings_to_copy[incr_state_update]
+            incr_state_update=4
+        }else when incr_state_update==4&update_needed{
+            score_settings_saved[incr_state_update]=score_settings_to_copy[incr_state_update]
+            incr_state_update=5
+        }else when incr_state_update==5&update_needed{
+            score_settings_saved[incr_state_update]=score_settings_to_copy[incr_state_update]
+            update_needed=false
+        }
+
+
+
+    }
+}
+
+module enigma_machine_driver{
+    // logic for creating all fixed enigma machines and giving them new incrementing settings for each time the message has been fully parsed
+
+}
