@@ -1,13 +1,14 @@
 module ioc_calc{
-    state int#(FROM: 0,TO: 60)[26] Letter_count
+    state int#(FROM: 0,TO: 100)[26] Letter_count
     state int#(FROM: 0,TO: 5000) message_length
     state bool done_with_current_decode
 
-    action letter_input'0: int#(FROM: 0,TO: 26) decoded_letter'0, bool last'0{
+    action letter_input'0: int#(FROM: 0,TO: 26) decoded_letter'0, bool last'0->bool done_receiving_message'0{
         message_length=message_length+1 mod 5000
-        Letter_count[decoded_letter]=Letter_count[decoded_letter]+1 mod 26
+        Letter_count[decoded_letter]=Letter_count[decoded_letter]+1 mod 100
         when last{
             done_with_current_decode=true
+            done_receiving_message=true
         }
     }
     action ioc_calc_message_mult'0:int#(FROM: 0,TO: 5000) cur_message_length'0 -> int#(FROM: 1,TO: 25000)cur_message_length_multiply'1{
@@ -27,10 +28,11 @@ module ioc_calc{
     action ioc_calc_div'0:int#(FROM: 0,TO: 25000) letter_mult_result, int#(FROM: 1,TO: 25000) message_length_mult_result -> int#(FROM: 0,TO: 25000) div_result{
         div_result=letter_mult_result/message_length_mult_result
     }
-    state int#(FROM: 0,TO: 25000) div_result_last = 0   
+    state int#(FROM: 0,TO: 25000) div_result_last
+    initial div_result_last=0
     action ioc_calc_sum_result'0:int#(FROM: 0,TO: 25000) cur_div_result -> int#(FROM: 0,TO: 50000) sum_result {
         sum_result=cur_div_result+div_result_last
-    
+        div_result_last=cur_div_result
     }
     state int#(FROM: 0,TO: 5000) message_length_for_calc
     state int#(FROM: 0,TO: 5000) inc=0
@@ -62,8 +64,11 @@ module best_settings{                                                           
     action update_check'0: float IOC_score'0, int#(FROM: 0,TO: 26)[6] score_settings'0->int#(FROM: 0,TO: 26)[6] score_settings_passing'0, float IOC_score_passing'0{
         int#(FROM: 0,TO: 200) temp_new_score
         int#(FROM: 0,TO: 200) temp_cur_score
-        //temp_new_score=IOC_score*100
-        //temp_cur_score=best_IOC_score*100    cast from float to int how ?
+        //float temp_subtract = IOC_score-best_IOC_score
+        //temp_new_score=IOC_score
+        //temp_cur_score=best_IOC_score    how to compare floats ? is there some method to work around that 
+        //when temp_subtract>0{
+        //}
         
         when temp_new_score> temp_cur_score{
             IOC_score_passing=best_IOC_score
@@ -94,6 +99,7 @@ module best_settings{                                                           
         }else when incr_state_update==5&update_needed{
             score_settings_saved[incr_state_update]=score_settings_to_copy[incr_state_update]
             update_needed=false
+            incr_state_update=0
         }
 
 
