@@ -176,6 +176,12 @@ module enigma_machine_driver{
         initial cur_state = 0
         initial cur_letter = 0
 
+
+        // Stuff for setup of machines
+
+
+
+
         when start{
             cur_state=1
         }
