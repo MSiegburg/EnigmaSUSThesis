@@ -109,5 +109,90 @@ module best_settings{                                                           
 
 module enigma_machine_driver{
     // logic for creating all fixed enigma machines and giving them new incrementing settings for each time the message has been fully parsed
+    enigma_machine_runtime enigma_machine_1
+    enigma_machine_runtime enigma_machine_2
+    enigma_machine_runtime enigma_machine_3
+    enigma_machine_runtime enigma_machine_4
+    enigma_machine_runtime enigma_machine_5
+    enigma_machine_runtime enigma_machine_6
+    enigma_machine_runtime enigma_machine_7
+    enigma_machine_runtime enigma_machine_8
+    enigma_machine_runtime enigma_machine_9
+    enigma_machine_runtime enigma_machine_10
+    enigma_machine_runtime enigma_machine_11
+    enigma_machine_runtime enigma_machine_12
+    enigma_machine_runtime enigma_machine_13
+    enigma_machine_runtime enigma_machine_14
+    enigma_machine_runtime enigma_machine_15
+    enigma_machine_runtime enigma_machine_16
+    enigma_machine_runtime enigma_machine_17
+    enigma_machine_runtime enigma_machine_18
+    enigma_machine_runtime enigma_machine_19
+    enigma_machine_runtime enigma_machine_20
+    enigma_machine_runtime enigma_machine_21
+    enigma_machine_runtime enigma_machine_22
+    enigma_machine_runtime enigma_machine_23
+    enigma_machine_runtime enigma_machine_24
+    enigma_machine_runtime enigma_machine_25
+    enigma_machine_runtime enigma_machine_26
+    enigma_machine_runtime enigma_machine_27
+    enigma_machine_runtime enigma_machine_28
+    enigma_machine_runtime enigma_machine_29
+    enigma_machine_runtime enigma_machine_30
+    enigma_machine_runtime enigma_machine_31
+    enigma_machine_runtime enigma_machine_32
+    enigma_machine_runtime enigma_machine_33
+    enigma_machine_runtime enigma_machine_34
+    enigma_machine_runtime enigma_machine_35
+    enigma_machine_runtime enigma_machine_36
+    enigma_machine_runtime enigma_machine_37
+    enigma_machine_runtime enigma_machine_38
+    enigma_machine_runtime enigma_machine_39
+    enigma_machine_runtime enigma_machine_40
+    enigma_machine_runtime enigma_machine_41
+    enigma_machine_runtime enigma_machine_42
+    enigma_machine_runtime enigma_machine_43
+    enigma_machine_runtime enigma_machine_44
+    enigma_machine_runtime enigma_machine_45
+    enigma_machine_runtime enigma_machine_46
+    enigma_machine_runtime enigma_machine_47
+    enigma_machine_runtime enigma_machine_48
+    enigma_machine_runtime enigma_machine_49
+    enigma_machine_runtime enigma_machine_50
+    enigma_machine_runtime enigma_machine_51
+    enigma_machine_runtime enigma_machine_52
+    enigma_machine_runtime enigma_machine_53
+    enigma_machine_runtime enigma_machine_54
+    enigma_machine_runtime enigma_machine_55
+    enigma_machine_runtime enigma_machine_56
+    enigma_machine_runtime enigma_machine_57
+    enigma_machine_runtime enigma_machine_58
+    enigma_machine_runtime enigma_machine_59
+    enigma_machine_runtime enigma_machine_60
 
+    enigma_machine_1.setup([0,0,0],[0,0,0][0,0,0])          //manually setup all of them ? is there something we can do with gencode ?
+
+
+    for int I in 0..61{
+        for int J in 0..26{
+            for int K in 0..26{
+                for int L in 0..26{
+                    enigma_machine_[I].setup([L,K,J],[0,0,0][0,0,0])
+                }
+            }
+        }
+    }
+
+    ioc_calc ioc_calc_1
+
+    // Driver after setup
+    // reader.ready_for_lots_of_data = ?
+    when reader.chunk_valid : bool[ELEM_BITWIDTH][NUM_PARALLEL_ELEMENTS] elements, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS+1) chunk_length, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS) chunk_offset, bool last, bool[0] _unused_extra_data{
+        //last_letter_in_message=last
+        int#(FROM: 0,TO: 26) letter_to_parse
+        int#(FROM: 0,TO: 26) encoded_letter
+        letter_to_parse=IntNarrow#(FROM: 0, TO: 26)(BitsToInt(elements[0]))
+        encoded_letter=enigma_machine_1.parse_letter(letter_to_parse)
+        ioc_calc_1.letter_input(encoded_letter,last)
+    }
 }
