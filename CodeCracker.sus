@@ -1,85 +1,60 @@
-module ioc_calc{
-    state int#(FROM: 0,TO: 100)[26] Letter_count
-    state int#(FROM: 0,TO: 5000) message_length
-    state bool done_with_current_decode
-
-    action letter_input'0: int#(FROM: 0,TO: 26) decoded_letter'0, bool last'0->bool done_receiving_message'0{
-        message_length=message_length+1 mod 5000
-        Letter_count[decoded_letter]=Letter_count[decoded_letter]+1 mod 100
-        when last{
-            done_with_current_decode=true
-            done_receiving_message=true
-        }
+module ioc_count#(){
+    state int#(FROM: 0,TO: 100)[26] letter_count
+    
+    action letter_input'0: int#(FROM: 0,TO: 26) decoded_letter'0{
+        letter_count[decoded_letter]=letter_count[decoded_letter]+1 mod 100
     }
-    action ioc_calc_message_mult'0:int#(FROM: 0,TO: 5000) cur_message_length'0 -> int#(FROM: 1,TO: 25000)cur_message_length_multiply'1{
-        cur_message_length_multiply=(cur_message_length*(cur_message_length-1) mod 24999) +1        // was there a way to not scuff this so much ?
+    action pass_letter_count'0:-> int#(FROM: 0,TO: 100)[26] letter_count_cur'0{
+        letter_count_cur=letter_count
     }
-    action ioc_calc_individual_letter'0: int#(FROM: 0,TO: 60) letter_amount->int#(FROM: 0,TO: 5000) mult_result{
-        when letter_amount==0{
-            mult_result=0
-        }else when letter_amount==1{
-            mult_result=0
-        }else when letter_amount==2{
-            mult_result=0
-        }else{
-            mult_result=letter_amount*(letter_amount-1) mod 5000
-        } 
+    action reset'0{
+        letter_count[:]=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]     // better way to reset a bunch of registers ?
     }
-    action ioc_calc_div'0:int#(FROM: 0,TO: 25000) letter_mult_result, int#(FROM: 1,TO: 25000) message_length_mult_result -> int#(FROM: 0,TO: 25000) div_result{
-        div_result=letter_mult_result/message_length_mult_result
-    }
-    state int#(FROM: 0,TO: 25000) div_result_last
-    initial div_result_last=0
-    action ioc_calc_sum_result'0:int#(FROM: 0,TO: 25000) cur_div_result -> int#(FROM: 0,TO: 50000) sum_result {
-        sum_result=cur_div_result+div_result_last
-        div_result_last=cur_div_result
-    }
-    state int#(FROM: 0,TO: 5000) message_length_for_calc
-    state int#(FROM: 0,TO: 5000) inc=0
-    action ioc_calc'0 {
-        when inc<message_length_for_calc{
-            inc=inc+1 mod 5000
-
-        }
-    }
-
 }
 
-module best_settings{                                                                       // instantiate as many as i wanna save best settings for each machine variant and have them be sitting in a row passing along the data down the line
-    state float best_IOC_score
+module ioc_calc{
+    state int#(FROM: 0,TO: 100)[26] letter_count
+    action set_letter_count:int#(FROM: 0,TO: 100)[26] letter_count_new{
+        letter_count=letter_count_new
+    }
+    
+    
+
+    action ioc_calc_individual_letter'0:int#(FROM: 0,TO: 26) cur_index -> int#(FROM: 0,TO: 65536) mult_result{
+        when letter_count[cur_index]==0{
+            mult_result=0
+        }else when letter_count[cur_index]==1{
+            mult_result=0
+        }else when letter_count[cur_index]==2{
+            mult_result=0
+        }else{
+            mult_result=letter_count[cur_index]*(letter_count[cur_index]-1) mod 65536
+        } 
+    }
+}
+
+module best_settings{                                            // instantiate as many as i wanna save best settings for each machine variant and have them be sitting in a row passing along the data down the line
+    state int#(FROM: 0,TO: 65536) best_IOC_score
     state int#(FROM: 0,TO: 26)[6] score_settings_saved
-    initial best_IOC_score =0.0
-    initial score_settings_saved[0] = 0
-    initial score_settings_saved[1] = 0
-    initial score_settings_saved[2] = 0
-    initial score_settings_saved[3] = 0
-    initial score_settings_saved[4] = 0
-    initial score_settings_saved[5] = 0
-    state int#(FROM: 0,TO: 6)incr_state_update
-    initial incr_state_update=0
-    state bool update_needed
-    initial update_needed=false
+    initial best_IOC_score = 0
+    initial score_settings_saved[:] = [0,0,0,0,0,0]
     
     
-    action update_check'0: float IOC_score'0, int#(FROM: 0,TO: 26)[6] score_settings'0->int#(FROM: 0,TO: 26)[6] score_settings_passing'0, float IOC_score_passing'0{
-        int#(FROM: 0,TO: 200) temp_new_score
-        int#(FROM: 0,TO: 200) temp_cur_score
-        //float temp_subtract = IOC_score-best_IOC_score
-        //temp_new_score=IOC_score
-        //temp_cur_score=best_IOC_score    how to compare floats ? is there some method to work around that 
-        //when temp_subtract>0{
-        //}
-        
+    action update_check'0: int#(FROM: 0,TO: 65536) IOC_score'0, int#(FROM: 0,TO: 26)[6] score_settings'0->int#(FROM: 0,TO: 26)[6] score_settings_passing'0, int#(FROM: 0,TO: 65536) IOC_score_passing'0{
+        int#(FROM: 0,TO: 65536) temp_new_score = IOC_score_passing
+        int#(FROM: 0,TO: 65536) temp_cur_score = best_IOC_score
+
         when temp_new_score> temp_cur_score{
             IOC_score_passing=best_IOC_score
-            best_IOC_score=IOC_score
+            best_IOC_score = IOC_score
             score_settings_passing=score_settings_saved
-            update_needed=true
+            score_settings_saved[:]=score_settings[:]                   // [:] implied when we write over an array of registers with another array of registers ?
         }else{
-        score_settings_passing=score_settings
-        IOC_score_passing=IOC_score
+            score_settings_passing=score_settings
+            IOC_score_passing = IOC_score
         }
     }
+    /*
     action update_states'0:int#(FROM: 0,TO: 26)[6] score_settings_to_copy'0{                    // fsm updating states we never expect new settings in less then 7 cycles anyway 
         when incr_state_update==0&update_needed{
             score_settings_saved[incr_state_update]=score_settings_to_copy[incr_state_update]
@@ -104,7 +79,7 @@ module best_settings{                                                           
 
 
 
-    }
+    }*/
 }
 
 module enigma_machine_driver{
@@ -170,9 +145,10 @@ module enigma_machine_driver{
     enigma_machine_runtime enigma_machine_59
     enigma_machine_runtime enigma_machine_60
 
-    enigma_machine_1.setup([0,0,0],[0,0,0][0,0,0])          //manually setup all of them ? is there something we can do with gencode ?
+    enigma_machine_1.setup([0,0,0],[0,0,0],[0,0,0])         //manually setup all of them ? is there something we can do with gencode ?
+                                                            //seperate rotors and rings setting search do ring settings with prelim "good" rotor settings
 
-
+/*
     for int I in 0..61{
         for int J in 0..26{
             for int K in 0..26{
@@ -182,17 +158,172 @@ module enigma_machine_driver{
             }
         }
     }
+*/
+    best_settings best_settings_inst1
+    // how many tbd
 
-    ioc_calc ioc_calc_1
 
-    // Driver after setup
+
+    for int I in 0..61{
+        ioc_count ioc_count_inst
+        ioc_calc ioc_calc_inst
+
+        state int#(FROM: 0,TO: 6) cur_state
+        state int#(FROM: 0,TO: 26) cur_letter
+        state int#(FROM: 0,TO: 65536) multiplication_result
+        
+        initial multiplication_result=0
+        initial cur_state = 0
+        initial cur_letter = 0
+
+        when start{
+            cur_state=1
+        }
+        when cur_state==1{
+            ioc_count_inst.letter_input(decoded_letter)        // need to determine when we get a new letter
+            when last{
+                cur_state=2
+            }
+        }
+        when cur_state==2{
+            
+            multiplication_result = multiplication_result + ioc_calc_inst.ioc_calc_individual_letter(cur_letter)
+            cur_letter=cur_letter+1 mod 26
+            when cur_letter==25{
+                cur_state=1
+                cur_letter=0
+                multiplication_result=0
+                
+                
+                best_settings_inst1.update_check(multiplication_result, score_settings)             // better to not use gencode since well have to nestle it and i dont know how referencing would work 
+                                                                                                    // we require some kind of Bus at the end regardless to manage to different best settings
+            }
+        }
+
+
+    }
+
+
+
+
+
+}
+module cracker_top{
+
+    clock aclk
+    input bool aresetn
+
+    gen int CTRL_AXI_WIDTH = 32
+    gen int CTRL_ADDR_WIDTH = 12
+    gen int MEM_ADDR_WIDTH = 64
+    gen int AXI_WIDTH = 32
+
+    gen int ELEM_BYTE_SIZE = 4
+    gen int ELEM_BITWIDTH = ELEM_BYTE_SIZE * 8
+    gen int NUM_PARALLEL_ELEMENTS = AXI_WIDTH / ELEM_BITWIDTH
+
+    xrt_ctrl_slave #(NUM_INPUT_REGS: 45, NUM_OUTPUT_REGS: 0, ADDR_WIDTH: CTRL_ADDR_WIDTH, AXI_WIDTH: CTRL_AXI_WIDTH) ctrl  // what does numinput/output regs do ?
+
+    // Export AXI4-Lite interface
+    domain axi_control
+    input  int#(FROM: 0, TO: 1 << CTRL_ADDR_WIDTH)    s_axi_control_awaddr
+    input  bool                     s_axi_control_awvalid
+    output bool                     s_axi_control_awready = ctrl.awready
+    input  bool[CTRL_AXI_WIDTH]     s_axi_control_wdata
+    input  bool[CTRL_AXI_WIDTH / 8] s_axi_control_wstrb
+    input  bool                     s_axi_control_wvalid
+    output bool                     s_axi_control_wready  = ctrl.wready
+    output bool[2]                  s_axi_control_bresp   = ctrl.bresp
+    output bool                     s_axi_control_bvalid  = ctrl.bvalid
+    input  bool                     s_axi_control_bready
+    input  int#(FROM: 0, TO: 1 << CTRL_ADDR_WIDTH)    s_axi_control_araddr
+    input  bool                     s_axi_control_arvalid
+    output bool                     s_axi_control_arready = ctrl.arready
+    output bool[CTRL_AXI_WIDTH]     s_axi_control_rdata   = ctrl.rdata
+    output bool[2]                  s_axi_control_rresp   = ctrl.rresp
+    output bool                     s_axi_control_rvalid  = ctrl.rvalid
+    input  bool                     s_axi_control_rready
+    ctrl.awaddr  =         s_axi_control_awaddr
+    ctrl.awvalid =         s_axi_control_awvalid
+    ctrl.wdata   =         s_axi_control_wdata
+    ctrl.wstrb   =         s_axi_control_wstrb
+    ctrl.wvalid  =         s_axi_control_wvalid
+    ctrl.bready  =         s_axi_control_bready
+    ctrl.araddr  =         s_axi_control_araddr
+    ctrl.arvalid =         s_axi_control_arvalid
+    ctrl.rready  =         s_axi_control_rready
+
+    axi4_burst_reader#(AXI_WIDTH, ADDR_WIDTH: MEM_ADDR_WIDTH, ADDR_ALIGN: 4, MAX_IN_FLIGHT: 412) reader
+    axi4_burst_writer#(AXI_WIDTH, ADDR_WIDTH: MEM_ADDR_WIDTH, ADDR_ALIGN: 4, ADDR_MAY_PUSH_LATENCY: 0) writer
+
+    domain mem_write
+    output bool                     m_axi_awvalid = writer.awvalid
+    input  bool                     m_axi_awready
+    output int#(FROM: 0, TO: 1 << MEM_ADDR_WIDTH)     m_axi_awaddr = writer.awaddr
+    output int#(FROM: 0, TO: 256)   m_axi_awlen = writer.awlen
+    output int#(FROM: 0, TO: 8)     m_axi_awsize  = writer.awsize
+    output bool[2]                  m_axi_awburst = writer.awburst
+    output bool[3]                  m_axi_awprot = writer.awprot
+    output bool[4]                  m_axi_awcache = writer.awcache
+    output int#(FROM: 0, TO: 16)    m_axi_awqos = writer.awqos
+    output bool                     m_axi_awlock = writer.awlock
+    output int#(FROM: 0, TO: 16)    m_axi_awregion = writer.awregion
+    output bool                     m_axi_wvalid = writer.wvalid
+    input  bool                     m_axi_wready
+    output bool[AXI_WIDTH]          m_axi_wdata = writer.wdata
+    output bool[AXI_WIDTH / 8]      m_axi_wstrb = writer.wstrb
+    output bool                     m_axi_wlast = writer.wlast
+    input  bool                     m_axi_bvalid
+    output bool                     m_axi_bready = writer.bready
+    input  bool[2]                  m_axi_bresp
+    writer.awready =                m_axi_awready
+    writer.wready =                 m_axi_wready
+    writer.bvalid =                 m_axi_bvalid
+    writer.bresp =                  m_axi_bresp
+
+    domain mem_read
+    output bool                     m_axi_arvalid'0 = reader.arvalid
+    input  bool                     m_axi_arready
+    output int#(FROM: 0, TO: 1 << MEM_ADDR_WIDTH)     m_axi_araddr = reader.araddr
+    output int#(FROM: 0, TO: 256)   m_axi_arlen = reader.arlen
+    output int#(FROM: 0, TO: 8)     m_axi_arsize  = reader.arsize
+    output bool[2]                  m_axi_arburst = reader.arburst
+    output bool[3]                        m_axi_arprot = reader.arprot
+    output bool[4]                        m_axi_arcache = reader.arcache
+    output int#(FROM: 0, TO: 16)          m_axi_arqos = reader.arqos
+    output bool                           m_axi_arlock = reader.arlock
+    output int#(FROM: 0, TO: 16)          m_axi_arregion = reader.arregion
+    input  bool                     m_axi_rvalid
+    output bool                     m_axi_rready = reader.rready
+    input  bool[AXI_WIDTH]          m_axi_rdata
+    input  bool[2]                  m_axi_rresp
+    input  bool                     m_axi_rlast
+    reader.arready =                m_axi_arready
+    reader.rvalid =                 m_axi_rvalid
+    reader.rdata =                  m_axi_rdata
+    reader.rresp =                  m_axi_rresp
+    reader.rlast =                  m_axi_rlast
+
+        // Driver after setup
     // reader.ready_for_lots_of_data = ?
     when reader.chunk_valid : bool[ELEM_BITWIDTH][NUM_PARALLEL_ELEMENTS] elements, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS+1) chunk_length, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS) chunk_offset, bool last, bool[0] _unused_extra_data{
         //last_letter_in_message=last
         int#(FROM: 0,TO: 26) letter_to_parse
         int#(FROM: 0,TO: 26) encoded_letter
         letter_to_parse=IntNarrow#(FROM: 0, TO: 26)(BitsToInt(elements[0]))
-        encoded_letter=enigma_machine_1.parse_letter(letter_to_parse)
+        encoded_letter=enigma_machine_driver.enigma_machine_1.parse_letter(letter_to_parse)
         ioc_calc_1.letter_input(encoded_letter,last)
     }
+    /*
+    we calculate message legth once here for the relative value of our sum to the optimal IoC 1,73 for our message length so we can have an integer value to compare against later and avoid floating point ops 
+    need flaot library here
+
+    action ioc_calc_message_mult'0:int#(FROM: 0,TO: 2048) cur_message_length'0 -> int#(FROM: 1,TO: 4194304)cur_message_length_multiply'1{
+        cur_message_length_multiply=cur_message_length*(cur_message_length-1)
+    }
+    action ioc_calc_max_sum_value:int#(FROM: 1,TO: 4194304) message_length_multiply -> float max_sum_value_ioc{
+        max_sum_value_ioc = message_length_multiply * 1,73
+    }
+    */
+
 }
