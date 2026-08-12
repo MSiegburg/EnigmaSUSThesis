@@ -13,7 +13,9 @@ module ioc_count#(){
 }
 
 module ioc_calc{
+
     state int#(FROM: 0,TO: 100)[26] letter_count
+
     action set_letter_count:int#(FROM: 0,TO: 100)[26] letter_count_new{
         letter_count=letter_count_new
     }
@@ -26,14 +28,16 @@ module ioc_calc{
         }else when letter_count[cur_index]==1{
             mult_result=0
         }else when letter_count[cur_index]==2{
-            mult_result=0
+            mult_result=2
         }else{
             mult_result=letter_count[cur_index]*(letter_count[cur_index]-1) mod 65536
         } 
     }
 }
 
-module best_settings{                                            // instantiate as many as i wanna save best settings for each machine variant and have them be sitting in a row passing along the data down the line
+/* instantiate as many as i wanna save best settings for each machine variant 
+and have them be sitting in a row passing along the data down the line*/
+module best_settings{   
     state int#(FROM: 0,TO: 65536) best_IOC_score
     state int#(FROM: 0,TO: 26)[6] score_settings_saved
     initial best_IOC_score = 0
@@ -48,13 +52,17 @@ module best_settings{                                            // instantiate 
             IOC_score_passing=best_IOC_score
             best_IOC_score = IOC_score
             score_settings_passing=score_settings_saved
-            score_settings_saved[:]=score_settings[:]                   // [:] implied when we write over an array of registers with another array of registers ?
+            score_settings_saved[:]=score_settings[:]                   
         }else{
             score_settings_passing=score_settings
             IOC_score_passing = IOC_score
         }
     }
-    /*
+    action reset{
+        best_IOC_score=0
+        score_settings_saved[:]=[0,0,0,0,0,0]
+    }
+    /*  DEPRECATED
     action update_states'0:int#(FROM: 0,TO: 26)[6] score_settings_to_copy'0{                    // fsm updating states we never expect new settings in less then 7 cycles anyway 
         when incr_state_update==0&update_needed{
             score_settings_saved[incr_state_update]=score_settings_to_copy[incr_state_update]
@@ -76,34 +84,16 @@ module best_settings{                                            // instantiate 
             update_needed=false
             incr_state_update=0
         }
-
-
-
     }*/
 }
 
 module enigma_machine_driver{
     // logic for creating all fixed enigma machines and giving them new incrementing settings for each time the message has been fully parsed
 
-    enigma_machine_runtime enigma_machine_1
+    //seperate rotors and rings setting search do ring settings with prelim "good" rotor settings
 
-    enigma_machine_1.setup([0,0,0],[0,0,0],[0,0,0])         //manually setup all of them ? is there something we can do with gencode ?
-                                                            //seperate rotors and rings setting search do ring settings with prelim "good" rotor settings
-
-/*
-    for int I in 0..61{
-        for int J in 0..26{
-            for int K in 0..26{
-                for int L in 0..26{
-                    enigma_machine_[I].setup([L,K,J],[0,0,0][0,0,0])
-                }
-            }
-        }
-    }
-*/
-   
-    // how many tbd
-
+    state int#(FROM: 0,TO: 26)[60][45] setting_safe
+    state int#(FROM: 0,TO: 65536)[60][5] score_safe
 
 
     for int I in 0..60{
@@ -240,6 +230,8 @@ module enigma_machine_driver{
             initial rotor_config=[4, 3, 2]
         }
 
+        // TODO possibly make 62 enigma machines 2 of which do nothing during initial 60 machine calcs but then we could use 26x2 machines to do ring settings faster maybe
+
 
         state int#(FROM: 0,TO: 6) cur_state
         state int#(FROM: 0,TO: 26) cur_letter
@@ -248,8 +240,11 @@ module enigma_machine_driver{
         state bool last
 
         state bool start
+
+        state bool all_config_done
+        initial all_config_done=false
         
-        initial multiplication_result=0
+        initial multiplication_result = 0
         initial cur_state = 0
         initial cur_letter = 0
         
@@ -259,8 +254,19 @@ module enigma_machine_driver{
 
         // Stuff for setup of machines
 
-        int#(FROM: 0,TO: 65536) ioc_score_temp1
-        int#(FROM: 0,TO: 26)[6] temp_settings1
+        int#(FROM: 0,TO: 26)[6] score_settings
+
+        state int#(FROM: 0,TO: 65536) ioc_score_temp1
+        state int#(FROM: 0,TO: 26)[6] temp_settings1
+        state int#(FROM: 0,TO: 65536) ioc_score_temp2
+        state int#(FROM: 0,TO: 26)[6] temp_settings2
+        state int#(FROM: 0,TO: 65536) ioc_score_temp3
+        state int#(FROM: 0,TO: 26)[6] temp_settings3
+        state int#(FROM: 0,TO: 65536) ioc_score_temp4
+        state int#(FROM: 0,TO: 26)[6] temp_settings4
+        state int#(FROM: 0,TO: 65536) ioc_score_temp5
+        state int#(FROM: 0,TO: 26)[6] temp_settings5
+
         
         
 
@@ -277,39 +283,102 @@ module enigma_machine_driver{
         initial middle_ring_pos=0
         initial left_ring_pos=0
 
+        state bool right_lap
+        state bool middle_lap
+        state bool left_lap
+
+        initial right_lap=false
+        initial middle_lap=false
+        initial left_lap=false
+
 
         
         when start{
             cur_state=1
         }
-        when cur_state==1{
-            enigma_machine_inst.setup(rotor_config,[left_rotor_pos,middle_rotor_pos,rigth_rotor_pos],[left_ring_pos,middle_ring_pos,rigth_ring_pos])        //TODO add state changes to rotor and ring settings
+        when cur_state==1{              
+            when rigth_rotor_pos<25{                                    // if we dont go into this right rotor is at 25
+                rigth_rotor_pos=rigth_rotor_pos+1 mod 26
+                when rigth_rotor_pos+1==25{
+                    right_lap=true
+                }
+            }else when middle_rotor_pos<25 & right_lap {                // if we dont go into this middle rotor is at 25
+                rigth_rotor_pos=0
+                middle_rotor_pos=middle_rotor_pos+1 mod 26
+                right_lap=false
+                when middle_rotor_pos+1==25{
+                    middle_lap=true
+                }
+            }else when left_rotor_pos<25 & middle_lap{                  // if we dont go into this left rotor is at 25
+                middle_rotor_pos=0
+                left_rotor_pos=left_rotor_pos+1 mod 26
+                middle_lap=false
+                when left_rotor_pos+1==25{
+                    left_lap=true                                                  
+                }
+            }else when right_lap&middle_lap&left_lap{                   // if all rotors are at 25 we have reached the last config
+                all_config_done=true
+            }
+
+            enigma_machine_inst.setup(rotor_config,[left_rotor_pos,middle_rotor_pos,rigth_rotor_pos],[left_ring_pos,middle_ring_pos,rigth_ring_pos]) 
+            
+            cur_state = 2
+
         }
         when cur_state==2{
             decoded_letter=enigma_machine_inst.parse_letter(input_letter)
             ioc_count_inst.letter_input(decoded_letter)       
             when last{
                 cur_state=3
+                ioc_calc_inst.set_letter_count(ioc_count_inst.pass_letter_count())
             }
         }
         when cur_state==3{
             
-            multiplication_result = multiplication_result + ioc_calc_inst.ioc_calc_individual_letter(cur_letter)
-            ioc_score_temp1,temp_settings1=best_settings_inst1.update_check(multiplication_result, score_settings)
-            best_settings_inst2.update_check()                                                                              // TODO add the chain of setting checks
+            multiplication_result = multiplication_result + ioc_calc_inst.ioc_calc_individual_letter(cur_letter) mod 65536
             cur_letter=cur_letter+1 mod 26
             when cur_letter==25{
-                cur_state=1
                 cur_letter=0
                 multiplication_result=0
-                
-       // better to not use gencode since well have to nestle it and i dont know how referencing would work 
+                ioc_count_inst.reset()
 
+                ioc_score_temp1,temp_settings1=best_settings_inst1.update_check(multiplication_result, score_settings)
+                ioc_score_temp2,temp_settings2=best_settings_inst2.update_check(ioc_score_temp1,temp_settings1)     
+                ioc_score_temp3,temp_settings3=best_settings_inst3.update_check(ioc_score_temp2,temp_settings2)  
+                ioc_score_temp4,temp_settings4=best_settings_inst4.update_check(ioc_score_temp3,temp_settings3)  
+                ioc_score_temp5,temp_settings5=best_settings_inst5.update_check(ioc_score_temp4,temp_settings4)  
+                when all_config_done{
+                    cur_state=4
+                }else {
+                    cur_state=1
+                }
 
             }
         }
+        when cur_state==4{
+            setting_safe[0:6][I]=temp_settings1
+            setting_safe[6:9][I]=rotor_config
+            setting_safe[9:15][I]=temp_settings2
+            setting_safe[15:18][I]=rotor_config
+            setting_safe[18:24][I]=temp_settings3
+            setting_safe[24:27][I]=rotor_config
+            setting_safe[27:33][I]=temp_settings4
+            setting_safe[33:36][I]=rotor_config
+            setting_safe[36:42][I]=temp_settings5
+            setting_safe[42:45][I]=rotor_config
 
+            score_safe[0][I] = ioc_score_temp1
+            score_safe[1][I] = ioc_score_temp2
+            score_safe[2][I] = ioc_score_temp3
+            score_safe[3][I] = ioc_score_temp4
+            score_safe[4][I] = ioc_score_temp5
 
+            best_settings_inst1.reset()
+            best_settings_inst2.reset()
+            best_settings_inst3.reset()
+            best_settings_inst4.reset()
+            best_settings_inst5.reset()            
+        }
     }
 
 
@@ -413,16 +482,18 @@ module cracker_top{
     reader.rresp =                  m_axi_rresp
     reader.rlast =                  m_axi_rlast
 
-        // Driver after setup
+
     // reader.ready_for_lots_of_data = ?
     when reader.chunk_valid : bool[ELEM_BITWIDTH][NUM_PARALLEL_ELEMENTS] elements, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS+1) chunk_length, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS) chunk_offset, bool last, bool[0] _unused_extra_data{
         //last_letter_in_message=last
         int#(FROM: 0,TO: 26) letter_to_parse
         int#(FROM: 0,TO: 26) encoded_letter
         letter_to_parse=IntNarrow#(FROM: 0, TO: 26)(BitsToInt(elements[0]))
-        encoded_letter=enigma_machine_driver.enigma_machine_1.parse_letter(letter_to_parse)
-        ioc_calc_1.letter_input(encoded_letter,last)
+        //encoded_letter=enigma_machine_driver(letter_to_parse)
+        
     }
+
+
     /*
     we calculate message legth once here for the relative value of our sum to the optimal IoC 1,73 for our message length so we can have an integer value to compare against later and avoid floating point ops 
     need flaot library here
