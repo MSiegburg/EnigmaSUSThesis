@@ -98,6 +98,7 @@ module enigma_machine_driver{
 
     state int#(FROM: 0,TO: 26)[60][45] setting_safe
     state int#(FROM: 0,TO: 65536)[60][5] score_safe
+    gen int[3] rotor_setup1
 
 
     for int I in 0..60{
@@ -113,9 +114,10 @@ module enigma_machine_driver{
         best_settings best_settings_inst6
 
         state int#(FROM: 0,TO: 5)[3] rotor_config 
+        gen int[3] rotor_config_compile                 // test with this
 
         if  I==0{
-            initial rotor_config=[0, 1, 2]
+            rotor_config=[0, 1, 2]
         }else if I==1{
             initial rotor_config=[0, 1, 3]
         }else if I==2{
