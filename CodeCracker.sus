@@ -58,6 +58,10 @@ module best_settings{
             IOC_score_passing = IOC_score
         }
     }
+    action give_settings:->int#(FROM: 0,TO: 65536) best_IOC_score_cur'0, int#(FROM: 0,TO: 26)[6] cur_settings_saved'0{
+        best_IOC_score_cur=best_IOC_score
+        cur_settings_saved=score_settings_saved
+    }
     action reset{
         best_IOC_score=0
         score_settings_saved[:]=[0,0,0,0,0,0]
@@ -105,6 +109,8 @@ module enigma_machine_driver{
         best_settings best_settings_inst3
         best_settings best_settings_inst4
         best_settings best_settings_inst5
+
+        best_settings best_settings_inst6
 
         state int#(FROM: 0,TO: 5)[3] rotor_config 
 
@@ -233,7 +239,7 @@ module enigma_machine_driver{
         // TODO possibly make 62 enigma machines 2 of which do nothing during initial 60 machine calcs but then we could use 26x2 machines to do ring settings faster maybe
 
 
-        state int#(FROM: 0,TO: 6) cur_state
+        state int#(FROM: 0,TO: 10) cur_state
         state int#(FROM: 0,TO: 26) cur_letter
         state int#(FROM: 0,TO: 65536) multiplication_result
 
@@ -254,7 +260,7 @@ module enigma_machine_driver{
 
         // Stuff for setup of machines
 
-        int#(FROM: 0,TO: 26)[6] score_settings
+        state int#(FROM: 0,TO: 26)[6] score_settings
 
         state int#(FROM: 0,TO: 65536) ioc_score_temp1
         state int#(FROM: 0,TO: 26)[6] temp_settings1
@@ -327,10 +333,11 @@ module enigma_machine_driver{
         }
         when cur_state==2{
             decoded_letter=enigma_machine_inst.parse_letter(input_letter)
-            ioc_count_inst.letter_input(decoded_letter)       
+            ioc_count_inst.letter_input(decoded_letter)
             when last{
                 cur_state=3
                 ioc_calc_inst.set_letter_count(ioc_count_inst.pass_letter_count())
+                score_settings=[rotor_config[0],rotor_config[1],rotor_config[2],left_rotor_pos,middle_rotor_pos,rigth_rotor_pos,left_ring_pos,middle_ring_pos,rigth_ring_pos]
             }
         }
         when cur_state==3{
@@ -338,24 +345,26 @@ module enigma_machine_driver{
             multiplication_result = multiplication_result + ioc_calc_inst.ioc_calc_individual_letter(cur_letter) mod 65536
             cur_letter=cur_letter+1 mod 26
             when cur_letter==25{
-                cur_letter=0
-                multiplication_result=0
-                ioc_count_inst.reset()
 
                 ioc_score_temp1,temp_settings1=best_settings_inst1.update_check(multiplication_result, score_settings)
                 ioc_score_temp2,temp_settings2=best_settings_inst2.update_check(ioc_score_temp1,temp_settings1)     
                 ioc_score_temp3,temp_settings3=best_settings_inst3.update_check(ioc_score_temp2,temp_settings2)  
                 ioc_score_temp4,temp_settings4=best_settings_inst4.update_check(ioc_score_temp3,temp_settings3)  
                 ioc_score_temp5,temp_settings5=best_settings_inst5.update_check(ioc_score_temp4,temp_settings4)  
+
+
+                cur_letter=0
+                multiplication_result=0
+                ioc_count_inst.reset()
                 when all_config_done{
-                    cur_state=4
+                    cur_state=9
                 }else {
                     cur_state=1
                 }
 
             }
         }
-        when cur_state==4{
+        when cur_state==9{
             setting_safe[0:6][I]=temp_settings1
             setting_safe[6:9][I]=rotor_config
             setting_safe[9:15][I]=temp_settings2
@@ -378,6 +387,84 @@ module enigma_machine_driver{
             best_settings_inst3.reset()
             best_settings_inst4.reset()
             best_settings_inst5.reset()            
+        }
+
+
+        when cur_state==4{
+            state int#(FROM: 1,TO: 6) cur_best
+            state int#(FROM: 0,TO: 65536) IoC_score_dummy
+            state int#(FROM: 0,TO: 26)[6] best_settings_cur
+            when cur_best==1{
+                IoC_score_dummy,best_settings_cur=best_settings_inst1.give_settings()
+                cur_best=2
+                cur_state=5
+            }else when cur_best==2{
+                IoC_score_dummy,best_settings_cur=best_settings_inst2.give_settings()
+                cur_best=3
+                cur_state=5
+            }
+
+        
+        }
+
+        state bool right_ring_lap
+        state bool middle_ring_lap
+        state bool all_rings_done
+
+        when cur_state==5{
+            //do the ring setting calcs on the same machines with the 5 best values and then output the best result of that process
+
+            when rigth_ring_pos<25{                                    
+                rigth_rotor_pos=rigth_rotor_pos+1 mod 26
+                rigth_ring_pos=rigth_ring_pos+1 mod 26
+                when rigth_rotor_pos+1==25{
+                    right_ring_lap=true
+                }
+            }else when middle_ring_pos<25 & right_lap {
+                rigth_ring_pos=0
+                middle_rotor_pos=middle_rotor_pos+1 mod 26
+                middle_ring_pos=middle_ring_pos+1 mod 26
+                right_ring_lap=false
+                when middle_rotor_pos+1==25{
+                    middle_ring_lap=true
+                }
+            }else when right_ring_lap&middle_ring_lap{
+                all_rings_done=true
+            }
+
+            enigma_machine_inst.setup(rotor_config,[left_rotor_pos,middle_rotor_pos,rigth_rotor_pos],[left_ring_pos,middle_ring_pos,rigth_ring_pos]) 
+
+            cur_state=6
+        }
+        when cur_state==6{
+            decoded_letter=enigma_machine_inst.parse_letter(input_letter)
+            ioc_count_inst.letter_input(decoded_letter)
+            when last{
+                cur_state=7
+                ioc_calc_inst.set_letter_count(ioc_count_inst.pass_letter_count())
+                score_settings=[rotor_config[0],rotor_config[1],rotor_config[2],left_rotor_pos,middle_rotor_pos,rigth_rotor_pos,left_ring_pos,middle_ring_pos,rigth_ring_pos]
+            }
+        }
+        when cur_state==7{
+            
+            multiplication_result = multiplication_result + ioc_calc_inst.ioc_calc_individual_letter(cur_letter) mod 65536
+            cur_letter=cur_letter+1 mod 26
+            when cur_letter==25{
+
+                ioc_score_temp1,temp_settings1=best_settings_inst6.update_check(multiplication_result, score_settings)
+
+
+
+                cur_letter=0
+                multiplication_result=0
+                ioc_count_inst.reset()
+                when all_rings_done{
+                    cur_state=9
+                }else {
+                    cur_state=5
+                }
+
+            }
         }
     }
 
