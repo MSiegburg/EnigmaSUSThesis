@@ -112,9 +112,13 @@ module enigma_machine_driver{
         best_settings best_settings_inst5
 
         best_settings best_settings_inst6
+        best_settings best_settings_inst7
+        best_settings best_settings_inst8
+        best_settings best_settings_inst9
+        best_settings best_settings_inst10
 
         state int#(FROM: 0,TO: 5)[3] rotor_config 
-        gen int[3] rotor_config_compile                 // test with this
+        gen int[3] rotor_config_compile                 // TODO: test with this
 
         if  I==0{
             rotor_config=[0, 1, 2]
@@ -238,7 +242,7 @@ module enigma_machine_driver{
             initial rotor_config=[4, 3, 2]
         }
 
-        // TODO possibly make 62 enigma machines 2 of which do nothing during initial 60 machine calcs but then we could use 26x2 machines to do ring settings faster maybe
+        // TODO: possibly make 62 enigma machines 2 of which do nothing during initial 60 machine calcs but then we could use 26x2 machines to do ring settings faster maybe
 
 
         state int#(FROM: 0,TO: 10) cur_state
@@ -366,44 +370,52 @@ module enigma_machine_driver{
 
             }
         }
-        when cur_state==9{
-            setting_safe[0:6][I]=temp_settings1
-            setting_safe[6:9][I]=rotor_config
-            setting_safe[9:15][I]=temp_settings2
-            setting_safe[15:18][I]=rotor_config
-            setting_safe[18:24][I]=temp_settings3
-            setting_safe[24:27][I]=rotor_config
-            setting_safe[27:33][I]=temp_settings4
-            setting_safe[33:36][I]=rotor_config
-            setting_safe[36:42][I]=temp_settings5
-            setting_safe[42:45][I]=rotor_config
+        
 
-            score_safe[0][I] = ioc_score_temp1
-            score_safe[1][I] = ioc_score_temp2
-            score_safe[2][I] = ioc_score_temp3
-            score_safe[3][I] = ioc_score_temp4
-            score_safe[4][I] = ioc_score_temp5
-
-            best_settings_inst1.reset()
-            best_settings_inst2.reset()
-            best_settings_inst3.reset()
-            best_settings_inst4.reset()
-            best_settings_inst5.reset()            
-        }
-
+        state bool all_best_settings_tested
+        initial all_best_settings_tested=false
 
         when cur_state==4{
             state int#(FROM: 1,TO: 6) cur_best
-            state int#(FROM: 0,TO: 65536) IoC_score_dummy
-            state int#(FROM: 0,TO: 26)[6] best_settings_cur
+            int#(FROM: 0,TO: 65536) IoC_score_dummy
+            int#(FROM: 0,TO: 26)[6] best_settings_cur
             when cur_best==1{
                 IoC_score_dummy,best_settings_cur=best_settings_inst1.give_settings()
+                rigth_rotor_pos=best_settings_cur[0]
+                middle_rotor_pos=best_settings_cur[1]
+                left_rotor_pos=best_settings_cur[2]
                 cur_best=2
                 cur_state=5
             }else when cur_best==2{
                 IoC_score_dummy,best_settings_cur=best_settings_inst2.give_settings()
+                rigth_rotor_pos=best_settings_cur[0]
+                middle_rotor_pos=best_settings_cur[1]
+                left_rotor_pos=best_settings_cur[2]
                 cur_best=3
                 cur_state=5
+            }else when cur_best==3{
+                IoC_score_dummy,best_settings_cur=best_settings_inst3.give_settings()
+                rigth_rotor_pos=best_settings_cur[0]
+                middle_rotor_pos=best_settings_cur[1]
+                left_rotor_pos=best_settings_cur[2]                
+                cur_best=4
+                cur_state=5
+            }else when cur_best==4{
+                IoC_score_dummy,best_settings_cur=best_settings_inst4.give_settings()
+                rigth_rotor_pos=best_settings_cur[0]
+                middle_rotor_pos=best_settings_cur[1]
+                left_rotor_pos=best_settings_cur[2]   
+                cur_best=5
+                cur_state=5
+            }else when cur_best==5{
+                IoC_score_dummy,best_settings_cur=best_settings_inst5.give_settings()
+                rigth_rotor_pos=best_settings_cur[0]
+                middle_rotor_pos=best_settings_cur[1]
+                left_rotor_pos=best_settings_cur[2]   
+                cur_best=1
+                cur_state=5
+                all_best_settings_tested=true
+
             }
 
         
@@ -454,6 +466,10 @@ module enigma_machine_driver{
             when cur_letter==25{
 
                 ioc_score_temp1,temp_settings1=best_settings_inst6.update_check(multiplication_result, score_settings)
+                ioc_score_temp2,temp_settings2=best_settings_inst7.update_check(ioc_score_temp1,temp_settings1)     
+                ioc_score_temp3,temp_settings3=best_settings_inst8.update_check(ioc_score_temp2,temp_settings2)  
+                ioc_score_temp4,temp_settings4=best_settings_inst9.update_check(ioc_score_temp3,temp_settings3)  
+                ioc_score_temp5,temp_settings5=best_settings_inst10.update_check(ioc_score_temp4,temp_settings4) 
 
 
 
@@ -468,6 +484,31 @@ module enigma_machine_driver{
 
             }
         }
+        when cur_state==9{
+            setting_safe[0:6][I]=temp_settings1
+            setting_safe[6:9][I]=rotor_config
+            setting_safe[9:15][I]=temp_settings2
+            setting_safe[15:18][I]=rotor_config
+            setting_safe[18:24][I]=temp_settings3
+            setting_safe[24:27][I]=rotor_config
+            setting_safe[27:33][I]=temp_settings4
+            setting_safe[33:36][I]=rotor_config
+            setting_safe[36:42][I]=temp_settings5
+            setting_safe[42:45][I]=rotor_config
+
+            score_safe[0][I] = ioc_score_temp1
+            score_safe[1][I] = ioc_score_temp2
+            score_safe[2][I] = ioc_score_temp3
+            score_safe[3][I] = ioc_score_temp4
+            score_safe[4][I] = ioc_score_temp5
+
+            best_settings_inst1.reset()
+            best_settings_inst2.reset()
+            best_settings_inst3.reset()
+            best_settings_inst4.reset()
+            best_settings_inst5.reset()            
+        }
+        
     }
 
 
@@ -581,7 +622,7 @@ module cracker_top{
         //encoded_letter=enigma_machine_driver(letter_to_parse)
         
     }
-
+    //TODO: work out the burst reader in this context
 
     /*
     we calculate message legth once here for the relative value of our sum to the optimal IoC 1,73 for our message length so we can have an integer value to compare against later and avoid floating point ops 
