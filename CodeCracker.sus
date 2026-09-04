@@ -121,59 +121,24 @@ module bigram_scores{
   [834649781, 2164724, 746076293, 168263, 614533122, 52374239, 542548, 117618666, 1111463633, 511074, 281255, 16728256, 6569222, 1613611, 76097183, 1885334638, 8225536, 907409, 1804740, 1315669490, 134528161, 55076715, 6292525, 79068246, 72645837, 136521],
   [444542870, 121220723, 380670476, 192245315, 2612941418, 21246637, 73102462, 14682887, 812619095, 561334, 9292584, 416082307, 667551857, 372595315, 4226720021, 702499946, 384882, 219696469, 2730343336, 470429861, 37436235, 5115763, 95070267, 4211192, 1993017, 51097953],
   [702199296, 5858211, 2100797, 1415016, 1402290616, 608389, 4726653, 18782710, 341671190, 309029, 906537, 35456851, 4713608, 4300522, 202480511, 1361846, 913036, 5320518, 8395904, 6627349, 60692846, 4618705, 6279286, 108224, 66473188, 75012595]
-]
+]   // TODO: look at a realistic upper bound for this 
 
-
-bigram_score_array[]
-    state int#(FROM: 0,TO: 650)temp_index
-    state int#(FROM: 0,TO: 27)[2]temp_bigram
-    state int#(FROM: 0,TO: 4294967296) bigram_score         // TODO: look at a realistic upper bound for this 
-    state bool done
 
 
     action get_bigram_score:int#(FROM: 0,TO: 26)[2]cur_bigram->int#(FROM: 0,TO: 4294967296) cur_bigram_score {
-        temp_bigram=cur_bigram
-        done=false
-        when temp_index<650&!done{
-            when temp_bigram[0]==bigram_score_array[0][temp_index][0]&bigram_score_array[1][temp_index][0]==temp_bigram[1]{
-                done=true
-            }else{
-                temp_index=temp_index+1
-            }
-
-        }
-        when done{
-            cur_bigram_score=bigram_score_array[0][temp_index][1]
-        }
-
+        cur_bigram_score=bigram_score_array[cur_bigram[0]][cur_bigram[1]]
     }
 
 }
 
 module trigram_scores{
     gen int[][][] trigram_score_array                       // TODO: if i make this a global variavle i can have multiple instances of this module use the same data structure
-    trigram_score_array=[]
-
-    state int#(FROM: 0,TO: 17576)temp_index
-    state int#(FROM: 0,TO: 27)[2]temp_bigram
-    state int#(FROM: 0,TO: 4294967296) bigram_score         // TODO: look at a realistic upper bound for this 
-    state bool done
-
-
-    action get_trigram_score:int#(FROM: 0,TO: 26)[2]cur_bigram->int#(FROM: 0,TO: 4294967296) cur_bigram_score {
-        temp_bigram=cur_bigram
-        done=false
-        when temp_index<17576&!done{
-            when temp_bigram[0]==trigram_score_array[0][temp_index][0]&trigram_score_array[1][temp_index][0]==temp_bigram[1]{
-                done=true
-            }else{
-                temp_index=temp_index+1
-            }
-
-        }
-        when done{
-            cur_bigram_score=trigram_score_array[0][temp_index][1]
-        }
+    trigram_score_array=[[[]]]
+    
+    
+    action get_trigram_score:int#(FROM: 0,TO: 26)[2]cur_trigram->int#(FROM: 0,TO: 4294967296) cur_trigram_score {
+        cur_trigram_score=trigram_score_array[cur_bigram[0]][cur_trigram[1]]
+    
     }
 
 }
@@ -596,11 +561,31 @@ module enigma_machine_driver{
         
     }
 
+}
 
 
+module plug_guessing{
 
+    // we get 5 settings for the machine these will be the results of our rotor config rotor pos and ring pos guessing earlier 
+    // we start with the best one 
+    // we start with the first plug 26x25 possible settings
+    //      we need some sort of checking mechanism to make sure we dont plug into already existing plugs 
+    //          we could use an array with bools in it to check our combinations against to make sure
+    //      we set a plug we pipe it through the machine and we see what the result is passing it to the bigram/trigram check 
+    //          need to figure out roughly how long this takes or how we are going to store the results 
+    //          just a bunch of lookups for bigrams shouldnt take longer then the message decode just checking a 2 dimensional array
+    //          for trigrams 3 dimensional array not sure how local that can be but at the end of the day similar timing 
+    //          amount of bigrams to check is ML-1 trigrams is ML-2
+    //      for each decode run we have to change the plugs but not anything esle so similar overhead to earlier for rotor and ring pos
+    //      we use a new variation of the best_settings module to keep our best ranking plug setting 
+    //          this should allways be clearly better if we are working with the right rotor settings
+    //      at the end of the first run take the best settings and enter their plug pair into the bool array 
+    //      repeat for the next runs checking against plug array if we can skip steps until we arrive at 10 plugs 
+    //              (variable given number or alternatively make it so we can check if a "selfplug" is the best plug meanning we dont have any plugs that yield better results)
+    //      
 
 }
+
 module cracker_top{
 
     clock aclk
