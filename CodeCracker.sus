@@ -66,30 +66,6 @@ module best_settings{
         best_IOC_score=0
         score_settings_saved[:]=[0,0,0,0,0,0]
     }
-
-    /*  DEPRECATED
-    action update_states'0:int#(FROM: 0,TO: 26)[6] score_settings_to_copy'0{                    // fsm updating states we never expect new settings in less then 7 cycles anyway 
-        when incr_state_update==0&update_needed{
-            score_settings_saved[incr_state_update]=score_settings_to_copy[incr_state_update]
-            incr_state_update=1
-        }else when incr_state_update==1&update_needed{
-            score_settings_saved[incr_state_update]=score_settings_to_copy[incr_state_update]
-            incr_state_update=2
-        }else when incr_state_update==2&update_needed{
-            score_settings_saved[incr_state_update]=score_settings_to_copy[incr_state_update]
-            incr_state_update=3
-        }else when incr_state_update==3&update_needed{
-            score_settings_saved[incr_state_update]=score_settings_to_copy[incr_state_update]
-            incr_state_update=4
-        }else when incr_state_update==4&update_needed{
-            score_settings_saved[incr_state_update]=score_settings_to_copy[incr_state_update]
-            incr_state_update=5
-        }else when incr_state_update==5&update_needed{
-            score_settings_saved[incr_state_update]=score_settings_to_copy[incr_state_update]
-            update_needed=false
-            incr_state_update=0
-        }
-    }*/
 }
 
 module bigram_scores{
@@ -173,125 +149,125 @@ module enigma_machine_driver{
         gen int[3] rotor_config_compile                 // TODO: test with this
 
         if  I==0{
-            rotor_config=[0, 1, 2]
+            rotor_config_compile=[0, 1, 2]
         }else if I==1{
-            initial rotor_config=[0, 1, 3]
+            rotor_config_compile=[0, 1, 3]
         }else if I==2{
-            initial rotor_config=[0, 1, 4]
+            rotor_config_compile=[0, 1, 4]
         }else if I==3{
-            initial rotor_config=[0, 2, 1]
+            rotor_config_compile=[0, 2, 1]
         }else if I==4{
-            initial rotor_config=[0, 2, 3]
+            rotor_config_compile=[0, 2, 3]
         }else if I==5{
-            initial rotor_config=[0, 2, 4]
+            rotor_config_compile=[0, 2, 4]
         }else if I==6{
-            initial rotor_config=[0, 3, 1]
+            rotor_config_compile=[0, 3, 1]
         }else if I==7{
-            initial rotor_config=[0, 3, 2]
+            rotor_config_compile=[0, 3, 2]
         }else if I==8{
-            initial rotor_config=[0, 3, 4]
+            rotor_config_compile=[0, 3, 4]
         }else if I==9{
-            initial rotor_config=[0, 4, 1]
+            rotor_config_compile=[0, 4, 1]
         }else if I==10{
-            initial rotor_config=[0, 4, 2]
+            rotor_config_compile=[0, 4, 2]
         }else if I==11{
-            initial rotor_config=[0, 4, 3]
+            rotor_config_compile=[0, 4, 3]
         }else if I==12{
-            initial rotor_config=[1, 0, 2]
+            rotor_config_compile=[1, 0, 2]
         }else if I==13{
-            initial rotor_config=[1, 0, 3]
+            rotor_config_compile=[1, 0, 3]
         }else if I==14{
-            initial rotor_config=[1, 0, 4]
+            rotor_config_compile=[1, 0, 4]
         }else if I==15{
-            initial rotor_config=[1, 2, 0]
+            rotor_config_compile=[1, 2, 0]
         }else if I==16{
-            initial rotor_config=[1, 2, 3]
+            rotor_config_compile=[1, 2, 3]
         }else if I==17{
-            initial rotor_config=[1, 2, 4]
+            rotor_config_compile=[1, 2, 4]
         }else if I==18{
-            initial rotor_config=[1, 3, 0]
+            rotor_config_compile=[1, 3, 0]
         }else if I==19{
-            initial rotor_config=[1, 3, 2]
+            rotor_config_compile=[1, 3, 2]
         }else if I==20{
-            initial rotor_config=[1, 3, 4]
+            rotor_config_compile=[1, 3, 4]
         }else if I==21{
-            initial rotor_config=[1, 4, 0]
+            rotor_config_compile=[1, 4, 0]
         }else if I==22{
-            initial rotor_config=[1, 4, 2]
+            rotor_config_compile=[1, 4, 2]
         }else if I==23{
-            initial rotor_config=[1, 4, 3]
+            rotor_config_compile=[1, 4, 3]
         }else if I==24{
-            initial rotor_config=[2, 0, 1]
+            rotor_config_compile=[2, 0, 1]
         }else if I==25{
-            initial rotor_config=[2, 0, 3]
+            rotor_config_compile=[2, 0, 3]
         }else if I==26{
-            initial rotor_config=[2, 0, 4]
+            rotor_config_compile=[2, 0, 4]
         }else if I==27{
-            initial rotor_config=[2, 1, 0]
+            rotor_config_compile=[2, 1, 0]
         }else if I==28{
-            initial rotor_config=[2, 1, 3]
+            rotor_config_compile=[2, 1, 3]
         }else if I==29{
-            initial rotor_config=[2, 1, 4]
+            rotor_config_compile=[2, 1, 4]
         }else if I==30{
-            initial rotor_config=[2, 3, 0]
+            rotor_config_compile=[2, 3, 0]
         }else if I==31{
-            initial rotor_config=[2, 3, 1]
+            rotor_config_compile=[2, 3, 1]
         }else if I==32{
-            initial rotor_config=[2, 3, 4]
+            rotor_config_compile=[2, 3, 4]
         }else if I==33{
-            initial rotor_config=[2, 4, 0]
+            rotor_config_compile=[2, 4, 0]
         }else if I==34{
-            initial rotor_config=[2, 4, 1]
+            rotor_config_compile=[2, 4, 1]
         }else if I==35{
-            initial rotor_config=[2, 4, 3]
+            rotor_config_compile=[2, 4, 3]
         }else if I==36{
-            initial rotor_config=[3, 0, 1]
+            rotor_config_compile=[3, 0, 1]
         }else if I==37{
-            initial rotor_config=[3, 0, 2]
+            rotor_config_compile=[3, 0, 2]
         }else if I==38{
-            initial rotor_config=[3, 0, 4]
+            rotor_config_compile=[3, 0, 4]
         }else if I==39{
-            initial rotor_config=[3, 1, 0]
+            rotor_config_compile=[3, 1, 0]
         }else if I==40{
-            initial rotor_config=[3, 1, 2]
+            rotor_config_compile=[3, 1, 2]
         }else if I==41{
-            initial rotor_config=[3, 1, 4]
+            rotor_config_compile=[3, 1, 4]
         }else if I==42{
-            initial rotor_config=[3, 2, 0]
+            rotor_config_compile=[3, 2, 0]
         }else if I==43{
-            initial rotor_config=[3, 2, 1]
+            rotor_config_compile=[3, 2, 1]
         }else if I==44{
-            initial rotor_config=[3, 2, 4]
+            rotor_config_compile=[3, 2, 4]
         }else if I==45{
-            initial rotor_config=[3, 4, 0]
+            rotor_config_compile=[3, 4, 0]
         }else if I==46{
-            initial rotor_config=[3, 4, 1]
+            rotor_config_compile=[3, 4, 1]
         }else if I==47{
-            initial rotor_config=[3, 4, 2]
+            rotor_config_compile=[3, 4, 2]
         }else if I==48{
-            initial rotor_config=[4, 0, 1]
+            rotor_config_compile=[4, 0, 1]
         }else if I==49{
-            initial rotor_config=[4, 0, 2]
+            rotor_config_compile=[4, 0, 2]
         }else if I==50{
-            initial rotor_config=[4, 0, 3]
+            rotor_config_compile=[4, 0, 3]
         }else if I==51{
-            initial rotor_config=[4, 1, 0]
+            rotor_config_compile=[4, 1, 0]
         }else if I==52{
-            initial rotor_config=[4, 1, 2]
+            rotor_config_compile=[4, 1, 2]
         }else if I==53{
-            initial rotor_config=[4, 1, 3]
+            rotor_config_compile=[4, 1, 3]
         }else if I==54{
-            initial rotor_config=[4, 2, 0]
+            rotor_config_compile=[4, 2, 0]
         }else if I==55{
-            initial rotor_config=[4, 2, 1]
+            rotor_config_compile=[4, 2, 1]
         }else if I==56{
-            initial rotor_config=[4, 2, 3]
+            rotor_config_compile=[4, 2, 3]
         }else if I==57{
-            initial rotor_config=[4, 3, 0]
+            rotor_config_compile=[4, 3, 0]
         }else if I==58{
-            initial rotor_config=[4, 3, 1]
+            rotor_config_compile=[4, 3, 1]
         }else if I==59{
-            initial rotor_config=[4, 3, 2]
+            rotor_config_compile=[4, 3, 2]
         }
 
 
@@ -358,6 +334,7 @@ module enigma_machine_driver{
         when start{
             cur_state=1
         }
+        // Go over the various possible rotor settings in order 
         when cur_state==1{              
             when rigth_rotor_pos<25{                                    // if we dont go into this right rotor is at 25
                 rigth_rotor_pos=rigth_rotor_pos+1 mod 26
@@ -381,12 +358,13 @@ module enigma_machine_driver{
             }else when right_lap&middle_lap&left_lap{                   // if all rotors are at 25 we have reached the last config
                 all_config_done=true
             }
-
+            // instantiate an enigma machine with the given rotors
             enigma_machine_inst.setup(rotor_config,[left_rotor_pos,middle_rotor_pos,rigth_rotor_pos],[left_ring_pos,middle_ring_pos,rigth_ring_pos]) 
             
             cur_state = 2
 
         }
+        // calculate our version of the IoC score 
         when cur_state==2{
             decoded_letter=enigma_machine_inst.parse_letter(input_letter)
             ioc_count_inst.letter_input(decoded_letter)
@@ -396,19 +374,20 @@ module enigma_machine_driver{
                 score_settings=[rotor_config[0],rotor_config[1],rotor_config[2],left_rotor_pos,middle_rotor_pos,rigth_rotor_pos,left_ring_pos,middle_ring_pos,rigth_ring_pos]
             }
         }
+        // sum up our letter counts until we reach the end of the alphaet
         when cur_state==3{
             
             multiplication_result = multiplication_result + ioc_calc_inst.ioc_calc_individual_letter(cur_letter) mod 65536
             cur_letter=cur_letter+1 mod 26
             when cur_letter==25{
-
+                // fill our IoC score modules with the sum result passing down values in order thereby effectively geting a sortet list 
                 ioc_score_temp1,temp_settings1=best_settings_inst1.update_check(multiplication_result, score_settings)
                 ioc_score_temp2,temp_settings2=best_settings_inst2.update_check(ioc_score_temp1,temp_settings1)     
                 ioc_score_temp3,temp_settings3=best_settings_inst3.update_check(ioc_score_temp2,temp_settings2)  
                 ioc_score_temp4,temp_settings4=best_settings_inst4.update_check(ioc_score_temp3,temp_settings3)  
                 ioc_score_temp5,temp_settings5=best_settings_inst5.update_check(ioc_score_temp4,temp_settings4)  
 
-
+                // reset relevant values and start over with the next rotor settings for the given message 
                 cur_letter=0
                 multiplication_result=0
                 ioc_count_inst.reset()
@@ -529,12 +508,21 @@ module enigma_machine_driver{
                 when all_rings_done{
                     cur_state=9
                 }else {
-                    cur_state=5
+                    cur_state=4
                 }
 
             }
         }
+        // get all the best settings out of the setting modules and assign them to our temp values 
         when cur_state==9{
+            ioc_score_temp1,temp_settings1=best_settings_inst6.give_settings()
+            ioc_score_temp2,temp_settings2=best_settings_inst7.give_settings()
+            ioc_score_temp3,temp_settings3=best_settings_inst8.give_settings()
+            ioc_score_temp4,temp_settings4=best_settings_inst9.give_settings()
+            ioc_score_temp5,temp_settings5=best_settings_inst10.give_settings()
+
+
+
             setting_safe[0:6][I]=temp_settings1
             setting_safe[6:9][I]=rotor_config
             setting_safe[9:15][I]=temp_settings2
@@ -582,7 +570,7 @@ module plug_guessing{
     //      at the end of the first run take the best settings and enter their plug pair into the bool array 
     //      repeat for the next runs checking against plug array if we can skip steps until we arrive at 10 plugs 
     //              (variable given number or alternatively make it so we can check if a "selfplug" is the best plug meanning we dont have any plugs that yield better results)
-    //      
+    //      TODO: turn this into code 
 
 }
 
