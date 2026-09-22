@@ -1,10 +1,10 @@
 module ioc_count#(){
     state int#(FROM: 0,TO: 100)[26] letter_count
     
-    action letter_input'0: int#(FROM: 0,TO: 26) decoded_letter'0{
+    action letter_input: int#(FROM: 0,TO: 26) decoded_letter{
         letter_count[decoded_letter]=letter_count[decoded_letter]+1 mod 100
     }
-    action pass_letter_count'0:-> int#(FROM: 0,TO: 100)[26] letter_count_cur'0{
+    action pass_letter_count:-> int#(FROM: 0,TO: 100)[26] letter_count_cur{
         letter_count_cur=letter_count
     }
     action reset'0{
@@ -22,7 +22,7 @@ module ioc_calc{
     
     
 
-    action ioc_calc_individual_letter'0:int#(FROM: 0,TO: 26) cur_index -> int#(FROM: 0,TO: 65536) mult_result{
+    action ioc_calc_individual_letter:int#(FROM: 0,TO: 26) cur_index -> int#(FROM: 0,TO: 65536) mult_result{
         when letter_count[cur_index]==0{
             mult_result=0
         }else when letter_count[cur_index]==1{
@@ -44,7 +44,7 @@ module best_settings{
     initial score_settings_saved[:] = [0,0,0,0,0,0]
     
     
-    action update_check'0: int#(FROM: 0,TO: 65536) IOC_score'0, int#(FROM: 0,TO: 26)[6] score_settings'0->int#(FROM: 0,TO: 65536) IOC_score_passing'0, int#(FROM: 0,TO: 26)[6] score_settings_passing'0{
+    action update_check: int#(FROM: 0,TO: 65536) IOC_score, int#(FROM: 0,TO: 26)[6] score_settings->int#(FROM: 0,TO: 65536) IOC_score_passing, int#(FROM: 0,TO: 26)[6] score_settings_passing{
         int#(FROM: 0,TO: 65536) temp_new_score = IOC_score_passing
         int#(FROM: 0,TO: 65536) temp_cur_score = best_IOC_score
 
@@ -58,13 +58,36 @@ module best_settings{
             IOC_score_passing = IOC_score
         }
     }
-    action give_settings:->int#(FROM: 0,TO: 65536) best_IOC_score_cur'0, int#(FROM: 0,TO: 26)[6] cur_settings_saved'0{
+    action give_settings:->int#(FROM: 0,TO: 65536) best_IOC_score_cur, int#(FROM: 0,TO: 26)[6] cur_settings_saved{
         best_IOC_score_cur=best_IOC_score
         cur_settings_saved=score_settings_saved
     }
     action reset{
         best_IOC_score=0
         score_settings_saved[:]=[0,0,0,0,0,0]
+    }
+}
+
+module best_ngram_score{
+    state int#(FROM: 0,TO: 281474976710656)cur_best     //48bit
+    state int#(FROM: 0,TO: 26)[2] plugs_cur
+    action update:int#(FROM: 0,TO: 26)[2]plugs_used, int#(FROM: 0,TO: 281474976710656)ngram_score->int#(FROM: 0,TO: 26)[2]plugs_new, int#(FROM: 0,TO: 281474976710656)ngram_score_worse{
+        when cur_best<ngram_score{
+            ngram_score_worse=cur_best
+            cur_best=ngram_score
+            plugs_new=plugs_cur
+            plugs_cur=plugs_used
+        }
+    }
+    action give_plugs:->int#(FROM: 0,TO: 26)[2]plugs_used_for_best_score{
+        plugs_used_for_best_score=plugs_cur
+    }
+    action give_score:->int#(FROM: 0,TO: 4294967296)best_score_recorded{
+        best_score_recorded=cur_best
+    }
+    action reset{
+        cur_best=0
+        plugs_cur=[0,0]
     }
 }
 
@@ -108,12 +131,12 @@ module bigram_scores{
 }
 
 module trigram_scores{
-    gen int[][][] trigram_score_array                       // TODO: if i make this a global variavle i can have multiple instances of this module use the same data structure
+    gen int[][][] trigram_score_array              
     trigram_score_array=[[[]]]
     
     
-    action get_trigram_score:int#(FROM: 0,TO: 26)[2]cur_trigram->int#(FROM: 0,TO: 4294967296) cur_trigram_score {
-        cur_trigram_score=trigram_score_array[cur_bigram[0]][cur_trigram[1]]
+    action get_trigram_score:int#(FROM: 0,TO: 26)[3]cur_trigram->int#(FROM: 0,TO: 4294967296) cur_trigram_score {
+        cur_trigram_score=trigram_score_array[cur_trigram[0],cur_trigram[1],cur_trigram[2]]
     
     }
 
@@ -145,8 +168,8 @@ module enigma_machine_driver{
         best_settings best_settings_inst9
         best_settings best_settings_inst10
 
-        state int#(FROM: 0,TO: 5)[3] rotor_config 
-        gen int[3] rotor_config_compile                 // TODO: test with this
+        //state int#(FROM: 0,TO: 5)[3] rotor_config 
+        gen int[3] rotor_config_compile                 
 
         if  I==0{
             rotor_config_compile=[0, 1, 2]
@@ -359,8 +382,8 @@ module enigma_machine_driver{
                 all_config_done=true
             }
             // instantiate an enigma machine with the given rotors
-            enigma_machine_inst.setup(rotor_config,[left_rotor_pos,middle_rotor_pos,rigth_rotor_pos],[left_ring_pos,middle_ring_pos,rigth_ring_pos]) 
-            
+            enigma_machine_inst.setup(rotor_config_compile,[left_rotor_pos,middle_rotor_pos,rigth_rotor_pos],[left_ring_pos,middle_ring_pos,rigth_ring_pos]) 
+            enigma_machine_inst.prep_message_encode()
             cur_state = 2
 
         }
@@ -371,7 +394,7 @@ module enigma_machine_driver{
             when last{
                 cur_state=3
                 ioc_calc_inst.set_letter_count(ioc_count_inst.pass_letter_count())
-                score_settings=[rotor_config[0],rotor_config[1],rotor_config[2],left_rotor_pos,middle_rotor_pos,rigth_rotor_pos,left_ring_pos,middle_ring_pos,rigth_ring_pos]
+                score_settings=[rotor_config_compile[0],rotor_config_compile[1],rotor_config_compile[2],left_rotor_pos,middle_rotor_pos,rigth_rotor_pos,left_ring_pos,middle_ring_pos,rigth_ring_pos]
             }
         }
         // sum up our letter counts until we reach the end of the alphaet
@@ -392,11 +415,10 @@ module enigma_machine_driver{
                 multiplication_result=0
                 ioc_count_inst.reset()
                 when all_config_done{
-                    cur_state=9
+                    cur_state=4
                 }else {
                     cur_state=1
                 }
-
             }
         }
         
@@ -460,7 +482,7 @@ module enigma_machine_driver{
             when rigth_ring_pos<25{                                    
                 rigth_rotor_pos=rigth_rotor_pos+1 mod 26
                 rigth_ring_pos=rigth_ring_pos+1 mod 26
-                when rigth_rotor_pos+1==25{
+                when rigth_ring_pos+1==25{
                     right_ring_lap=true
                 }
             }else when middle_ring_pos<25 & right_lap {
@@ -468,15 +490,15 @@ module enigma_machine_driver{
                 middle_rotor_pos=middle_rotor_pos+1 mod 26
                 middle_ring_pos=middle_ring_pos+1 mod 26
                 right_ring_lap=false
-                when middle_rotor_pos+1==25{
+                when middle_ring_pos+1==25{
                     middle_ring_lap=true
                 }
             }else when right_ring_lap&middle_ring_lap{
                 all_rings_done=true
             }
 
-            enigma_machine_inst.setup(rotor_config,[left_rotor_pos,middle_rotor_pos,rigth_rotor_pos],[left_ring_pos,middle_ring_pos,rigth_ring_pos]) 
-
+            enigma_machine_inst.setup(rotor_config_compile,[left_rotor_pos,middle_rotor_pos,rigth_rotor_pos],[left_ring_pos,middle_ring_pos,rigth_ring_pos]) 
+            enigma_machine_inst.prep_message_encode()
             cur_state=6
         }
         when cur_state==6{
@@ -485,7 +507,7 @@ module enigma_machine_driver{
             when last{
                 cur_state=7
                 ioc_calc_inst.set_letter_count(ioc_count_inst.pass_letter_count())
-                score_settings=[rotor_config[0],rotor_config[1],rotor_config[2],left_rotor_pos,middle_rotor_pos,rigth_rotor_pos,left_ring_pos,middle_ring_pos,rigth_ring_pos]
+                score_settings=[rotor_config_compile[0],rotor_config_compile[1],rotor_config_compile[2],left_rotor_pos,middle_rotor_pos,rigth_rotor_pos,left_ring_pos,middle_ring_pos,rigth_ring_pos]
             }
         }
         when cur_state==7{
@@ -506,9 +528,12 @@ module enigma_machine_driver{
                 multiplication_result=0
                 ioc_count_inst.reset()
                 when all_rings_done{
-                    cur_state=9
-                }else {
                     cur_state=4
+                    when all_best_settings_tested{
+                        cur_state=9
+                    }
+                }else {
+                    cur_state=5
                 }
 
             }
@@ -524,15 +549,15 @@ module enigma_machine_driver{
 
 
             setting_safe[0:6][I]=temp_settings1
-            setting_safe[6:9][I]=rotor_config
+            setting_safe[6:9][I]=rotor_config_compile
             setting_safe[9:15][I]=temp_settings2
-            setting_safe[15:18][I]=rotor_config
+            setting_safe[15:18][I]=rotor_config_compile
             setting_safe[18:24][I]=temp_settings3
-            setting_safe[24:27][I]=rotor_config
+            setting_safe[24:27][I]=rotor_config_compile
             setting_safe[27:33][I]=temp_settings4
-            setting_safe[33:36][I]=rotor_config
+            setting_safe[33:36][I]=rotor_config_compile
             setting_safe[36:42][I]=temp_settings5
-            setting_safe[42:45][I]=rotor_config
+            setting_safe[42:45][I]=rotor_config_compile
 
             score_safe[0][I] = ioc_score_temp1
             score_safe[1][I] = ioc_score_temp2
@@ -554,11 +579,100 @@ module enigma_machine_driver{
 
 module plug_guessing{
 
+    enigma_machine_runtime enigma_machine_plugboard
+    bigram_scores bigram_scores_inst
+    best_ngram_score best_ngram_score_inst
+
+    state int#(FROM: 0,TO: 5) plug_state
+    state bool last
+    initial last=false
+
     // we get 5 settings for the machine these will be the results of our rotor config rotor pos and ring pos guessing earlier 
+    // could do compile time for to do it in parallel on all best settings if we have space
+    state int#(FROM: 0,TO: 26)[9] given_settings
     // we start with the best one 
     // we start with the first plug 26x25 possible settings
-    //      we need some sort of checking mechanism to make sure we dont plug into already existing plugs 
-    //          we could use an array with bools in it to check our combinations against to make sure
+    state bool[26] alphabet
+    alphabet==[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]     // we could use an array with bools in it to check our combinations against to make sure
+    state int#(FROM: 0,TO: 26) plug_one
+    state int#(FROM: 0,TO: 26) plug_two
+    
+    state bool all_pairs_for_step_complete
+    state int#(FROM: 0,TO: 16) plugs_in_use
+    gen int max_plugs=10
+
+    state int#(FROM: 0,TO: 26) decoded_letter_pb
+
+    state int#(FROM: 0,TO: 26)[2] buffer
+
+    initial plug_one = 0
+    initial plug_two = 1
+
+    state int#(FROM: 0,TO: 4096) increment
+    state int#(FROM: 0,TO: 4294967296) bigram_score_temp            // 32 bit
+    state int#(FROM: 0,TO: 281474976710656) bigram_score_sum        // 48 bit
+
+    enigma_machine_plugboard.setup(given_settings[0:3], given_settings[3:6], given_settings[6:9])
+
+    when plug_state==0{
+        when plugs_in_use<max_plugs{
+            plug_state=1
+        }else{
+            //TODO: plugboard done give results 
+        }
+    }
+ 
+ // increment over the possible plugs to set up since direction doesnt matter and we cant plug two plugs into the same place 
+ // we need to make sure that doesnt happen
+    when plug_state==1{                
+        when plug_one< 26{
+            when plug_two < 26{
+                when plug_two>plug_one{
+                    plug_two=plug_two+1 mod 26
+                }else{
+                    plug_two=plug_one+1 mod 26
+                }
+            }else{
+                plug_one=plug_one+1 mod 26
+            }
+        }else{              // TODO: check if this terminates correctly
+            plug_one=0
+            plug_two=1
+            plug_state=3
+        }
+        
+        when alphabet[plug_one] & alphabet[plug_two]{     //      we need some sort of checking mechanism to make sure we dont plug into already existing plugs 
+            //save plugs and set them in machine
+            enigma_machine_plugboard.change_plugs(plug_one, plug_two)
+            enigma_machine_plugboard.prep_message_encode()
+            plug_state=2
+        }
+    }
+    when plug_state==2{
+        increment=increment+1 mod 4096
+        decoded_letter_pb=enigma_machine_plugboard.parse_letter(input_letter)
+        buffer[0]=decoded_letter_pb
+        when increment>1{
+            buffer[1]=buffer[0]
+        }
+        bigram_score_temp=bigram_scores_inst.get_bigram_score(buffer)
+        bigram_score_sum=bigram_score_sum+bigram_score_temp
+        when last{
+            best_ngram_score_inst.update([plug_one,plug_two], bigram_score_sum)
+            plug_state=1
+        }
+
+    }
+
+    when plug_state==3{
+        plug_one,plug_two=best_ngram_score_inst.give_plugs()
+        alphabet[plug_one]=0
+        alphabet[plug_two]=0
+        plugs_in_use=plugs_in_use+1 mod 16
+        plug_state=0
+    }
+
+
     //      we set a plug we pipe it through the machine and we see what the result is passing it to the bigram/trigram check 
     //          need to figure out roughly how long this takes or how we are going to store the results 
     //          just a bunch of lookups for bigrams shouldnt take longer then the message decode just checking a 2 dimensional array
@@ -570,7 +684,10 @@ module plug_guessing{
     //      at the end of the first run take the best settings and enter their plug pair into the bool array 
     //      repeat for the next runs checking against plug array if we can skip steps until we arrive at 10 plugs 
     //              (variable given number or alternatively make it so we can check if a "selfplug" is the best plug meanning we dont have any plugs that yield better results)
-    //      TODO: turn this into code 
+    //      :TODO 
+
+
+
 
 }
 
