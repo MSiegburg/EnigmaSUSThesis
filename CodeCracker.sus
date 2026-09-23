@@ -1,10 +1,10 @@
 module ioc_count#(){
-    state int#(FROM: 0,TO: 100)[26] letter_count
+    state int#(FROM: 0,TO: 256)[26] letter_count
     
     action letter_input: int#(FROM: 0,TO: 26) decoded_letter{
         letter_count[decoded_letter]=letter_count[decoded_letter]+1 mod 100
     }
-    action pass_letter_count:-> int#(FROM: 0,TO: 100)[26] letter_count_cur{
+    action pass_letter_count:-> int#(FROM: 0,TO: 256)[26] letter_count_cur{
         letter_count_cur=letter_count
     }
     action reset'0{
@@ -14,14 +14,12 @@ module ioc_count#(){
 
 module ioc_calc{
 
-    state int#(FROM: 0,TO: 100)[26] letter_count
+    state int#(FROM: 0,TO: 256)[26] letter_count
 
-    action set_letter_count:int#(FROM: 0,TO: 100)[26] letter_count_new{
+    action set_letter_count:int#(FROM: 0,TO: 256)[26] letter_count_new{
         letter_count=letter_count_new
     }
     
-    
-
     action ioc_calc_individual_letter:int#(FROM: 0,TO: 26) cur_index -> int#(FROM: 0,TO: 65536) mult_result{
         when letter_count[cur_index]==0{
             mult_result=0
@@ -68,6 +66,37 @@ module best_settings{
     }
 }
 
+module best_configs{   
+    state int#(FROM: 0,TO: 65536) best_IOC_score
+    state int#(FROM: 0,TO: 26)[9] score_settings_saved
+    initial best_IOC_score = 0
+    initial score_settings_saved[:] = [0,0,0,0,0,0,0,0,0]
+    
+    
+    action update_check: int#(FROM: 0,TO: 65536) IOC_score, int#(FROM: 0,TO: 26)[9] score_settings->int#(FROM: 0,TO: 65536) IOC_score_passing, int#(FROM: 0,TO: 26)[9] score_settings_passing{
+        int#(FROM: 0,TO: 65536) temp_new_score = IOC_score_passing
+        int#(FROM: 0,TO: 65536) temp_cur_score = best_IOC_score
+
+        when temp_new_score> temp_cur_score{
+            IOC_score_passing=best_IOC_score
+            best_IOC_score = IOC_score
+            score_settings_passing=score_settings_saved
+            score_settings_saved[:]=score_settings[:]                   
+        }else{
+            score_settings_passing=score_settings
+            IOC_score_passing = IOC_score
+        }
+    }
+    action give_settings:->int#(FROM: 0,TO: 65536) best_IOC_score_cur, int#(FROM: 0,TO: 26)[9] cur_settings_saved{
+        best_IOC_score_cur=best_IOC_score
+        cur_settings_saved=score_settings_saved
+    }
+    action reset{
+        best_IOC_score=0
+        score_settings_saved[:]=[0,0,0,0,0,0,0,0,0]
+    }
+}
+
 module best_ngram_score{
     state int#(FROM: 0,TO: 281474976710656)cur_best     //48bit
     state int#(FROM: 0,TO: 26)[2] plugs_cur
@@ -82,7 +111,7 @@ module best_ngram_score{
     action give_plugs:->int#(FROM: 0,TO: 26)[2]plugs_used_for_best_score{
         plugs_used_for_best_score=plugs_cur
     }
-    action give_score:->int#(FROM: 0,TO: 4294967296)best_score_recorded{
+    action give_score:->int#(FROM: 0,TO: 281474976710656)best_score_recorded{
         best_score_recorded=cur_best
     }
     action reset{
@@ -130,7 +159,7 @@ module bigram_scores{
 
 }
 
-module trigram_scores{
+module trigram_scores{                          // TODO: finish after talking about the reduction of values
     gen int[][][] trigram_score_array              
     trigram_score_array=[[[]]]
     
@@ -147,7 +176,7 @@ module enigma_machine_driver{
 
     //seperate rotors and rings setting search do ring settings with prelim "good" rotor settings
 
-    state int#(FROM: 0,TO: 26)[60][45] setting_safe
+    state int#(FROM: 0,TO: 26)[60][5][9] setting_safe
     state int#(FROM: 0,TO: 65536)[60][5] score_safe
     gen int[3] rotor_setup1
 
@@ -540,24 +569,34 @@ module enigma_machine_driver{
         }
         // get all the best settings out of the setting modules and assign them to our temp values 
         when cur_state==9{
+            state int#(FROM: 0,TO: 26)[9] concat_temp1
+            state int#(FROM: 0,TO: 26)[9] concat_temp2
+            state int#(FROM: 0,TO: 26)[9] concat_temp3
+            state int#(FROM: 0,TO: 26)[9] concat_temp4
+            state int#(FROM: 0,TO: 26)[9] concat_temp5
+
+            Concat concat_inst
+
+
+
             ioc_score_temp1,temp_settings1=best_settings_inst6.give_settings()
             ioc_score_temp2,temp_settings2=best_settings_inst7.give_settings()
             ioc_score_temp3,temp_settings3=best_settings_inst8.give_settings()
             ioc_score_temp4,temp_settings4=best_settings_inst9.give_settings()
             ioc_score_temp5,temp_settings5=best_settings_inst10.give_settings()
 
+            concat_temp1=concat_inst(temp_settings1, rotor_config_compile)
+            concat_temp2=concat_inst(temp_settings2, rotor_config_compile)
+            concat_temp3=concat_inst(temp_settings3, rotor_config_compile)
+            concat_temp4=concat_inst(temp_settings4, rotor_config_compile)
+            concat_temp5=concat_inst(temp_settings5, rotor_config_compile)
 
+            setting_safe[0][I]=concat_temp1
+            setting_safe[1][I]=concat_temp2
+            setting_safe[2][I]=concat_temp3
+            setting_safe[3][I]=concat_temp4
+            setting_safe[4][I]=concat_temp5
 
-            setting_safe[0:6][I]=temp_settings1
-            setting_safe[6:9][I]=rotor_config_compile
-            setting_safe[9:15][I]=temp_settings2
-            setting_safe[15:18][I]=rotor_config_compile
-            setting_safe[18:24][I]=temp_settings3
-            setting_safe[24:27][I]=rotor_config_compile
-            setting_safe[27:33][I]=temp_settings4
-            setting_safe[33:36][I]=rotor_config_compile
-            setting_safe[36:42][I]=temp_settings5
-            setting_safe[42:45][I]=rotor_config_compile
 
             score_safe[0][I] = ioc_score_temp1
             score_safe[1][I] = ioc_score_temp2
@@ -569,11 +608,56 @@ module enigma_machine_driver{
             best_settings_inst2.reset()
             best_settings_inst3.reset()
             best_settings_inst4.reset()
-            best_settings_inst5.reset()            
+            best_settings_inst5.reset()
+            best_settings_inst6.reset()
+            best_settings_inst7.reset()
+            best_settings_inst8.reset()
+            best_settings_inst9.reset()
+            best_settings_inst10.reset()
+
         }
         
     }
 
+    // sort out the score safe array to get top 5 configs
+    best_configs best_config_to_plug1
+    best_configs best_config_to_plug2
+    best_configs best_config_to_plug3
+    best_configs best_config_to_plug4
+    best_configs best_config_to_plug5
+
+    state int#(FROM: 0,TO: 60) machindex
+    state int#(FROM: 0, TO: 6) scoreindex
+
+    state int#(FROM: 0,TO: 65536) ioc_score_top1
+    state int#(FROM: 0,TO: 26)[9] best_settings1
+    state int#(FROM: 0,TO: 65536) ioc_score_top2
+    state int#(FROM: 0,TO: 26)[9] best_settings2
+    state int#(FROM: 0,TO: 65536) ioc_score_top3
+    state int#(FROM: 0,TO: 26)[9] best_settings3
+    state int#(FROM: 0,TO: 65536) ioc_score_top4
+    state int#(FROM: 0,TO: 26)[9] best_settings4
+    state int#(FROM: 0,TO: 65536) ioc_score_top5
+    state int#(FROM: 0,TO: 26)[9] best_settings5
+
+    initial machindex=0
+    initial scoreindex=0
+
+    when machindex<60{
+        when scoreindex<5{
+            scoreindex=scoreindex+1 mod 6
+            ioc_score_top1,best_settings1=best_config_to_plug1.update_check(score_safe[scoreindex][machindex], setting_safe[scoreindex][machindex])
+            ioc_score_top2,best_settings2=best_config_to_plug2.update_check(ioc_score_top1, best_settings1)
+            ioc_score_top3,best_settings3=best_config_to_plug2.update_check(ioc_score_top2, best_settings2)
+            ioc_score_top4,best_settings4=best_config_to_plug2.update_check(ioc_score_top3, best_settings3)
+            ioc_score_top5,best_settings5=best_config_to_plug2.update_check(ioc_score_top4, best_settings4)
+
+        }else{
+            machindex=machindex+1
+            scoreindex=0
+        }
+    
+    }
 }
 
 
@@ -593,7 +677,7 @@ module plug_guessing{
     // we start with the best one 
     // we start with the first plug 26x25 possible settings
     state bool[26] alphabet
-    alphabet==[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]     // we could use an array with bools in it to check our combinations against to make sure
+    alphabet=[true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true]     // we could use an array with bools in it to check our combinations against to make sure
     state int#(FROM: 0,TO: 26) plug_one
     state int#(FROM: 0,TO: 26) plug_two
     
@@ -675,16 +759,19 @@ module plug_guessing{
 
     //      we set a plug we pipe it through the machine and we see what the result is passing it to the bigram/trigram check 
     //          need to figure out roughly how long this takes or how we are going to store the results 
+
     //          just a bunch of lookups for bigrams shouldnt take longer then the message decode just checking a 2 dimensional array
+
     //          for trigrams 3 dimensional array not sure how local that can be but at the end of the day similar timing 
-    //          amount of bigrams to check is ML-1 trigrams is ML-2
+    //          amount of bigrams to check
+
     //      for each decode run we have to change the plugs but not anything esle so similar overhead to earlier for rotor and ring pos
     //      we use a new variation of the best_settings module to keep our best ranking plug setting 
     //          this should allways be clearly better if we are working with the right rotor settings
+
     //      at the end of the first run take the best settings and enter their plug pair into the bool array 
     //      repeat for the next runs checking against plug array if we can skip steps until we arrive at 10 plugs 
     //              (variable given number or alternatively make it so we can check if a "selfplug" is the best plug meanning we dont have any plugs that yield better results)
-    //      :TODO 
 
 
 
