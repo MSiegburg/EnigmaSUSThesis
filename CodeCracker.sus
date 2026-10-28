@@ -1,782 +1,4 @@
-module ioc_count#(){
-    state int#(FROM: 0,TO: 256)[26] letter_count
-    
-    action letter_input: int#(FROM: 0,TO: 26) decoded_letter{
-        letter_count[decoded_letter]=letter_count[decoded_letter]+1 mod 100
-    }
-    action pass_letter_count:-> int#(FROM: 0,TO: 256)[26] letter_count_cur{
-        letter_count_cur=letter_count
-    }
-    action reset'0{
-        letter_count[:]=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]     // better way to reset a bunch of registers ?
-    }
-}
 
-module ioc_calc{
-
-    state int#(FROM: 0,TO: 256)[26] letter_count
-
-    action set_letter_count:int#(FROM: 0,TO: 256)[26] letter_count_new{
-        letter_count=letter_count_new
-    }
-    
-    action ioc_calc_individual_letter:int#(FROM: 0,TO: 26) cur_index -> int#(FROM: 0,TO: 65536) mult_result{
-        when letter_count[cur_index]==0{
-            mult_result=0
-        }else when letter_count[cur_index]==1{
-            mult_result=0
-        }else when letter_count[cur_index]==2{
-            mult_result=2
-        }else{
-            mult_result=letter_count[cur_index]*(letter_count[cur_index]-1) mod 65536
-        } 
-    }
-}
-
-/* instantiate as many as i wanna save best settings for each machine variant 
-and have them be sitting in a row passing along the data down the line*/
-module best_settings{   
-    state int#(FROM: 0,TO: 65536) best_IOC_score
-    state int#(FROM: 0,TO: 26)[6] score_settings_saved
-    initial best_IOC_score = 0
-    initial score_settings_saved[:] = [0,0,0,0,0,0]
-    
-    
-    action update_check: int#(FROM: 0,TO: 65536) IOC_score, int#(FROM: 0,TO: 26)[6] score_settings->int#(FROM: 0,TO: 65536) IOC_score_passing, int#(FROM: 0,TO: 26)[6] score_settings_passing{
-        int#(FROM: 0,TO: 65536) temp_new_score = IOC_score_passing
-        int#(FROM: 0,TO: 65536) temp_cur_score = best_IOC_score
-
-        when temp_new_score> temp_cur_score{
-            IOC_score_passing=best_IOC_score
-            best_IOC_score = IOC_score
-            score_settings_passing=score_settings_saved
-            score_settings_saved[:]=score_settings[:]                   
-        }else{
-            score_settings_passing=score_settings
-            IOC_score_passing = IOC_score
-        }
-    }
-    action give_settings:->int#(FROM: 0,TO: 65536) best_IOC_score_cur, int#(FROM: 0,TO: 26)[6] cur_settings_saved{
-        best_IOC_score_cur=best_IOC_score
-        cur_settings_saved=score_settings_saved
-    }
-    action reset{
-        best_IOC_score=0
-        score_settings_saved[:]=[0,0,0,0,0,0]
-    }
-}
-
-module best_configs{   
-    state int#(FROM: 0,TO: 65536) best_IOC_score
-    state int#(FROM: 0,TO: 26)[9] score_settings_saved
-    initial best_IOC_score = 0
-    initial score_settings_saved[:] = [0,0,0,0,0,0,0,0,0]
-    
-    
-    action update_check: int#(FROM: 0,TO: 65536) IOC_score, int#(FROM: 0,TO: 26)[9] score_settings->int#(FROM: 0,TO: 65536) IOC_score_passing, int#(FROM: 0,TO: 26)[9] score_settings_passing{
-        int#(FROM: 0,TO: 65536) temp_new_score = IOC_score_passing
-        int#(FROM: 0,TO: 65536) temp_cur_score = best_IOC_score
-
-        when temp_new_score> temp_cur_score{
-            IOC_score_passing=best_IOC_score
-            best_IOC_score = IOC_score
-            score_settings_passing=score_settings_saved
-            score_settings_saved[:]=score_settings[:]                   
-        }else{
-            score_settings_passing=score_settings
-            IOC_score_passing = IOC_score
-        }
-    }
-    action give_settings:->int#(FROM: 0,TO: 65536) best_IOC_score_cur, int#(FROM: 0,TO: 26)[9] cur_settings_saved{
-        best_IOC_score_cur=best_IOC_score
-        cur_settings_saved=score_settings_saved
-    }
-    action reset{
-        best_IOC_score=0
-        score_settings_saved[:]=[0,0,0,0,0,0,0,0,0]
-    }
-}
-
-module best_ngram_score{
-    state int#(FROM: 0,TO: 281474976710656)cur_best     //48bit
-    state int#(FROM: 0,TO: 26)[2] plugs_cur
-    action update:int#(FROM: 0,TO: 26)[2]plugs_used, int#(FROM: 0,TO: 281474976710656)ngram_score->int#(FROM: 0,TO: 26)[2]plugs_new, int#(FROM: 0,TO: 281474976710656)ngram_score_worse{
-        when cur_best<ngram_score{
-            ngram_score_worse=cur_best
-            cur_best=ngram_score
-            plugs_new=plugs_cur
-            plugs_cur=plugs_used
-        }
-    }
-    action give_plugs:->int#(FROM: 0,TO: 26)[2]plugs_used_for_best_score{
-        plugs_used_for_best_score=plugs_cur
-    }
-    action give_score:->int#(FROM: 0,TO: 281474976710656)best_score_recorded{
-        best_score_recorded=cur_best
-    }
-    action reset{
-        cur_best=0
-        plugs_cur=[0,0]
-    }
-}
-
-module bigram_scores{
-    gen int[][] bigram_score_array
-    bigram_score_array=[
-  [79794787, 6479202253, 12625666388, 10375130449, 349540062, 2092395523, 5772552144, 384694919, 8922759715, 331384552, 2952167845, 30662410438, 8032259916, 55974567611, 130442323, 5719570727, 63283982, 30308513014, 24561944198, 41920838452, 3356322923, 5778409728, 1689436638, 531206960, 6128842727, 334669428],
-  [4122472992, 308276690, 53278096, 69761165, 16249257887, 4108696, 7203255, 29797934, 3005679357, 654853039, 2639491, 6581097936, 88228719, 59062122, 5509918152, 15427250, 346506, 3145611704, 1292319275, 482272940, 5214802738, 108385069, 8319869, 778622, 4975814759, 1007374],
-  [15174413181, 17751935, 2344219345, 62905910, 18367773425, 39704311, 24975673, 16854985236, 7936922442, 2962048, 3316660134, 4201617719, 75144874, 24249641, 22384167777, 37067423, 154363546, 4214150542, 643530723, 12997849406, 4585165906, 5869407, 3909223, 876736, 1176324279, 20601701],
-  [4259590348, 78190243, 71030077, 1205446875, 21565300071, 78347492, 874188188, 153344431, 13899990598, 134832736, 9494027, 911886482, 512522701, 213431654, 5307591560, 48855638, 19927900, 2409399231, 3560125353, 81648332, 4186093215, 537221821, 230152384, 1296277, 1421751251, 2200704],
-  [19403941063, 763383542, 13457763533, 32937140633, 10647199443, 4588497002, 3370515965, 742240059, 5169898489, 128194584, 464449289, 14952716079, 10536054813, 41004903554, 2044268477, 4837800987, 1614312175, 57754162106, 37766388079, 11634161334, 878402090, 7184041787, 3293529190, 6035335807, 4053144855, 127540198],
-  [4624241031, 7730842, 16254390, 13966832, 6670566518, 4125634219, 14424524, 5166165, 8024355222, 2065436, 3293208, 1830098844, 19340776, 11823066, 13753006196, 6262895, 149430, 6011200185, 155349948, 2302659749, 2706168901, 807297, 6451511, 812116, 256535008, 263860],
-  [4175274057, 13944852, 6455066, 89087728, 10861045622, 33962536, 697999944, 6414827751, 4275639800, 1093028, 7338894, 1709752272, 277966576, 1850801359, 3725558729, 11612944, 345624, 5548472398, 1443474876, 434302509, 2418410978, 1192366, 18260884, 557030, 731420025, 3431194],
-  [26103411208, 123778334, 34631551, 80544316, 86697336727, 63249924, 7789748, 14730425, 21520845924, 1282370, 6595610, 355049620, 359316447, 726288117, 13672603513, 16696129, 11925353, 2379584978, 414044112, 3670802795, 2077887429, 6292998, 134615178, 263997, 1412343465, 10729982],
-  [8072199471, 2780268452, 19701195496, 8332214014, 10845731320, 5731148470, 7189051323, 58966344, 642384029, 31324465, 1209994695, 12167821320, 8959759181, 68595215308, 23542263265, 2515455253, 318727904, 8886799024, 31817918249, 31672532308, 490874936, 8116349309, 17611969, 621227893, 6247588, 1814164135],
-  [729206855, 2126115, 3447571, 2615147, 1463052212, 2421784, 1034900, 3541869, 77899882, 2979950, 1740133, 3192327, 3659540, 4150888, 1516687319, 6129447, 0, 6846578, 3329038, 2917850, 1655210582, 1719726, 1165914, 161750, 1120221, 220675],
-  [478095427, 25406204, 6326022, 18894758, 6027536039, 44759608, 72267691, 89811517, 2759841743, 3471162, 12782664, 298033281, 50449220, 1450401608, 171324962, 20492678, 187242, 76743394, 1339590722, 29132180, 85313841, 4414960, 61416538, 555422, 167761726, 150760],
-  [14874551789, 188643782, 333338045, 7122648226, 23382173640, 1507867867, 171657388, 45643026, 17604626629, 3169833, 555883002, 16257360474, 649112313, 165509578, 10908830081, 536595562, 3582930, 283411884, 3990203351, 3486149365, 3811884104, 984229060, 356374125, 8612462, 11983948242, 11767790],
-  [15938689768, 2544901434, 121591374, 18929019, 22360109325, 107664447, 34537023, 15033898, 8957825538, 2923325, 3956883, 129888836, 2708822249, 247850339, 9498813191, 6743935008, 708424, 87580303, 2617582287, 38538709, 3231856188, 8172535, 16465357, 994334, 1753447198, 970282],
-  [9790855551, 122258836, 11722631112, 38129777631, 19504235770, 1894270041, 26871805511, 306883963, 9564648232, 312598990, 1455100124, 1798491132, 782441941, 2051719074, 13099447521, 170186564, 167770304, 258048421, 14350320288, 29359771944, 2217508482, 1466426243, 163456000, 73899576, 2760941827, 123192934],
-  [1620913259, 2725791138, 4692062395, 5511014957, 1089254517, 33130341561, 2651165734, 602121281, 2474275212, 196696657, 1813376076, 10305660447, 15402602484, 49570981965, 5928601045, 6313536754, 29227658, 35994097756, 8176085241, 12465822481, 24531132241, 5021440160, 523764012, 1020190223, 97904996],
-  [9123652775, 36901495, 33156666, 33798376, 13477683504, 41022263, 13354952, 2661480326, 3470838749, 2810773, 23099462, 7415349106, 449910017, 33536129, 10189505383, 3850125519, 1075049, 13378480175, 1538723474, 2982699529, 2947681332, 6222096, 34037460, 1473468, 331698156, 6382200],
-  [4298294, 1083443, 1127399, 519921, 572443, 947879, 0, 263509, 8954617, 236928, 0, 6708919, 989868, 1859810, 1324363, 272180, 1712219, 1744325, 4448602, 1385505, 4160167957, 635514, 163292, 159505, 0, 0],
-  [19332539912, 753194669, 3422694015, 5338083783, 52285662239, 909634941, 2813274913, 426095630, 20516398905, 15598009, 2736041446, 2432373251, 4938158020, 4521640992, 20491179118, 1173542093, 28152573, 3404547067, 11180732354, 10198055461, 3618438291, 1953555667, 359714599, 32990613, 6985436186, 17993128],
-  [6147356936, 223212317, 4363410770, 148275222, 26282488562, 483979931, 69588685, 8888705287, 15509759748, 7621847, 1112771273, 1575646777, 1838392669, 258702825, 11214705934, 5392724233, 209894196, 168896339, 11421755201, 29704461829, 8774129154, 35005005, 663415953, 503772, 1602829285, 7041052],
-  [14941000711, 71746167, 736955048, 36539510, 33973261529, 159626603, 55522877, 100272945963, 37856196209, 3169658, 13081991, 2775935006, 746621025, 282266629, 29360205581, 121089391, 2517400, 12006693396, 9516029773, 4812693687, 7187510085, 32805751, 2322619238, 3328898, 6408447994, 108527540],
-  [3844138094, 2497666762, 5291161134, 2577213760, 4158448570, 522547858, 3606562400, 30097154, 2852182384, 14548024, 129819900, 9751225781, 3901923211, 11121118166, 300484143, 3835093459, 7235727, 15303657594, 12808517567, 11423899818, 22006895, 82252351, 7824504, 110947766, 128782521, 53873803],
-  [3946966167, 2496014, 6570845, 8430332, 23270129573, 1550317, 2960268, 2691078, 7600241898, 724370, 337545, 11621019, 3178223, 4317772, 2004982879, 5510046, 212856, 24701238, 16263248, 6181932, 62384927, 2622571, 742188, 449854, 138085211, 501189],
-  [10865206430, 29929113, 19008254, 99767462, 10176141608, 45330551, 2751783, 10680697684, 10557401491, 914179, 30095733, 429185823, 30732232, 2227183930, 6252724050, 20982546, 163292, 867361010, 989253674, 184446342, 19601657, 389123, 7377619, 150637, 68368953, 0],
-  [834649781, 2164724, 746076293, 168263, 614533122, 52374239, 542548, 117618666, 1111463633, 511074, 281255, 16728256, 6569222, 1613611, 76097183, 1885334638, 8225536, 907409, 1804740, 1315669490, 134528161, 55076715, 6292525, 79068246, 72645837, 136521],
-  [444542870, 121220723, 380670476, 192245315, 2612941418, 21246637, 73102462, 14682887, 812619095, 561334, 9292584, 416082307, 667551857, 372595315, 4226720021, 702499946, 384882, 219696469, 2730343336, 470429861, 37436235, 5115763, 95070267, 4211192, 1993017, 51097953],
-  [702199296, 5858211, 2100797, 1415016, 1402290616, 608389, 4726653, 18782710, 341671190, 309029, 906537, 35456851, 4713608, 4300522, 202480511, 1361846, 913036, 5320518, 8395904, 6627349, 60692846, 4618705, 6279286, 108224, 66473188, 75012595]
-]   // TODO: look at a realistic upper bound for this 
-
-
-
-    action get_bigram_score:int#(FROM: 0,TO: 26)[2]cur_bigram->int#(FROM: 0,TO: 4294967296) cur_bigram_score {
-        cur_bigram_score=bigram_score_array[cur_bigram[0]][cur_bigram[1]]
-    }
-
-}
-
-module trigram_scores{                          // TODO: finish after talking about the reduction of values
-    gen int[][][] trigram_score_array              
-    trigram_score_array=[[[]]]
-    
-    
-    action get_trigram_score:int#(FROM: 0,TO: 26)[3]cur_trigram->int#(FROM: 0,TO: 4294967296) cur_trigram_score {
-        cur_trigram_score=trigram_score_array[cur_trigram[0],cur_trigram[1],cur_trigram[2]]
-    
-    }
-
-}
-
-module enigma_machine_driver{
-    // logic for creating all fixed enigma machines and giving them new incrementing settings for each time the message has been fully parsed
-
-    //seperate rotors and rings setting search do ring settings with prelim "good" rotor settings
-
-    state int#(FROM: 0,TO: 26)[60][5][9] setting_safe
-    state int#(FROM: 0,TO: 65536)[60][5] score_safe
-    gen int[3] rotor_setup1
-
-
-    for int I in 0..60{
-        ioc_count ioc_count_inst
-        ioc_calc ioc_calc_inst
-        enigma_machine_runtime enigma_machine_inst
-        best_settings best_settings_inst1
-        best_settings best_settings_inst2
-        best_settings best_settings_inst3
-        best_settings best_settings_inst4
-        best_settings best_settings_inst5
-
-        best_settings best_settings_inst6
-        best_settings best_settings_inst7
-        best_settings best_settings_inst8
-        best_settings best_settings_inst9
-        best_settings best_settings_inst10
-
-        //state int#(FROM: 0,TO: 5)[3] rotor_config 
-        gen int[3] rotor_config_compile                 
-
-        if  I==0{
-            rotor_config_compile=[0, 1, 2]
-        }else if I==1{
-            rotor_config_compile=[0, 1, 3]
-        }else if I==2{
-            rotor_config_compile=[0, 1, 4]
-        }else if I==3{
-            rotor_config_compile=[0, 2, 1]
-        }else if I==4{
-            rotor_config_compile=[0, 2, 3]
-        }else if I==5{
-            rotor_config_compile=[0, 2, 4]
-        }else if I==6{
-            rotor_config_compile=[0, 3, 1]
-        }else if I==7{
-            rotor_config_compile=[0, 3, 2]
-        }else if I==8{
-            rotor_config_compile=[0, 3, 4]
-        }else if I==9{
-            rotor_config_compile=[0, 4, 1]
-        }else if I==10{
-            rotor_config_compile=[0, 4, 2]
-        }else if I==11{
-            rotor_config_compile=[0, 4, 3]
-        }else if I==12{
-            rotor_config_compile=[1, 0, 2]
-        }else if I==13{
-            rotor_config_compile=[1, 0, 3]
-        }else if I==14{
-            rotor_config_compile=[1, 0, 4]
-        }else if I==15{
-            rotor_config_compile=[1, 2, 0]
-        }else if I==16{
-            rotor_config_compile=[1, 2, 3]
-        }else if I==17{
-            rotor_config_compile=[1, 2, 4]
-        }else if I==18{
-            rotor_config_compile=[1, 3, 0]
-        }else if I==19{
-            rotor_config_compile=[1, 3, 2]
-        }else if I==20{
-            rotor_config_compile=[1, 3, 4]
-        }else if I==21{
-            rotor_config_compile=[1, 4, 0]
-        }else if I==22{
-            rotor_config_compile=[1, 4, 2]
-        }else if I==23{
-            rotor_config_compile=[1, 4, 3]
-        }else if I==24{
-            rotor_config_compile=[2, 0, 1]
-        }else if I==25{
-            rotor_config_compile=[2, 0, 3]
-        }else if I==26{
-            rotor_config_compile=[2, 0, 4]
-        }else if I==27{
-            rotor_config_compile=[2, 1, 0]
-        }else if I==28{
-            rotor_config_compile=[2, 1, 3]
-        }else if I==29{
-            rotor_config_compile=[2, 1, 4]
-        }else if I==30{
-            rotor_config_compile=[2, 3, 0]
-        }else if I==31{
-            rotor_config_compile=[2, 3, 1]
-        }else if I==32{
-            rotor_config_compile=[2, 3, 4]
-        }else if I==33{
-            rotor_config_compile=[2, 4, 0]
-        }else if I==34{
-            rotor_config_compile=[2, 4, 1]
-        }else if I==35{
-            rotor_config_compile=[2, 4, 3]
-        }else if I==36{
-            rotor_config_compile=[3, 0, 1]
-        }else if I==37{
-            rotor_config_compile=[3, 0, 2]
-        }else if I==38{
-            rotor_config_compile=[3, 0, 4]
-        }else if I==39{
-            rotor_config_compile=[3, 1, 0]
-        }else if I==40{
-            rotor_config_compile=[3, 1, 2]
-        }else if I==41{
-            rotor_config_compile=[3, 1, 4]
-        }else if I==42{
-            rotor_config_compile=[3, 2, 0]
-        }else if I==43{
-            rotor_config_compile=[3, 2, 1]
-        }else if I==44{
-            rotor_config_compile=[3, 2, 4]
-        }else if I==45{
-            rotor_config_compile=[3, 4, 0]
-        }else if I==46{
-            rotor_config_compile=[3, 4, 1]
-        }else if I==47{
-            rotor_config_compile=[3, 4, 2]
-        }else if I==48{
-            rotor_config_compile=[4, 0, 1]
-        }else if I==49{
-            rotor_config_compile=[4, 0, 2]
-        }else if I==50{
-            rotor_config_compile=[4, 0, 3]
-        }else if I==51{
-            rotor_config_compile=[4, 1, 0]
-        }else if I==52{
-            rotor_config_compile=[4, 1, 2]
-        }else if I==53{
-            rotor_config_compile=[4, 1, 3]
-        }else if I==54{
-            rotor_config_compile=[4, 2, 0]
-        }else if I==55{
-            rotor_config_compile=[4, 2, 1]
-        }else if I==56{
-            rotor_config_compile=[4, 2, 3]
-        }else if I==57{
-            rotor_config_compile=[4, 3, 0]
-        }else if I==58{
-            rotor_config_compile=[4, 3, 1]
-        }else if I==59{
-            rotor_config_compile=[4, 3, 2]
-        }
-
-
-        state int#(FROM: 0,TO: 10) cur_state
-        state int#(FROM: 0,TO: 26) cur_letter
-        state int#(FROM: 0,TO: 65536) multiplication_result
-
-        state bool last
-
-        state bool start
-
-        state bool all_config_done
-        initial all_config_done=false
-        
-        initial multiplication_result = 0
-        initial cur_state = 0
-        initial cur_letter = 0
-        
-        int#(FROM: 0,TO: 26) decoded_letter
-        int#(FROM: 0,TO: 26) input_letter
-
-
-        // Stuff for setup of machines
-
-        state int#(FROM: 0,TO: 26)[6] score_settings
-
-        state int#(FROM: 0,TO: 65536) ioc_score_temp1
-        state int#(FROM: 0,TO: 26)[6] temp_settings1
-        state int#(FROM: 0,TO: 65536) ioc_score_temp2
-        state int#(FROM: 0,TO: 26)[6] temp_settings2
-        state int#(FROM: 0,TO: 65536) ioc_score_temp3
-        state int#(FROM: 0,TO: 26)[6] temp_settings3
-        state int#(FROM: 0,TO: 65536) ioc_score_temp4
-        state int#(FROM: 0,TO: 26)[6] temp_settings4
-        state int#(FROM: 0,TO: 65536) ioc_score_temp5
-        state int#(FROM: 0,TO: 26)[6] temp_settings5
-
-        
-        
-
-        state int#(FROM: 0,TO: 26) rigth_rotor_pos
-        state int#(FROM: 0,TO: 26) middle_rotor_pos
-        state int#(FROM: 0,TO: 26) left_rotor_pos
-        state int#(FROM: 0,TO: 26) rigth_ring_pos
-        state int#(FROM: 0,TO: 26) middle_ring_pos
-        state int#(FROM: 0,TO: 26) left_ring_pos
-        initial rigth_rotor_pos=0
-        initial middle_rotor_pos=0
-        initial left_rotor_pos=0
-        initial rigth_ring_pos=0
-        initial middle_ring_pos=0
-        initial left_ring_pos=0
-
-        state bool right_lap
-        state bool middle_lap
-        state bool left_lap
-
-        initial right_lap=false
-        initial middle_lap=false
-        initial left_lap=false
-
-
-        
-        when start{
-            cur_state=1
-        }
-        // Go over the various possible rotor settings in order 
-        when cur_state==1{              
-            when rigth_rotor_pos<25{                                    // if we dont go into this right rotor is at 25
-                rigth_rotor_pos=rigth_rotor_pos+1 mod 26
-                when rigth_rotor_pos+1==25{
-                    right_lap=true
-                }
-            }else when middle_rotor_pos<25 & right_lap {                // if we dont go into this middle rotor is at 25
-                rigth_rotor_pos=0
-                middle_rotor_pos=middle_rotor_pos+1 mod 26
-                right_lap=false
-                when middle_rotor_pos+1==25{
-                    middle_lap=true
-                }
-            }else when left_rotor_pos<25 & middle_lap{                  // if we dont go into this left rotor is at 25
-                middle_rotor_pos=0
-                left_rotor_pos=left_rotor_pos+1 mod 26
-                middle_lap=false
-                when left_rotor_pos+1==25{
-                    left_lap=true                                                  
-                }
-            }else when right_lap&middle_lap&left_lap{                   // if all rotors are at 25 we have reached the last config
-                all_config_done=true
-            }
-            // instantiate an enigma machine with the given rotors
-            enigma_machine_inst.setup(rotor_config_compile,[left_rotor_pos,middle_rotor_pos,rigth_rotor_pos],[left_ring_pos,middle_ring_pos,rigth_ring_pos]) 
-            enigma_machine_inst.prep_message_encode()
-            cur_state = 2
-
-        }
-        // calculate our version of the IoC score 
-        when cur_state==2{
-            decoded_letter=enigma_machine_inst.parse_letter(input_letter)
-            ioc_count_inst.letter_input(decoded_letter)
-            when last{
-                cur_state=3
-                ioc_calc_inst.set_letter_count(ioc_count_inst.pass_letter_count())
-                score_settings=[rotor_config_compile[0],rotor_config_compile[1],rotor_config_compile[2],left_rotor_pos,middle_rotor_pos,rigth_rotor_pos,left_ring_pos,middle_ring_pos,rigth_ring_pos]
-            }
-        }
-        // sum up our letter counts until we reach the end of the alphaet
-        when cur_state==3{
-            
-            multiplication_result = multiplication_result + ioc_calc_inst.ioc_calc_individual_letter(cur_letter) mod 65536
-            cur_letter=cur_letter+1 mod 26
-            when cur_letter==25{
-                // fill our IoC score modules with the sum result passing down values in order thereby effectively geting a sortet list 
-                ioc_score_temp1,temp_settings1=best_settings_inst1.update_check(multiplication_result, score_settings)
-                ioc_score_temp2,temp_settings2=best_settings_inst2.update_check(ioc_score_temp1,temp_settings1)     
-                ioc_score_temp3,temp_settings3=best_settings_inst3.update_check(ioc_score_temp2,temp_settings2)  
-                ioc_score_temp4,temp_settings4=best_settings_inst4.update_check(ioc_score_temp3,temp_settings3)  
-                ioc_score_temp5,temp_settings5=best_settings_inst5.update_check(ioc_score_temp4,temp_settings4)  
-
-                // reset relevant values and start over with the next rotor settings for the given message 
-                cur_letter=0
-                multiplication_result=0
-                ioc_count_inst.reset()
-                when all_config_done{
-                    cur_state=4
-                }else {
-                    cur_state=1
-                }
-            }
-        }
-        
-
-        state bool all_best_settings_tested
-        initial all_best_settings_tested=false
-
-        when cur_state==4{
-            state int#(FROM: 1,TO: 6) cur_best
-            int#(FROM: 0,TO: 65536) IoC_score_dummy
-            int#(FROM: 0,TO: 26)[6] best_settings_cur
-            when cur_best==1{
-                IoC_score_dummy,best_settings_cur=best_settings_inst1.give_settings()
-                rigth_rotor_pos=best_settings_cur[0]
-                middle_rotor_pos=best_settings_cur[1]
-                left_rotor_pos=best_settings_cur[2]
-                cur_best=2
-                cur_state=5
-            }else when cur_best==2{
-                IoC_score_dummy,best_settings_cur=best_settings_inst2.give_settings()
-                rigth_rotor_pos=best_settings_cur[0]
-                middle_rotor_pos=best_settings_cur[1]
-                left_rotor_pos=best_settings_cur[2]
-                cur_best=3
-                cur_state=5
-            }else when cur_best==3{
-                IoC_score_dummy,best_settings_cur=best_settings_inst3.give_settings()
-                rigth_rotor_pos=best_settings_cur[0]
-                middle_rotor_pos=best_settings_cur[1]
-                left_rotor_pos=best_settings_cur[2]                
-                cur_best=4
-                cur_state=5
-            }else when cur_best==4{
-                IoC_score_dummy,best_settings_cur=best_settings_inst4.give_settings()
-                rigth_rotor_pos=best_settings_cur[0]
-                middle_rotor_pos=best_settings_cur[1]
-                left_rotor_pos=best_settings_cur[2]   
-                cur_best=5
-                cur_state=5
-            }else when cur_best==5{
-                IoC_score_dummy,best_settings_cur=best_settings_inst5.give_settings()
-                rigth_rotor_pos=best_settings_cur[0]
-                middle_rotor_pos=best_settings_cur[1]
-                left_rotor_pos=best_settings_cur[2]   
-                cur_best=1
-                cur_state=5
-                all_best_settings_tested=true
-
-            }
-
-        
-        }
-
-        state bool right_ring_lap
-        state bool middle_ring_lap
-        state bool all_rings_done
-
-        when cur_state==5{
-            //do the ring setting calcs on the same machines with the 5 best values and then output the best result of that process
-
-            when rigth_ring_pos<25{                                    
-                rigth_rotor_pos=rigth_rotor_pos+1 mod 26
-                rigth_ring_pos=rigth_ring_pos+1 mod 26
-                when rigth_ring_pos+1==25{
-                    right_ring_lap=true
-                }
-            }else when middle_ring_pos<25 & right_lap {
-                rigth_ring_pos=0
-                middle_rotor_pos=middle_rotor_pos+1 mod 26
-                middle_ring_pos=middle_ring_pos+1 mod 26
-                right_ring_lap=false
-                when middle_ring_pos+1==25{
-                    middle_ring_lap=true
-                }
-            }else when right_ring_lap&middle_ring_lap{
-                all_rings_done=true
-            }
-
-            enigma_machine_inst.setup(rotor_config_compile,[left_rotor_pos,middle_rotor_pos,rigth_rotor_pos],[left_ring_pos,middle_ring_pos,rigth_ring_pos]) 
-            enigma_machine_inst.prep_message_encode()
-            cur_state=6
-        }
-        when cur_state==6{
-            decoded_letter=enigma_machine_inst.parse_letter(input_letter)
-            ioc_count_inst.letter_input(decoded_letter)
-            when last{
-                cur_state=7
-                ioc_calc_inst.set_letter_count(ioc_count_inst.pass_letter_count())
-                score_settings=[rotor_config_compile[0],rotor_config_compile[1],rotor_config_compile[2],left_rotor_pos,middle_rotor_pos,rigth_rotor_pos,left_ring_pos,middle_ring_pos,rigth_ring_pos]
-            }
-        }
-        when cur_state==7{
-            
-            multiplication_result = multiplication_result + ioc_calc_inst.ioc_calc_individual_letter(cur_letter) mod 65536
-            cur_letter=cur_letter+1 mod 26
-            when cur_letter==25{
-
-                ioc_score_temp1,temp_settings1=best_settings_inst6.update_check(multiplication_result, score_settings)
-                ioc_score_temp2,temp_settings2=best_settings_inst7.update_check(ioc_score_temp1,temp_settings1)     
-                ioc_score_temp3,temp_settings3=best_settings_inst8.update_check(ioc_score_temp2,temp_settings2)  
-                ioc_score_temp4,temp_settings4=best_settings_inst9.update_check(ioc_score_temp3,temp_settings3)  
-                ioc_score_temp5,temp_settings5=best_settings_inst10.update_check(ioc_score_temp4,temp_settings4) 
-
-
-
-                cur_letter=0
-                multiplication_result=0
-                ioc_count_inst.reset()
-                when all_rings_done{
-                    cur_state=4
-                    when all_best_settings_tested{
-                        cur_state=9
-                    }
-                }else {
-                    cur_state=5
-                }
-
-            }
-        }
-        // get all the best settings out of the setting modules and assign them to our temp values 
-        when cur_state==9{
-            state int#(FROM: 0,TO: 26)[9] concat_temp1
-            state int#(FROM: 0,TO: 26)[9] concat_temp2
-            state int#(FROM: 0,TO: 26)[9] concat_temp3
-            state int#(FROM: 0,TO: 26)[9] concat_temp4
-            state int#(FROM: 0,TO: 26)[9] concat_temp5
-
-            Concat concat_inst
-
-
-
-            ioc_score_temp1,temp_settings1=best_settings_inst6.give_settings()
-            ioc_score_temp2,temp_settings2=best_settings_inst7.give_settings()
-            ioc_score_temp3,temp_settings3=best_settings_inst8.give_settings()
-            ioc_score_temp4,temp_settings4=best_settings_inst9.give_settings()
-            ioc_score_temp5,temp_settings5=best_settings_inst10.give_settings()
-
-            concat_temp1=concat_inst(temp_settings1, rotor_config_compile)
-            concat_temp2=concat_inst(temp_settings2, rotor_config_compile)
-            concat_temp3=concat_inst(temp_settings3, rotor_config_compile)
-            concat_temp4=concat_inst(temp_settings4, rotor_config_compile)
-            concat_temp5=concat_inst(temp_settings5, rotor_config_compile)
-
-            setting_safe[0][I]=concat_temp1
-            setting_safe[1][I]=concat_temp2
-            setting_safe[2][I]=concat_temp3
-            setting_safe[3][I]=concat_temp4
-            setting_safe[4][I]=concat_temp5
-
-
-            score_safe[0][I] = ioc_score_temp1
-            score_safe[1][I] = ioc_score_temp2
-            score_safe[2][I] = ioc_score_temp3
-            score_safe[3][I] = ioc_score_temp4
-            score_safe[4][I] = ioc_score_temp5
-
-            best_settings_inst1.reset()
-            best_settings_inst2.reset()
-            best_settings_inst3.reset()
-            best_settings_inst4.reset()
-            best_settings_inst5.reset()
-            best_settings_inst6.reset()
-            best_settings_inst7.reset()
-            best_settings_inst8.reset()
-            best_settings_inst9.reset()
-            best_settings_inst10.reset()
-
-        }
-        
-    }
-
-    // sort out the score safe array to get top 5 configs
-    best_configs best_config_to_plug1
-    best_configs best_config_to_plug2
-    best_configs best_config_to_plug3
-    best_configs best_config_to_plug4
-    best_configs best_config_to_plug5
-
-    state int#(FROM: 0,TO: 60) machindex
-    state int#(FROM: 0, TO: 6) scoreindex
-
-    state int#(FROM: 0,TO: 65536) ioc_score_top1
-    state int#(FROM: 0,TO: 26)[9] best_settings1
-    state int#(FROM: 0,TO: 65536) ioc_score_top2
-    state int#(FROM: 0,TO: 26)[9] best_settings2
-    state int#(FROM: 0,TO: 65536) ioc_score_top3
-    state int#(FROM: 0,TO: 26)[9] best_settings3
-    state int#(FROM: 0,TO: 65536) ioc_score_top4
-    state int#(FROM: 0,TO: 26)[9] best_settings4
-    state int#(FROM: 0,TO: 65536) ioc_score_top5
-    state int#(FROM: 0,TO: 26)[9] best_settings5
-
-    initial machindex=0
-    initial scoreindex=0
-
-    when machindex<60{
-        when scoreindex<5{
-            scoreindex=scoreindex+1 mod 6
-            ioc_score_top1,best_settings1=best_config_to_plug1.update_check(score_safe[scoreindex][machindex], setting_safe[scoreindex][machindex])
-            ioc_score_top2,best_settings2=best_config_to_plug2.update_check(ioc_score_top1, best_settings1)
-            ioc_score_top3,best_settings3=best_config_to_plug2.update_check(ioc_score_top2, best_settings2)
-            ioc_score_top4,best_settings4=best_config_to_plug2.update_check(ioc_score_top3, best_settings3)
-            ioc_score_top5,best_settings5=best_config_to_plug2.update_check(ioc_score_top4, best_settings4)
-
-        }else{
-            machindex=machindex+1
-            scoreindex=0
-        }
-    
-    }
-}
-
-
-module plug_guessing{
-
-    enigma_machine_runtime enigma_machine_plugboard
-    bigram_scores bigram_scores_inst
-    best_ngram_score best_ngram_score_inst
-
-    state int#(FROM: 0,TO: 5) plug_state
-    state bool last
-    initial last=false
-
-    // we get 5 settings for the machine these will be the results of our rotor config rotor pos and ring pos guessing earlier 
-    // could do compile time for to do it in parallel on all best settings if we have space
-    state int#(FROM: 0,TO: 26)[9] given_settings
-    // we start with the best one 
-    // we start with the first plug 26x25 possible settings
-    state bool[26] alphabet
-    alphabet=[true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true]     // we could use an array with bools in it to check our combinations against to make sure
-    state int#(FROM: 0,TO: 26) plug_one
-    state int#(FROM: 0,TO: 26) plug_two
-    
-    state bool all_pairs_for_step_complete
-    state int#(FROM: 0,TO: 16) plugs_in_use
-    gen int max_plugs=10
-
-    state int#(FROM: 0,TO: 26) decoded_letter_pb
-
-    state int#(FROM: 0,TO: 26)[2] buffer
-
-    initial plug_one = 0
-    initial plug_two = 1
-
-    state int#(FROM: 0,TO: 4096) increment
-    state int#(FROM: 0,TO: 4294967296) bigram_score_temp            // 32 bit
-    state int#(FROM: 0,TO: 281474976710656) bigram_score_sum        // 48 bit
-
-    enigma_machine_plugboard.setup(given_settings[0:3], given_settings[3:6], given_settings[6:9])
-
-    when plug_state==0{
-        when plugs_in_use<max_plugs{
-            plug_state=1
-        }else{
-            //TODO: plugboard done give results 
-        }
-    }
- 
- // increment over the possible plugs to set up since direction doesnt matter and we cant plug two plugs into the same place 
- // we need to make sure that doesnt happen
-    when plug_state==1{                
-        when plug_one< 26{
-            when plug_two < 26{
-                when plug_two>plug_one{
-                    plug_two=plug_two+1 mod 26
-                }else{
-                    plug_two=plug_one+1 mod 26
-                }
-            }else{
-                plug_one=plug_one+1 mod 26
-            }
-        }else{              // TODO: check if this terminates correctly
-            plug_one=0
-            plug_two=1
-            plug_state=3
-        }
-        
-        when alphabet[plug_one] & alphabet[plug_two]{     //      we need some sort of checking mechanism to make sure we dont plug into already existing plugs 
-            //save plugs and set them in machine
-            enigma_machine_plugboard.change_plugs(plug_one, plug_two)
-            enigma_machine_plugboard.prep_message_encode()
-            plug_state=2
-        }
-    }
-    when plug_state==2{
-        increment=increment+1 mod 4096
-        decoded_letter_pb=enigma_machine_plugboard.parse_letter(input_letter)
-        buffer[0]=decoded_letter_pb
-        when increment>1{
-            buffer[1]=buffer[0]
-        }
-        bigram_score_temp=bigram_scores_inst.get_bigram_score(buffer)
-        bigram_score_sum=bigram_score_sum+bigram_score_temp
-        when last{
-            best_ngram_score_inst.update([plug_one,plug_two], bigram_score_sum)
-            plug_state=1
-        }
-
-    }
-
-    when plug_state==3{
-        plug_one,plug_two=best_ngram_score_inst.give_plugs()
-        alphabet[plug_one]=0
-        alphabet[plug_two]=0
-        plugs_in_use=plugs_in_use+1 mod 16
-        plug_state=0
-    }
-
-
-    //      we set a plug we pipe it through the machine and we see what the result is passing it to the bigram/trigram check 
-    //          need to figure out roughly how long this takes or how we are going to store the results 
-
-    //          just a bunch of lookups for bigrams shouldnt take longer then the message decode just checking a 2 dimensional array
-
-    //          for trigrams 3 dimensional array not sure how local that can be but at the end of the day similar timing 
-    //          amount of bigrams to check
-
-    //      for each decode run we have to change the plugs but not anything esle so similar overhead to earlier for rotor and ring pos
-    //      we use a new variation of the best_settings module to keep our best ranking plug setting 
-    //          this should allways be clearly better if we are working with the right rotor settings
-
-    //      at the end of the first run take the best settings and enter their plug pair into the bool array 
-    //      repeat for the next runs checking against plug array if we can skip steps until we arrive at 10 plugs 
-    //              (variable given number or alternatively make it so we can check if a "selfplug" is the best plug meanning we dont have any plugs that yield better results)
-
-
-
-
-}
 
 module cracker_top{
 
@@ -875,16 +97,938 @@ module cracker_top{
     reader.rlast =                  m_axi_rlast
 
 
+    RAM#(DEPTH: 1024,T:type int#(FROM: 0,TO: 26)) message_memory
+    state int#(FROM: 0,TO: 1024) message_count
+    enigma_machine_driver enigma_machine_driver_inst
+
+    state bool start_guessing
+
+
     // reader.ready_for_lots_of_data = ?
     when reader.chunk_valid : bool[ELEM_BITWIDTH][NUM_PARALLEL_ELEMENTS] elements, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS+1) chunk_length, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS) chunk_offset, bool last, bool[0] _unused_extra_data{
         //last_letter_in_message=last
-        int#(FROM: 0,TO: 26) letter_to_parse
-        int#(FROM: 0,TO: 26) encoded_letter
-        letter_to_parse=IntNarrow#(FROM: 0, TO: 26)(BitsToInt(elements[0]))
-        //encoded_letter=enigma_machine_driver(letter_to_parse)
+        message_count=message_count+1 mod 1024
+        int#(FROM: 0,TO: 26) letter
+        letter=IntNarrow#(FROM: 0, TO: 26)(BitsToInt(elements[0]))
+        message_memory.write(message_count, letter)
+        
+        when last{
+            start_guessing=true
+          
+        }
         
     }
-    //TODO: work out the burst reader in this context
+        
+        
+    // needs to be in top module
+    state int#(FROM: 0,TO: 15) cur_state
+    initial cur_state = 0
+    // counting letters for IOC
+    state int#(FROM: 0,TO: 26) cur_letter
+    initial cur_letter = 0
+
+    // in top module we go through configs 
+    state bool all_config_done
+    initial all_config_done=false
+
+    // can be kept in Top module since allways the same for actions in submodules
+    int#(FROM: 0,TO: 26) decoded_letter
+    int#(FROM: 0,TO: 26) input_letter
+
+    
+    // variables for machine setup kept in Top module
+    state int#(FROM: 0,TO: 26) rigth_rotor_pos
+    state int#(FROM: 0,TO: 26) middle_rotor_pos
+    state int#(FROM: 0,TO: 26) left_rotor_pos
+    state int#(FROM: 0,TO: 26) rigth_ring_pos
+    state int#(FROM: 0,TO: 26) middle_ring_pos
+    state int#(FROM: 0,TO: 26) left_ring_pos
+    initial rigth_rotor_pos=0
+    initial middle_rotor_pos=0
+    initial left_rotor_pos=0
+    initial rigth_ring_pos=0
+    initial middle_ring_pos=0
+    initial left_ring_pos=0
+
+    state bool right_lap
+    state bool middle_lap
+    state bool left_lap
+
+    initial right_lap=false
+    initial middle_lap=false
+    initial left_lap=false
+
+    state int#(FROM: 0,TO:1024) message_counter
+    initial message_counter=0
+
+    state int#(FROM: 0,TO:1024) last_letter
+
+    state int#(FROM: 0,TO: 26)[5][9] best_settings_pb
+    state int#(FROM: 0,TO: 65536)[5] best_scores_pb
+    
+    when start_guessing{
+        cur_state=1
+        start_guessing=false
+        last_letter=message_count
+    }
+    // Go over the various possible rotor settings in order 
+    when cur_state==1{              
+        when rigth_rotor_pos<25{                                    // if we dont go into this right rotor is at 25
+            rigth_rotor_pos=rigth_rotor_pos+1 mod 26
+            when rigth_rotor_pos+1==25{
+                right_lap=true
+            }
+        }else when middle_rotor_pos<25 & right_lap {                // if we dont go into this middle rotor is at 25
+            rigth_rotor_pos=0
+            middle_rotor_pos=middle_rotor_pos+1 mod 26
+            right_lap=false
+            when middle_rotor_pos+1==25{
+                middle_lap=true
+            }
+        }else when left_rotor_pos<25 & middle_lap{                  // if we dont go into this left rotor is at 25
+            middle_rotor_pos=0
+            left_rotor_pos=left_rotor_pos+1 mod 26
+            middle_lap=false
+            when left_rotor_pos+1==25{
+                left_lap=true                                                  
+            }
+        }else when right_lap&middle_lap&left_lap{                   // if all rotors are at 25 we have reached the last config
+            all_config_done=true
+        }
+
+        // instantiate an enigma machine with the given rotors
+        when enigma_machine_driver_inst.machine_setup_rotor(left_rotor_pos, middle_rotor_pos, rigth_rotor_pos, left_ring_pos, middle_ring_pos, rigth_ring_pos){
+            cur_state = 2
+        }
+    }
+
+    // calculate our version of the IoC score 
+    when cur_state==2{
+        message_counter=message_counter+1
+        input_letter=message_memory.read(message_counter)
+        enigma_machine_driver_inst.parse_letter_ioc_count(input_letter, message_count)
+        when message_counter==last_letter{
+            enigma_machine_driver_inst.last_letter_save_settings_rotor(left_rotor_pos, middle_rotor_pos, rigth_rotor_pos, left_ring_pos, middle_ring_pos, rigth_ring_pos)
+            message_counter=0
+            cur_state=3
+        }
+    }
+    // sum up our letter counts until we reach the end of the alphaet
+    when cur_state==3{
+        
+        enigma_machine_driver_inst.sum_up_ioc(cur_letter)
+        cur_letter=cur_letter+1 mod 26
+        when cur_letter==25{
+            enigma_machine_driver_inst.save_result_ioc_rotors()
+            cur_letter=0
+            when all_config_done{
+                cur_state=4
+            }else {
+                cur_state=1
+            }
+        }
+    }
+    
+
+    state bool all_best_settings_tested
+    initial all_best_settings_tested=false
+
+    // Test all 5 best settings from the rotor guessing 
+    when cur_state==4{
+        enigma_machine_driver_inst.pick_from_best_options()
+        cur_state=5
+
+    }
+
+    state bool right_ring_lap
+    state bool middle_ring_lap
+    state bool all_rings_done
+
+    when cur_state==5{
+        //do the ring setting calcs on the same machines with the chosen value out of the best 5 and then output the best result of that process
+
+        when rigth_ring_pos<25{                                    
+            rigth_rotor_pos=rigth_rotor_pos+1 mod 26
+            rigth_ring_pos=rigth_ring_pos+1 mod 26
+            when rigth_ring_pos+1==25{
+                right_ring_lap=true
+            }
+        }else when middle_ring_pos<25 & right_lap {
+            rigth_ring_pos=0
+            middle_rotor_pos=middle_rotor_pos+1 mod 26
+            middle_ring_pos=middle_ring_pos+1 mod 26
+            right_ring_lap=false
+            when middle_ring_pos+1==25{
+                middle_ring_lap=true
+            }
+        }else when right_ring_lap&middle_ring_lap{
+            all_rings_done=true
+        }
+        
+        //TODO: does this do what i think it does ?
+        when enigma_machine_driver_inst.machine_setup_ring(left_ring_pos, middle_ring_pos, rigth_ring_pos){
+            cur_state=6
+        }
+    }
+    when cur_state==6{
+        message_counter=message_counter+1
+        input_letter=message_memory.read(message_count)
+        enigma_machine_driver_inst.parse_letter_ioc_count(input_letter, message_count)
+        when message_counter==last_letter{
+            enigma_machine_driver_inst.last_letter_save_settings_rings(left_ring_pos, middle_ring_pos, rigth_ring_pos)
+            message_counter=0
+            cur_state=7
+        }
+    }
+    when cur_state==7{
+        cur_letter=cur_letter+1 mod 26
+        enigma_machine_driver_inst.sum_up_ioc(cur_letter)
+        when cur_letter==25{
+            enigma_machine_driver_inst.safe_result_ioc_rings()
+            cur_letter=0
+            when all_rings_done{
+                cur_state=4
+                when all_best_settings_tested{
+                    cur_state=9
+                }
+            }else {
+                cur_state=5
+            }
+        }
+    }
+    // get all the best settings out of the setting modules and assign them to our temp values 
+    when cur_state==9{
+        enigma_machine_driver_inst.safe_best_settings_at_end()
+        cur_state=10
+    }
+
+    when cur_state==10{
+        best_scores_pb[0],best_settings_pb[0][:],best_scores_pb[1],best_settings_pb[1][:],best_scores_pb[2],best_settings_pb[2][:],best_scores_pb[3],best_settings_pb[3][:],best_scores_pb[4],best_settings_pb[4][:]=enigma_machine_driver_inst.get_top_settings()
+        cur_state=11
+        
+    }
+
+    gen int max_plugs=10
+    state int#(FROM: 0,TO: 16) plugs_in_use
+    plug_guessing plug_guessing_inst
+
+    when cur_state==11{
+        when plugs_in_use<max_plugs{
+            cur_state=12
+        }else{
+            /*TODO: plugboard done give results extract from instances 
+            for that well need one more state to compare the instances against one another or decide to give all *5* results as output
+            at any rate this will lead to the end state
+            */
+
+        }
+    }
+    when cur_state==12{
+        /* TODO: need to adjust for instances
+// increment over the possible plugs to set up since direction doesnt matter and we cant plug two plugs into the same place 
+ // we need to make sure that doesnt happen
+    when plug_state==1{                
+        when plug_one< 26&!wait_for_plug_setting{
+            when plug_two < 26{
+                when plug_two>plug_one{
+                    plug_two=plug_two+1 mod 26
+                }else{
+                    plug_two=plug_one+1 mod 26
+                }
+            }else{
+                plug_one=plug_one+1 mod 26
+            }
+        }else when wait_for_plug_setting{
+            wait_for_plug_setting=false
+        }else{             
+            plug_one=0
+            plug_two=1
+            plug_state=3
+        }
+        
+        when alphabet[plug_one] & alphabet[plug_two]{     // we need some sort of checking mechanism to make sure we dont plug into already existing plugs 
+            //save plugs and set them in machine
+            enigma_machine_plugboard.change_plugs(plug_one, plug_two)
+            plug_one=plug_two
+            plug_two=plug_one
+            
+            when !wait_for_plug_setting{
+                enigma_machine_plugboard.prep_message_encode()
+                plug_state=2
+                wait_for_plug_setting=true
+            }
+        }
+    }
+
+
+
+        //state int#(FROM: 0,TO: 5) plug_state
+    //state bool last
+    //initial last=false
+
+    // we get 5 settings for the machine these will be the results of our rotor config rotor pos and ring pos guessing earlier 
+    // could do compile time for to do it in parallel on all best settings if we have space
+    state int#(FROM: 0,TO: 26)[9] given_settings
+    // we start with the best one 
+    // we start with the first plug 26x25 possible settings
+    state bool[26] alphabet
+    alphabet=[true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true]     // we could use an array with bools in it to check our combinations against to make sure
+    state int#(FROM: 0,TO: 26) plug_one
+    state int#(FROM: 0,TO: 26) plug_two
+
+    //state int#(FROM: 0,TO: 26) input_letter
+    
+    state bool all_pairs_for_step_complete
+    //state int#(FROM: 0,TO: 16) plugs_in_use
+    //gen int max_plugs=10
+
+    state int#(FROM: 0,TO: 26) decoded_letter_pb
+
+    state int#(FROM: 0,TO: 26)[2] buffer
+
+    initial plug_one = 0
+    initial plug_two = 1
+
+    state int#(FROM: 0,TO: 4096) increment
+    state int#(FROM: 0,TO: 4294967296) bigram_score_temp            // 32 bit
+    state int#(FROM: 0,TO: 281474976710656) bigram_score_sum        // 48 bit
+
+    state int#(FROM: 0,TO: 281474976710656)dummy_score     //48bit
+    state int#(FROM: 0,TO: 26)[2] dummy_plugs
+
+    state bool wait_for_plug_setting
+    initial wait_for_plug_setting = true
+
+    enigma_machine_plugboard.setup(given_settings[0:3], given_settings[3:6], given_settings[6:9])
+
+
+ 
+ 
+    when plug_state==2{
+        increment=increment+1 mod 4096
+
+        decoded_letter_pb=enigma_machine_plugboard.parse_letter(input_letter)
+        buffer[0]=decoded_letter_pb
+        when increment>1{
+            buffer[1]=buffer[0]
+        }
+        bigram_score_temp=bigram_scores_inst.get_bigram_score(buffer)
+        bigram_score_sum=bigram_score_sum+bigram_score_temp
+        when last{
+            dummy_plugs,dummy_score=best_ngram_score_inst.update([plug_one,plug_two], bigram_score_sum)
+            plug_state=1
+        }
+
+    }
+
+    when plug_state==3{
+        plug_one,plug_two=best_ngram_score_inst.give_plugs()
+        alphabet[plug_one]=false
+        alphabet[plug_two]=false
+        plugs_in_use=plugs_in_use+1 mod 16
+        plug_state=0
+    }
+}
+
+    //      we set a plug we pipe it through the machine and we see what the result is passing it to the bigram/trigram check 
+    //          need to figure out roughly how long this takes or how we are going to store the results 
+
+    //          just a bunch of lookups for bigrams shouldnt take longer then the message decode just checking a 2 dimensional array
+
+    //          for trigrams 3 dimensional array not sure how local that can be but at the end of the day similar timing 
+    //          amount of bigrams to check
+
+    //      for each decode run we have to change the plugs but not anything esle so similar overhead to earlier for rotor and ring pos
+    //      we use a new variation of the best_settings module to keep our best ranking plug setting 
+    //          this should allways be clearly better if we are working with the right rotor settings
+
+    //      at the end of the first run take the best settings and enter their plug pair into the bool array 
+    //      repeat for the next runs checking against plug array if we can skip steps until we arrive at 10 plugs 
+    //              (variable given number or alternatively make it so we can check if a "selfplug" is the best plug meanning we dont have any plugs that yield better results)
+
+
+        */
+    
+    }
+
+}
+
+module ioc_count#(){
+    state int#(FROM: 0,TO: 256)[26] letter_count
+ 
+
+    action letter_input: int#(FROM: 0,TO: 26) decoded_letter{
+        letter_count[decoded_letter]=letter_count[decoded_letter]+1 mod 100
+    }
+    action pass_letter_count:-> int#(FROM: 0,TO: 256)[26] letter_count_cur{
+        letter_count_cur=letter_count
+    }
+    action reset'0{
+        letter_count[:]=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]     
+    }
+}
+
+module ioc_calc{
+
+    state int#(FROM: 0,TO: 256)[26] letter_count
+
+    action set_letter_count:int#(FROM: 0,TO: 256)[26] letter_count_new{
+        letter_count=letter_count_new
+    }
+    
+    action ioc_calc_individual_letter:int#(FROM: 0,TO: 26) cur_index -> int#(FROM: 0,TO: 65536) mult_result{
+        when letter_count[cur_index]==0{
+            mult_result=0
+        }else when letter_count[cur_index]==1{
+            mult_result=0
+        }else when letter_count[cur_index]==2{
+            mult_result=2
+        }else{
+            mult_result=letter_count[cur_index]*(letter_count[cur_index]-1) mod 65536
+        } 
+    }
+}
+
+/* instantiate as many as i wanna save best settings for each machine variant 
+and have them be sitting in a row passing along the data down the line*/
+module best_settings{   
+    state int#(FROM: 0,TO: 65536) best_IOC_score
+    state int#(FROM: 0,TO: 26)[6] score_settings_saved
+    initial best_IOC_score = 0
+    initial score_settings_saved[:] = [0,0,0,0,0,0]
+    
+    
+    action update_check: int#(FROM: 0,TO: 65536) IOC_score, int#(FROM: 0,TO: 26)[6] score_settings->int#(FROM: 0,TO: 65536) IOC_score_passing, int#(FROM: 0,TO: 26)[6] score_settings_passing{
+        int#(FROM: 0,TO: 65536) temp_new_score = IOC_score_passing
+        int#(FROM: 0,TO: 65536) temp_cur_score = best_IOC_score
+
+        when temp_new_score> temp_cur_score{
+            IOC_score_passing=best_IOC_score
+            best_IOC_score = IOC_score
+            score_settings_passing=score_settings_saved
+            score_settings_saved[:]=score_settings[:]                   
+        }else{
+            score_settings_passing=score_settings
+            IOC_score_passing = IOC_score
+        }
+    }
+    action give_settings:->int#(FROM: 0,TO: 65536) best_IOC_score_cur, int#(FROM: 0,TO: 26)[6] cur_settings_saved{
+        best_IOC_score_cur=best_IOC_score
+        cur_settings_saved=score_settings_saved
+    }
+    action reset{
+        best_IOC_score=0
+        score_settings_saved[:]=[0,0,0,0,0,0]
+    }
+}
+
+module best_configs{                                // saving the best IoC score configurations  
+    state int#(FROM: 0,TO: 65536) best_IOC_score
+    state int#(FROM: 0,TO: 26)[9] score_settings_saved
+    initial best_IOC_score = 0
+    initial score_settings_saved[:] = [0,0,0,0,0,0,0,0,0]
+    
+    // check for updated better values and save the corresponding config
+    action update_check: int#(FROM: 0,TO: 65536) IOC_score, int#(FROM: 0,TO: 26)[9] score_settings->int#(FROM: 0,TO: 65536) IOC_score_passing, int#(FROM: 0,TO: 26)[9] score_settings_passing{
+        int#(FROM: 0,TO: 65536) temp_new_score = IOC_score_passing
+        int#(FROM: 0,TO: 65536) temp_cur_score = best_IOC_score
+
+        when temp_new_score> temp_cur_score{
+            IOC_score_passing=best_IOC_score
+            best_IOC_score = IOC_score
+            score_settings_passing=score_settings_saved
+            score_settings_saved[:]=score_settings[:]                   
+        }else{
+            score_settings_passing=score_settings
+            IOC_score_passing = IOC_score
+        }
+    }
+    // used to get settings out of a given instance
+    action give_settings:->int#(FROM: 0,TO: 65536) best_IOC_score_cur, int#(FROM: 0,TO: 26)[9] cur_settings_saved{
+        best_IOC_score_cur=best_IOC_score
+        cur_settings_saved=score_settings_saved
+    }
+    action reset{
+        best_IOC_score=0
+        score_settings_saved[:]=[0,0,0,0,0,0,0,0,0]
+    }
+}
+
+module best_ngram_score{
+    state int#(FROM: 0,TO: 281474976710656)cur_best     //48bit
+    state int#(FROM: 0,TO: 26)[2] plugs_cur
+    action update:int#(FROM: 0,TO: 26)[2]plugs_used, int#(FROM: 0,TO: 281474976710656)ngram_score->int#(FROM: 0,TO: 26)[2]plugs_new, int#(FROM: 0,TO: 281474976710656)ngram_score_worse{
+        when cur_best<ngram_score{
+            ngram_score_worse=cur_best
+            cur_best=ngram_score
+            plugs_new=plugs_cur
+            plugs_cur=plugs_used
+        }
+    }
+    // gives the two plugs used in the ngram score
+    action give_plugs:->int#(FROM: 0,TO: 26)plug_one_best,int#(FROM: 0,TO: 26)plug_two_best{
+        plug_one_best=plugs_cur[0]
+        plug_two_best=plugs_cur[1]
+    }
+    // gives the score of the current best achieved score for a message
+    action give_score:->int#(FROM: 0,TO: 281474976710656)best_score_recorded{
+        best_score_recorded=cur_best
+    }
+    action reset{
+        cur_best=0
+        plugs_cur=[0,0]
+    }
+}
+
+module bigram_scores{
+    gen int[][] bigram_score_array
+    bigram_score_array=[[7979, 647920, 1262567, 1037513, 34954, 209240, 577255, 38469, 892276, 33138, 295217, 3066241, 803226, 5597457, 13044, 571957, 6328, 3030851, 2456194, 4192084, 335632, 577841, 168944, 53121, 612884, 33467], 
+    [412247, 30828, 5328, 6976, 1624926, 411, 720, 2980, 300568, 65485, 264, 658110, 8823, 5906, 550992, 1543, 35, 314561, 129232, 48227, 521480, 10839, 832, 78, 497581, 101], 
+    [1517441, 1775, 234422, 6291, 1836777, 3970, 2498, 1685499, 793692, 296, 331666, 420162, 7514, 2425, 2238417, 3707, 15436, 421415, 64353, 1299785, 458517, 587, 391, 88, 117632, 2060], 
+    [425959, 7819, 7103, 120545, 2156530, 7835, 87419, 15334, 1389999, 13483, 949, 91189, 51252, 21343, 530759, 4886, 1993, 240940, 356013, 8165, 418609, 53722, 23015, 130, 142175, 220], 
+    [1940394, 76338, 1345776, 3293714, 1064720, 458850, 337052, 74224, 516990, 12819, 46445, 1495272, 1053605, 4100490, 204427, 483780, 161431, 5775416, 3776639, 1163416, 87840, 718404, 329353, 603534, 405314, 12754], 
+    [462424, 773, 1625, 1397, 667057, 412563, 1442, 517, 802436, 207, 329, 183010, 1934, 1182, 1375301, 626, 15, 601120, 15535, 230266, 270617, 81, 645, 81, 25654, 26], 
+    [417527, 1394, 646, 8909, 1086105, 3396, 69800, 641483, 427564, 109, 734, 170975, 27797, 185080, 372556, 1161, 35, 554847, 144347, 43430, 241841, 119, 1826, 56, 73142, 343], 
+    [2610341, 12378, 3463, 8054, 8669734, 6325, 779, 1473, 2152085, 128, 660, 35505, 35932, 72629, 1367260, 1670, 1193, 237958, 41404, 367080, 207789, 629, 13462, 26, 141234, 1073], 
+    [807220, 278027, 1970120, 833221, 1084573, 573115, 718905, 5897, 64238, 3132, 120999, 1216782, 895976, 6859522, 2354226, 251546, 31873, 888680, 3181792, 3167253, 49087, 811635, 1761, 62123, 625, 181416], 
+    [72921, 213, 345, 262, 146305, 242, 103, 354, 7790, 298, 174, 319, 366, 415, 151669, 613, 0, 685, 333, 292, 165521, 172, 117, 16, 112, 22], 
+    [47810, 2541, 633, 1889, 602754, 4476, 7227, 8981, 275984, 347, 1278, 29803, 5045, 145040, 17132, 2049, 19, 7674, 133959, 2913, 8531, 441, 6142, 56, 16776, 15], 
+    [1487455, 18864, 33334, 712265, 2338217, 150787, 17166, 4564, 1760463, 317, 55588, 1625736, 64911, 16551, 1090883, 53660, 358, 28341, 399020, 348615, 381188, 98423, 35637, 861, 1198395, 1177], 
+    [1593869, 254490, 12159, 1893, 2236011, 10766, 3454, 1503, 895783, 292, 396, 12989, 270882, 24785, 949881, 674394, 71, 8758, 261758, 3854, 323186, 817, 1647, 99, 175345, 97], 
+    [979086, 12226, 1172263, 3812978, 1950424, 189427, 2687181, 30688, 956465, 31260, 145510, 179849, 78244, 205172, 1309945, 17019, 16777, 25805, 1435032, 2935977, 221751, 146643, 16346, 7390, 276094, 12319], 
+    [162091, 272579, 469206, 551101, 108925, 3313034, 265117, 60212, 247428, 19670, 181338, 1030566, 1540260, 4957098, 592860, 631354, 2923, 3599410, 817609, 1246582, 2453113, 502144, 931837, 52376, 102019, 9790], 
+    [912365, 3690, 3316, 3380, 1347768, 4102, 1335, 266148, 347084, 281, 2310, 741535, 44991, 3354, 1018951, 385013, 108, 1337848, 153872, 298270, 294768, 622, 3404, 147, 33170, 638], 
+    [430, 108, 113, 52, 57, 95, 0, 26, 895, 24, 0, 671, 99, 186, 132, 27, 171, 174, 445, 139, 416017, 64, 16, 16, 0, 0], 
+    [1933254, 75319, 342269, 533808, 5228566, 90963, 281327, 42610, 2051640, 1560, 273604, 243237, 493816, 452164, 2049118, 117354, 2815, 340455, 1118073, 1019806, 361844, 195356, 35971, 3299, 698544, 1799], 
+    [614736, 22321, 436341, 14828, 2628249, 48398, 6959, 888871, 1550976, 762, 111277, 157565, 183839, 25870, 1121471, 539272, 20989, 16890, 1142176, 2970446, 877413, 3501, 66342, 50, 160283, 704], 
+    [1494100, 7175, 73696, 3654, 3397326, 15963, 5552, 10027295, 3785620, 317, 1308, 277594, 74662, 28227, 2936021, 12109, 252, 1200669, 951603, 481269, 718751, 3281, 232262, 333, 640845, 10853], 
+    [384414, 249767, 529116, 257721, 415845, 52255, 360656, 3010, 285218, 1455, 12982, 975123, 390192, 1112112, 30048, 383509, 724, 1530366, 1280852, 1142390, 2201, 8225, 782, 11095, 12878, 5387], 
+    [394697, 250, 657, 843, 2327013, 155, 296, 269, 760024, 72, 34, 1162, 318, 432, 200498, 551, 21, 2470, 1626, 618, 6238, 262, 74, 45, 13809, 50], 
+    [1086521, 2993, 1901, 9977, 1017614, 4533, 275, 1068070, 1055740, 91, 3010, 42919, 3073, 222718, 625272, 2098, 16, 86736, 98925, 18445, 1960, 39, 738, 15, 6837, 0], 
+    [83465, 216, 74608, 17, 61453, 5237, 54, 11762, 111146, 51, 28, 1673, 657, 161, 7610, 188533, 823, 91, 180, 131567, 13453, 5508, 629, 7907, 7265, 14], 
+    [44454, 12122, 38067, 19225, 261294, 2125, 7310, 1468, 81262, 56, 929, 41608, 66755, 37260, 422672, 70250, 38, 21970, 273034, 47043, 3744, 512, 9507, 421, 199, 5110], 
+    [70220, 586, 210, 142, 140229, 61, 473, 1878, 34167, 31, 91, 3546, 471, 430, 20248, 136, 91, 532, 840, 663, 6069, 462, 628, 11, 6647, 7501]
+    ]
+
+
+
+
+    action get_bigram_score:int#(FROM: 0,TO: 26)[2]cur_bigram->int#(FROM: 0,TO: 4294967296) cur_bigram_score {
+        cur_bigram_score=bigram_score_array[cur_bigram[0]][cur_bigram[1]]
+    }
+
+}
+
+/*module trigram_scores{                          // TODO: finish after reducing values
+    gen int[][][] trigram_score_array              
+    trigram_score_array=[[[]]]
+    
+    
+    action get_trigram_score:int#(FROM: 0,TO: 26)[3]cur_trigram->int#(FROM: 0,TO: 4294967296) cur_trigram_score {
+        cur_trigram_score=trigram_score_array[cur_trigram[0],cur_trigram[1],cur_trigram[2]]
+    
+    }
+
+}*/
+
+module enigma_machine_driver#(){
+    // logic for creating all fixed enigma machines and giving them new incrementing settings for each time the message has been fully parsed
+
+    //seperate rotors and rings setting search do ring settings with prelim "good" rotor settings
+//    state int#(FROM: 0,TO: 1024) last_letter_count   
+
+
+    state int#(FROM: 0,TO: 26)[60][5][9] setting_safe
+    state int#(FROM: 0,TO: 65536)[60][5] score_safe
+    //gen int[3] rotor_setup1
+    
+
+    for int I in 0..60{
+        ioc_count ioc_count_inst
+        ioc_calc ioc_calc_inst
+        enigma_machine_runtime enigma_machine_inst
+        best_settings best_settings_inst1
+        best_settings best_settings_inst2
+        best_settings best_settings_inst3
+        best_settings best_settings_inst4
+        best_settings best_settings_inst5
+
+        best_settings best_settings_inst6
+        best_settings best_settings_inst7
+        best_settings best_settings_inst8
+        best_settings best_settings_inst9
+        best_settings best_settings_inst10
+
+        //state int#(FROM: 0,TO: 5)[3] rotor_config 
+        gen int[3] rotor_config_compile
+        gen int[60][3] config_array
+        config_array=[[0, 1, 2],[0, 1, 3],[0, 1, 4],[0, 2, 1],[0, 2, 3],[0, 2, 4],[0, 3, 1],[0, 3, 2],[0, 3, 4],[0, 4, 1],[0, 4, 2],[0, 4, 3],[1, 0, 2],[1, 0, 3],[1, 0, 4],[1, 2, 0],[1, 2, 3],[1, 2, 4],[1, 3, 0],[1, 3, 2],
+        [1, 3, 4],[1, 4, 0],[1, 4, 2],[1, 4, 3],[2, 0, 1],[2, 0, 3],[2, 0, 4],[2, 1, 0],[2, 1, 3],[2, 1, 4],[2, 3, 0],[2, 3, 1],[2, 3, 4],[2, 4, 0],[2, 4, 1],[2, 4, 3],[3, 0, 1],[3, 0, 2],[3, 0, 4],[3, 1, 0],[3, 1, 2],[3, 1, 4],
+        [3, 2, 0],[3, 2, 1],[3, 2, 4],[3, 4, 0],[3, 4, 1],[3, 4, 2],[4, 0, 1],[4, 0, 2],[4, 0, 3],[4, 1, 0],[4, 1, 2],[4, 1, 3],[4, 2, 0],[4, 2, 1],[4, 2, 3],[4, 3, 0],[4, 3, 1],[4, 3, 2]]
+        rotor_config_compile=config_array[I]
+
+
+        // needed for internal ioc calculations
+        state int#(FROM: 0,TO: 65536) multiplication_result
+        initial multiplication_result = 0
+
+
+        // states for saving machine settings and ioc values temporarily
+        state int#(FROM: 0,TO: 26)[6] score_settings
+
+        state int#(FROM: 0,TO: 65536) ioc_score_temp1
+        state int#(FROM: 0,TO: 26)[6] temp_settings1
+        state int#(FROM: 0,TO: 65536) ioc_score_temp2
+        state int#(FROM: 0,TO: 26)[6] temp_settings2
+        state int#(FROM: 0,TO: 65536) ioc_score_temp3
+        state int#(FROM: 0,TO: 26)[6] temp_settings3
+        state int#(FROM: 0,TO: 65536) ioc_score_temp4
+        state int#(FROM: 0,TO: 26)[6] temp_settings4
+        state int#(FROM: 0,TO: 65536) ioc_score_temp5
+        state int#(FROM: 0,TO: 26)[6] temp_settings5
+
+
+        // instantiate an enigma machine with the given rotors
+        action machine_setup_rotor: int#(FROM: 0,TO: 26) lrop, int#(FROM: 0,TO: 26) mrop, int#(FROM: 0,TO: 26) rrop, int#(FROM: 0,TO: 26) lrip,int#(FROM: 0,TO: 26) mrip,int#(FROM: 0,TO: 26)rrip -> bool done{
+            enigma_machine_inst.setup(rotor_config_compile,[lrop,mrop,rrop],[0,0,0]) 
+            enigma_machine_inst.prep_message_encode()
+        }
+
+        
+        // calculate our version of the IoC score 
+        action parse_letter_ioc_count: int#(FROM: 0,TO: 26) input_letter, int#(FROM: 0,TO: 1024) message_length{ 
+            int#(FROM: 0,TO: 26) decoded_letter
+            decoded_letter=enigma_machine_inst.parse_letter(input_letter)
+            ioc_count_inst.letter_input(decoded_letter)
+        }
+        // safe settings once we get to the last letter of the message
+        action last_letter_save_settings_rotor: int#(FROM: 0,TO: 26) lrops, int#(FROM: 0,TO: 26) mrops, int#(FROM: 0,TO: 26) rrops, int#(FROM: 0,TO: 26) lrips,int#(FROM: 0,TO: 26) mrips,int#(FROM: 0,TO: 26)rrips{
+            ioc_calc_inst.set_letter_count(ioc_count_inst.pass_letter_count())
+            score_settings=[rotor_config_compile[0],rotor_config_compile[1],rotor_config_compile[2],lrops,mrops,rrops,0,0,0]
+        }
+
+    
+        // sum up our letter counts until we reach the end of the alphabet
+        action sum_up_ioc: int#(FROM: 0,TO: 26) cur_letter{
+            multiplication_result = multiplication_result + ioc_calc_inst.ioc_calc_individual_letter(cur_letter) mod 65536
+        }
+        action save_result_ioc_rotors{
+                // fill our IoC score modules with the sum result passing down values in order thereby effectively geting a sortet list 
+                ioc_score_temp1,temp_settings1=best_settings_inst1.update_check(multiplication_result, score_settings)
+                ioc_score_temp2,temp_settings2=best_settings_inst2.update_check(ioc_score_temp1,temp_settings1)     
+                ioc_score_temp3,temp_settings3=best_settings_inst3.update_check(ioc_score_temp2,temp_settings2)  
+                ioc_score_temp4,temp_settings4=best_settings_inst4.update_check(ioc_score_temp3,temp_settings3)  
+                ioc_score_temp5,temp_settings5=best_settings_inst5.update_check(ioc_score_temp4,temp_settings4)  
+                // reset relevant values so we can do this again for the next config
+                multiplication_result=0
+                ioc_count_inst.reset()
+        }
+
+        state int#(FROM: 1,TO: 6) cur_best
+        initial cur_best=1
+
+        // need to save rotor positions in instances because they will vary acroos the different machines which rotor positions turn out better
+        state int#(FROM: 0,TO: 26) left_rotor_pos
+        state int#(FROM: 0,TO: 26) middle_rotor_pos
+        state int#(FROM: 0,TO: 26) rigth_rotor_pos
+
+        // go over the 5 best settings for the rotors and get rotor positions from the settings instances
+        action pick_from_best_options{
+            int#(FROM: 0,TO: 65536) IoC_score_dummy
+            int#(FROM: 0,TO: 26)[6] best_settings_cur
+            when cur_best==1{
+                IoC_score_dummy,best_settings_cur=best_settings_inst1.give_settings()
+                rigth_rotor_pos=best_settings_cur[0]
+                middle_rotor_pos=best_settings_cur[1]
+                left_rotor_pos=best_settings_cur[2]
+                cur_best=2
+            }else when cur_best==2{
+                IoC_score_dummy,best_settings_cur=best_settings_inst2.give_settings()
+                rigth_rotor_pos=best_settings_cur[0]
+                middle_rotor_pos=best_settings_cur[1]
+                left_rotor_pos=best_settings_cur[2]
+                cur_best=3
+            }else when cur_best==3{
+                IoC_score_dummy,best_settings_cur=best_settings_inst3.give_settings()
+                rigth_rotor_pos=best_settings_cur[0]
+                middle_rotor_pos=best_settings_cur[1]
+                left_rotor_pos=best_settings_cur[2]                
+                cur_best=4
+            }else when cur_best==4{
+                IoC_score_dummy,best_settings_cur=best_settings_inst4.give_settings()
+                rigth_rotor_pos=best_settings_cur[0]
+                middle_rotor_pos=best_settings_cur[1]
+                left_rotor_pos=best_settings_cur[2]   
+                cur_best=5
+            }else when cur_best==5{
+                IoC_score_dummy,best_settings_cur=best_settings_inst5.give_settings()
+                rigth_rotor_pos=best_settings_cur[0]
+                middle_rotor_pos=best_settings_cur[1]
+                left_rotor_pos=best_settings_cur[2]
+                cur_best=1
+            }
+
+        }
+        action machine_setup_ring:int#(FROM: 0,TO: 26) left_ring_pos, int#(FROM: 0,TO: 26) middle_ring_pos, int#(FROM: 0,TO: 26) rigth_ring_pos-> bool done_rings{
+            enigma_machine_inst.setup(rotor_config_compile,[left_rotor_pos, middle_rotor_pos, rigth_rotor_pos], [left_ring_pos, middle_ring_pos, rigth_ring_pos]) 
+            enigma_machine_inst.prep_message_encode()
+        }
+
+        action last_letter_save_settings_rings: int#(FROM: 0,TO: 26) left_ring_pos_setting,int#(FROM: 0,TO: 26) middle_ring_pos_setting,int#(FROM: 0,TO: 26)rigth_ring_pos_setting{
+            ioc_calc_inst.set_letter_count(ioc_count_inst.pass_letter_count())
+            score_settings=[rotor_config_compile[0],rotor_config_compile[1],rotor_config_compile[2],left_rotor_pos,middle_rotor_pos,rigth_rotor_pos,left_ring_pos_setting,middle_ring_pos_setting,rigth_ring_pos_setting]
+        }
+
+        // seperate action since were saving to different setting instances from the rotor position testing
+        action safe_result_ioc_rings{
+            ioc_score_temp1,temp_settings1=best_settings_inst6.update_check(multiplication_result, score_settings)
+            ioc_score_temp2,temp_settings2=best_settings_inst7.update_check(ioc_score_temp1,temp_settings1)     
+            ioc_score_temp3,temp_settings3=best_settings_inst8.update_check(ioc_score_temp2,temp_settings2)  
+            ioc_score_temp4,temp_settings4=best_settings_inst9.update_check(ioc_score_temp3,temp_settings3)  
+            ioc_score_temp5,temp_settings5=best_settings_inst10.update_check(ioc_score_temp4,temp_settings4) 
+            multiplication_result=0
+            ioc_count_inst.reset()
+        }
+                
+        state int#(FROM: 0,TO: 26)[9] concat_temp1
+        state int#(FROM: 0,TO: 26)[9] concat_temp2
+        state int#(FROM: 0,TO: 26)[9] concat_temp3
+        state int#(FROM: 0,TO: 26)[9] concat_temp4
+        state int#(FROM: 0,TO: 26)[9] concat_temp5    
+    
+        // get all the best settings out of the setting modules and assign them to our temp values 
+        action safe_best_settings_at_end{
+            Concat concat_inst
+
+            ioc_score_temp1,temp_settings1=best_settings_inst6.give_settings()
+            ioc_score_temp2,temp_settings2=best_settings_inst7.give_settings()
+            ioc_score_temp3,temp_settings3=best_settings_inst8.give_settings()
+            ioc_score_temp4,temp_settings4=best_settings_inst9.give_settings()
+            ioc_score_temp5,temp_settings5=best_settings_inst10.give_settings()
+
+            concat_temp1=concat_inst(temp_settings1, rotor_config_compile)
+            concat_temp2=concat_inst(temp_settings2, rotor_config_compile)
+            concat_temp3=concat_inst(temp_settings3, rotor_config_compile)
+            concat_temp4=concat_inst(temp_settings4, rotor_config_compile)
+            concat_temp5=concat_inst(temp_settings5, rotor_config_compile)
+
+            setting_safe[0][I]=concat_temp1
+            setting_safe[1][I]=concat_temp2
+            setting_safe[2][I]=concat_temp3
+            setting_safe[3][I]=concat_temp4
+            setting_safe[4][I]=concat_temp5
+
+
+            score_safe[0][I] = ioc_score_temp1
+            score_safe[1][I] = ioc_score_temp2
+            score_safe[2][I] = ioc_score_temp3
+            score_safe[3][I] = ioc_score_temp4
+            score_safe[4][I] = ioc_score_temp5
+
+            best_settings_inst1.reset()
+            best_settings_inst2.reset()
+            best_settings_inst3.reset()
+            best_settings_inst4.reset()
+            best_settings_inst5.reset()
+            best_settings_inst6.reset()
+            best_settings_inst7.reset()
+            best_settings_inst8.reset()
+            best_settings_inst9.reset()
+            best_settings_inst10.reset()
+
+        }
+    }
+
+
+    best_configs best_config_to_plug1
+    best_configs best_config_to_plug2
+    best_configs best_config_to_plug3
+    best_configs best_config_to_plug4
+    best_configs best_config_to_plug5
+
+    //TODO: check this out tomorrow maybe for meeting
+    action sort_out_settings{
+        // sort out the score safe array to get top 5 configs
+
+
+        state int#(FROM: 0,TO: 60) machindex
+        state int#(FROM: 0, TO: 6) scoreindex
+        initial machindex=0
+        initial scoreindex=0
+
+        int#(FROM: 0,TO: 65536) ioc_score_top1
+        int#(FROM: 0,TO: 26)[9] best_settings1
+        int#(FROM: 0,TO: 65536) ioc_score_top2
+        int#(FROM: 0,TO: 26)[9] best_settings2
+        int#(FROM: 0,TO: 65536) ioc_score_top3
+        int#(FROM: 0,TO: 26)[9] best_settings3
+        int#(FROM: 0,TO: 65536) ioc_score_top4
+        int#(FROM: 0,TO: 26)[9] best_settings4
+        int#(FROM: 0,TO: 65536) ioc_score_top5
+        int#(FROM: 0,TO: 26)[9] best_settings5
+
+
+
+        when machindex<60{
+            when scoreindex<5{
+                scoreindex=scoreindex+1 mod 6
+                ioc_score_top1,best_settings1=best_config_to_plug1.update_check(score_safe[scoreindex][machindex], setting_safe[scoreindex][machindex])
+                ioc_score_top2,best_settings2=best_config_to_plug2.update_check(ioc_score_top1, best_settings1)
+                ioc_score_top3,best_settings3=best_config_to_plug3.update_check(ioc_score_top2, best_settings2)
+                ioc_score_top4,best_settings4=best_config_to_plug4.update_check(ioc_score_top3, best_settings3)
+                ioc_score_top5,best_settings5=best_config_to_plug5.update_check(ioc_score_top4, best_settings4)
+
+            }else{
+                machindex=machindex+1
+                scoreindex=0
+            }
+        
+        }
+    }
+    action get_top_settings:->int#(FROM: 0,TO: 65536) ioc_score_top1,int#(FROM: 0,TO: 26)[9] best_settings1,int#(FROM: 0,TO: 65536) ioc_score_top2,int#(FROM: 0,TO: 26)[9] best_settings2,int#(FROM: 0,TO: 65536) ioc_score_top3,int#(FROM: 0,TO: 26)[9] best_settings3,int#(FROM: 0,TO: 65536) ioc_score_top4,int#(FROM: 0,TO: 26)[9] best_settings4,int#(FROM: 0,TO: 65536) ioc_score_top5,int#(FROM: 0,TO: 26)[9] best_settings5{
+        ioc_score_top1,best_settings1=best_config_to_plug1.give_settings()
+        ioc_score_top2,best_settings2=best_config_to_plug2.give_settings()
+        ioc_score_top3,best_settings3=best_config_to_plug3.give_settings()
+        ioc_score_top4,best_settings4=best_config_to_plug4.give_settings()
+        ioc_score_top5,best_settings5=best_config_to_plug5.give_settings()
+
+    }
+}
+
+
+module plug_guessing{
+
+    enigma_machine_runtime enigma_machine_plugboard
+    bigram_scores bigram_scores_inst
+    best_ngram_score best_ngram_score_inst
+
+    state int#(FROM: 0,TO: 5) plug_state
+    state bool last
+    initial last=false
+
+    // we get 5 settings for the machine these will be the results of our rotor config rotor pos and ring pos guessing earlier 
+    // could do compile time for to do it in parallel on all best settings if we have space
+    state int#(FROM: 0,TO: 26)[9] given_settings
+    // we start with the best one 
+    // we start with the first plug 26x25 possible settings
+    state bool[26] alphabet
+    alphabet=[true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true]     // we could use an array with bools in it to check our combinations against to make sure
+    state int#(FROM: 0,TO: 26) plug_one
+    state int#(FROM: 0,TO: 26) plug_two
+
+    state int#(FROM: 0,TO: 26) input_letter
+    
+    state bool all_pairs_for_step_complete
+    state int#(FROM: 0,TO: 16) plugs_in_use
+    gen int max_plugs=10
+
+    state int#(FROM: 0,TO: 26) decoded_letter_pb
+
+    state int#(FROM: 0,TO: 26)[2] buffer
+
+    initial plug_one = 0
+    initial plug_two = 1
+
+    state int#(FROM: 0,TO: 4096) increment
+    state int#(FROM: 0,TO: 4294967296) bigram_score_temp            // 32 bit
+    state int#(FROM: 0,TO: 281474976710656) bigram_score_sum        // 48 bit
+
+    state int#(FROM: 0,TO: 281474976710656)dummy_score     //48bit
+    state int#(FROM: 0,TO: 26)[2] dummy_plugs
+
+    state bool wait_for_plug_setting
+    initial wait_for_plug_setting = true
+
+    action give_settings:int#(FROM: 0,TO: 26)[9] new_settings{
+        given_settings=new_settings
+    }
+
+    action plug_guessing_machine_setup{
+        enigma_machine_plugboard.setup(given_settings[0:3], given_settings[3:6], given_settings[6:9])
+    }
+ 
+ // increment over the possible plugs to set up since direction doesnt matter and we cant plug two plugs into the same place 
+ // we need to make sure that doesnt happen
+    when plug_state==1{                
+        when plug_one< 26&!wait_for_plug_setting{
+            when plug_two < 26{
+                when plug_two>plug_one{
+                    plug_two=plug_two+1 mod 26
+                }else{
+                    plug_two=plug_one+1 mod 26
+                }
+            }else{
+                plug_one=plug_one+1 mod 26
+            }
+        }else when wait_for_plug_setting{
+            wait_for_plug_setting=false
+        }else{             
+            plug_one=0
+            plug_two=1
+            plug_state=3
+        }
+        
+        when alphabet[plug_one] & alphabet[plug_two]{     // we need some sort of checking mechanism to make sure we dont plug into already existing plugs 
+            //save plugs and set them in machine
+            enigma_machine_plugboard.change_plugs(plug_one, plug_two)
+            plug_one=plug_two
+            plug_two=plug_one
+            
+            when !wait_for_plug_setting{
+                enigma_machine_plugboard.prep_message_encode()
+                plug_state=2
+                wait_for_plug_setting=true
+            }
+        }
+    }
+    when plug_state==2{
+        increment=increment+1 mod 4096
+
+        decoded_letter_pb=enigma_machine_plugboard.parse_letter(input_letter)
+        buffer[0]=decoded_letter_pb
+        when increment>1{
+            buffer[1]=buffer[0]
+        }
+        bigram_score_temp=bigram_scores_inst.get_bigram_score(buffer)
+        bigram_score_sum=bigram_score_sum+bigram_score_temp
+        when last{
+            dummy_plugs,dummy_score=best_ngram_score_inst.update([plug_one,plug_two], bigram_score_sum)
+            plug_state=1
+        }
+
+    }
+
+    when plug_state==3{
+        plug_one,plug_two=best_ngram_score_inst.give_plugs()
+        alphabet[plug_one]=false
+        alphabet[plug_two]=false
+        plugs_in_use=plugs_in_use+1 mod 16
+        plug_state=0
+    }
+}
+
+    //      we set a plug we pipe it through the machine and we see what the result is passing it to the bigram/trigram check 
+    //          need to figure out roughly how long this takes or how we are going to store the results 
+
+    //          just a bunch of lookups for bigrams shouldnt take longer then the message decode just checking a 2 dimensional array
+
+    //          for trigrams 3 dimensional array not sure how local that can be but at the end of the day similar timing 
+    //          amount of bigrams to check
+
+    //      for each decode run we have to change the plugs but not anything esle so similar overhead to earlier for rotor and ring pos
+    //      we use a new variation of the best_settings module to keep our best ranking plug setting 
+    //          this should allways be clearly better if we are working with the right rotor settings
+
+    //      at the end of the first run take the best settings and enter their plug pair into the bool array 
+    //      repeat for the next runs checking against plug array if we can skip steps until we arrive at 10 plugs 
+    //              (variable given number or alternatively make it so we can check if a "selfplug" is the best plug meanning we dont have any plugs that yield better results)
+
+
+
+
+
+
+
 
     /*
     we calculate message legth once here for the relative value of our sum to the optimal IoC 1,73 for our message length so we can have an integer value to compare against later and avoid floating point ops 
@@ -898,4 +1042,3 @@ module cracker_top{
     }
     */
 
-}
