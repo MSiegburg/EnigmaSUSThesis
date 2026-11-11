@@ -99,24 +99,43 @@ module cracker_top{
 
     RAM#(DEPTH: 1024,T:type int#(FROM: 0,TO: 26)) message_memory
     state int#(FROM: 0,TO: 1024) message_count
-    enigma_machine_driver enigma_machine_driver_inst
-
+    enigma_machine_driver enigma_machine_driver_inst    
     state bool start_guessing
 
 
-    // reader.ready_for_lots_of_data = ?
-    when reader.chunk_valid : bool[ELEM_BITWIDTH][NUM_PARALLEL_ELEMENTS] elements, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS+1) chunk_length, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS) chunk_offset, bool last, bool[0] _unused_extra_data{
-        //last_letter_in_message=last
-        message_count=message_count+1 mod 1024
-        int#(FROM: 0,TO: 26) letter
-        letter=IntNarrow#(FROM: 0, TO: 26)(BitsToInt(elements[0]))
-        message_memory.write(message_count, letter)
-        
-        when last{
-            start_guessing=true
-          
+    bool[64] message_adress
+    message_adress[:32] = ctrl.input_regs[0]
+    message_adress[32:] = ctrl.input_regs[1]
+    int read_start_addr = BitsToUInt(message_adress)
+
+    bool[64] settings_address
+    settings_address[:32] = ctrl.input_regs[2]
+    settings_address[32:] = ctrl.input_regs[3]
+    int write_start_addr = BitsToUInt(settings_address)
+
+    state int number_to_transfer
+
+    state bool xrt_setup_done
+
+
+    when ctrl.start {                                                           // setting initial values when xrt control starts 
+        number_to_transfer=BitsToUInt(ctrl.input_regs[4])
+        writer.request_new_write(write_start_addr)
+        xrt_setup_done=true
+
+    }
+    reader.ready_for_lots_of_data=true
+    when xrt_setup_done{
+        when reader.chunk_valid : bool[ELEM_BITWIDTH][NUM_PARALLEL_ELEMENTS] elements, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS+1) chunk_length, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS) chunk_offset, bool last, bool[0] _unused_extra_data{
+            message_count=message_count+1 mod 1024
+            int#(FROM: 0,TO: 26) letter
+            letter=IntNarrow#(FROM: 0, TO: 26)(BitsToInt(elements[0]))
+            message_memory.write(message_count, letter)
+            when last{
+                start_guessing=true
+            }
+            
         }
-        
     }
         
         
@@ -133,7 +152,7 @@ module cracker_top{
 
     // can be kept in Top module since allways the same for actions in submodules
     int#(FROM: 0,TO: 26) decoded_letter
-    int#(FROM: 0,TO: 26) input_letter
+    int#(FROM: 0,TO: 26) input_letter'0
     int#(FROM: 0,TO: 26) ioc_count_letter
 
     
@@ -164,8 +183,8 @@ module cracker_top{
 
     state int#(FROM: 0,TO:1024) last_letter
 
-    state int#(FROM: 0,TO: 26)[5][9] best_settings_pb
-    state int#(FROM: 0,TO: 65536)[5] best_scores_pb
+    //state int#(FROM: 0,TO: 26)[5][9] best_settings_pb
+    //state int#(FROM: 0,TO: 65536)[5] best_scores_pb
     
     when start_guessing{
         cur_state=1
@@ -205,7 +224,6 @@ module cracker_top{
 
     // calculate our version of the IoC score 
     when cur_state==2{
-        message_counter=message_counter+1
         input_letter=message_memory.read(message_counter)
         ioc_count_letter=enigma_machine_driver_inst.parse_letter_ioc_count(input_letter)
         enigma_machine_driver_inst.ioc_count_input(ioc_count_letter)
@@ -213,25 +231,173 @@ module cracker_top{
             enigma_machine_driver_inst.last_letter_save_settings_rotor(left_rotor_pos, middle_rotor_pos, rigth_rotor_pos)
             message_counter=0
             cur_state=3
+        }else{
+            message_counter=message_counter+1 mod 1024
         }
     }
     // sum up our letter counts until we reach the end of the alphaet
     when cur_state==3{
-        
         enigma_machine_driver_inst.sum_up_ioc(cur_letter)
         cur_letter=cur_letter+1 mod 26
         when cur_letter==25{
             enigma_machine_driver_inst.save_result_ioc_rotors()
             cur_letter=0
             when all_config_done{
+                enigma_machine_driver_inst.safe_best_settings_at_end()
                 cur_state=4
             }else {
                 cur_state=1
             }
         }
     }
-    
 
+    state int#(FROM:0, TO:60) machine_number
+    state int#(FROM:0, TO:5) top_choice
+
+    best_configs best_prelim_config1
+    best_configs best_prelim_config2
+    best_configs best_prelim_config3
+    best_configs best_prelim_config4
+    best_configs best_prelim_config5
+
+    
+    when cur_state==4{
+        top_choice=top_choice+1 mod 5
+        when top_choice<4{
+            machine_number=machine_number+1 mod 60
+            enigma_machine_driver_inst.sort_results(machine_number, top_choice)
+        }else when machine_number<59{
+            enigma_machine_driver_inst.sort_results(machine_number, top_choice)
+        }else{
+            cur_state==5
+        } 
+
+    
+    }
+    state int#(FROM: 0,TO: 65536) ioc_score_top1
+    state int#(FROM: 0,TO: 26)[9] best_settings1
+    state int#(FROM: 0,TO: 65536) ioc_score_top2
+    state int#(FROM: 0,TO: 26)[9] best_settings2
+    state int#(FROM: 0,TO: 65536) ioc_score_top3
+    state int#(FROM: 0,TO: 26)[9] best_settings3
+    state int#(FROM: 0,TO: 65536) ioc_score_top4
+    state int#(FROM: 0,TO: 26)[9] best_settings4
+    state int#(FROM: 0,TO: 65536) ioc_score_top5
+    state int#(FROM: 0,TO: 26)[9] best_settings5
+
+    state int#(FROM: 0,TO:6) top_count
+    state int#(FROM: 0,TO:9) setting_count
+    state bool score_done
+    when cur_state==5{
+        ioc_score_top1,best_settings1,ioc_score_top2,best_settings2,ioc_score_top3,best_settings3,ioc_score_top4,best_settings4,ioc_score_top5, best_settings5=enigma_machine_driver_inst.get_top_settings()
+        cur_state=6
+    }
+    when cur_state==6{
+        when writer.may_write & top_count<6{
+            when top_count==0{
+                when !score_done{                                               //write score to memory
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(ioc_score_top1)
+                    writer.write(to_save, 32, 0, false)
+                    score_done=true
+                }else when score_done&setting_count<4{                          // write settings to memory 
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings1[setting_count])
+                    writer.write(to_save, 32, 0, false)
+                    setting_count=setting_count+1 mod 9
+                }else{                                                          // last setting of current top and move to next
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings1[setting_count])
+                    writer.write(to_save, 32, 0, false)
+                    top_count=top_count+1 mod 6
+                }
+            }
+            when top_count==1{
+                when !score_done{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(ioc_score_top2)
+                    writer.write(to_save, 32, 0, false)
+                    score_done=true
+                }else when score_done&setting_count<4{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings2[setting_count])
+                    writer.write(to_save, 32, 0, false)
+                    setting_count=setting_count+1 mod 9
+                }else{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings2[setting_count])
+                    writer.write(to_save, 32, 0, false)
+                    score_done=false
+                    top_count=top_count+1 mod 6
+                }
+            }
+            when top_count==2{
+                when !score_done{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(ioc_score_top3)
+                    writer.write(to_save, 32, 0, false)
+                    score_done=true
+                }else when score_done&setting_count<4{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings3[setting_count])
+                    writer.write(to_save, 32, 0, false)
+                    setting_count=setting_count+1 mod 9
+                }else{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings3[setting_count])
+                    writer.write(to_save, 32, 0, false)
+                    top_count=top_count+1 mod 6
+                }
+            }
+            when top_count==3{
+                when !score_done{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(ioc_score_top4)
+                    writer.write(to_save, 32, 0, false)
+                    score_done=true
+                }else when score_done&setting_count<4{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings4[setting_count])
+                    writer.write(to_save, 32, 0, false)
+                    setting_count=setting_count+1 mod 9
+                }else{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings4[setting_count])
+                    writer.write(to_save, 32, 0, false)
+                    top_count=top_count+1 mod 6
+                }
+            }
+            when top_count==4{
+                when !score_done{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(ioc_score_top5)
+                    writer.write(to_save, 32, 0, false)
+                    score_done=true
+                }else when score_done&setting_count<4{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings5[setting_count])
+                    writer.write(to_save, 32, 0, false)
+                    setting_count=setting_count+1 mod 9
+                }else{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings5[setting_count])
+                    writer.write(to_save, 32, 0, true)
+                    top_count=top_count+1 mod 6
+                }
+            }
+        }
+        when top_count==6{
+        
+        }
+    }
+
+    when writer.write_has_been_committed{
+        ctrl.finish([])
+    }
+
+
+
+/*
     state bool all_best_settings_tested
     initial all_best_settings_tested=false
 
@@ -265,11 +431,9 @@ module cracker_top{
         }else when right_ring_lap&middle_ring_lap{
             all_rings_done=true
         }
+        enigma_machine_driver_inst.machine_setup_ring(left_ring_pos, middle_ring_pos, rigth_ring_pos)
+        cur_state=6
         
-        //TODO: does this do what i think it does ?
-        when enigma_machine_driver_inst.machine_setup_ring(left_ring_pos, middle_ring_pos, rigth_ring_pos){
-            cur_state=6
-        }
     }
     when cur_state==6{
         message_counter=message_counter+1
@@ -349,13 +513,12 @@ module cracker_top{
                 plug_guessing_inst.reset()
 
             }else{
-                /*writer.write(elements, chunk_length, chunk_offset, last)
-                    write the top 5 settings with their respective plugs to memory
-                */
+                //writer.write(elements, chunk_length, chunk_offset, last)
+                //    write the top 5 settings with their respective plugs to memory
+                
             }
         }
     }
-    
     when cur_state==13{
         when plug_guessing_inst.check_plug_one_not_done()&!wait_for_plug_setting{
             when plug_guessing_inst.check_plug_two_not_done(){
@@ -403,15 +566,17 @@ module cracker_top{
         plug_guessing_inst.update_plugs_in_use()
         cur_state=12
     }
+    */
 
 }
 
 module ioc_count#(){
     state int#(FROM: 0,TO: 256)[26] letter_count
- 
-    action letter_input: int#(FROM: 0,TO: 26) decoded_letter{
-        letter_count[decoded_letter]=letter_count[decoded_letter]+1 mod 100
+    domain score_counting
+    action letter_input'0: int#(FROM: 0,TO: 26) decoded_letter'0{
+        letter_count[decoded_letter]=letter_count[decoded_letter]+1 mod 256
     }
+    domain passing_score
     action pass_letter_count:-> int#(FROM: 0,TO: 256)[26] letter_count_cur{
         letter_count_cur=letter_count
     }
@@ -566,7 +731,7 @@ module bigram_scores{
 
 }
 
-/*module trigram_scores{                          // TODO: finish after reducing values
+/*module trigram_scores{                          // 
     gen int[][][] trigram_score_array              
     trigram_score_array=[[[]]]
     
@@ -619,6 +784,8 @@ module enigma_machine_driver#(){
         // states for saving machine settings and ioc values temporarily
         state int#(FROM: 0,TO: 26)[6] score_settings
 
+        state int#(FROM: 0,TO: 1024) letters_throughput'0
+
         state int#(FROM: 0,TO: 65536) ioc_score_temp1
         state int#(FROM: 0,TO: 26)[6] temp_settings1
         state int#(FROM: 0,TO: 65536) ioc_score_temp2
@@ -643,16 +810,20 @@ module enigma_machine_driver#(){
         action parse_letter_ioc_count: int#(FROM: 0,TO: 26) input_letter-> int#(FROM: 0,TO: 26) decoded_letter{ 
             decoded_letter=enigma_machine_inst.parse_letter(input_letter)
         }
-        action ioc_count_input:int#(FROM: 0,TO: 26) input_letter_count{
+        action ioc_count_input'0:int#(FROM: 0,TO: 26) input_letter_count'0/*->bool done_counting'0*/{ //TODO: what is the issue here ?
             ioc_count_inst.letter_input(input_letter_count)
+            /*letters_throughput=letters_throughput+1 mod 1024
+            when letters_throughput==input_letter_count{
+                done_counting=true
+            }*/
         }
         // safe settings once we get to the last letter of the message
         action last_letter_save_settings_rotor: int#(FROM: 0,TO: 26) lrops, int#(FROM: 0,TO: 26) mrops, int#(FROM: 0,TO: 26) rrops{
             ioc_calc_inst.set_letter_count(ioc_count_inst.pass_letter_count())
             score_settings=[rotor_config_compile[0],rotor_config_compile[1],rotor_config_compile[2],lrops,mrops,rrops,0,0,0]
+            ioc_count_inst.reset()
         }
 
-    
         // sum up our letter counts until we reach the end of the alphabet
         action sum_up_ioc: int#(FROM: 0,TO: 26) cur_letter{
             multiplication_result = multiplication_result + ioc_calc_inst.ioc_calc_individual_letter(cur_letter) mod 65536
@@ -666,7 +837,7 @@ module enigma_machine_driver#(){
                 ioc_score_temp5,temp_settings5=best_settings_inst5.update_check(ioc_score_temp4,temp_settings4)  
                 // reset relevant values so we can do this again for the next config
                 multiplication_result=0
-                ioc_count_inst.reset()
+               
         }
 
         state int#(FROM: 1,TO: 6) cur_best
@@ -714,10 +885,9 @@ module enigma_machine_driver#(){
             }
 
         }
-        action machine_setup_ring:int#(FROM: 0,TO: 26) left_ring_pos, int#(FROM: 0,TO: 26) middle_ring_pos, int#(FROM: 0,TO: 26) rigth_ring_pos-> bool done_rings{
+        action machine_setup_ring:int#(FROM: 0,TO: 26) left_ring_pos, int#(FROM: 0,TO: 26) middle_ring_pos, int#(FROM: 0,TO: 26) rigth_ring_pos{
             enigma_machine_inst.setup(rotor_config_compile,[left_rotor_pos, middle_rotor_pos, rigth_rotor_pos], [left_ring_pos, middle_ring_pos, rigth_ring_pos]) 
             enigma_machine_inst.prep_message_encode()
-            done_rings=true
         }
 
         action last_letter_save_settings_rings: int#(FROM: 0,TO: 26) left_ring_pos_setting,int#(FROM: 0,TO: 26) middle_ring_pos_setting,int#(FROM: 0,TO: 26)rigth_ring_pos_setting{
@@ -746,11 +916,11 @@ module enigma_machine_driver#(){
         action safe_best_settings_at_end{
             Concat concat_inst
 
-            ioc_score_temp1,temp_settings1=best_settings_inst6.give_settings()
-            ioc_score_temp2,temp_settings2=best_settings_inst7.give_settings()
-            ioc_score_temp3,temp_settings3=best_settings_inst8.give_settings()
-            ioc_score_temp4,temp_settings4=best_settings_inst9.give_settings()
-            ioc_score_temp5,temp_settings5=best_settings_inst10.give_settings()
+            ioc_score_temp1,temp_settings1=best_settings_inst1.give_settings()
+            ioc_score_temp2,temp_settings2=best_settings_inst2.give_settings()
+            ioc_score_temp3,temp_settings3=best_settings_inst3.give_settings()
+            ioc_score_temp4,temp_settings4=best_settings_inst4.give_settings()
+            ioc_score_temp5,temp_settings5=best_settings_inst5.give_settings()
 
             concat_temp1=concat_inst(temp_settings1, rotor_config_compile)
             concat_temp2=concat_inst(temp_settings2, rotor_config_compile)
@@ -796,16 +966,16 @@ module enigma_machine_driver#(){
     // sort out the score safe array to get top 5 configs
 
     action sort_results: int#(FROM: 0,TO: 60) machindex, int#(FROM: 0, TO: 5) scoreindex{
-    int#(FROM: 0,TO: 65536) ioc_score_top1
-    int#(FROM: 0,TO: 26)[9] best_settings1
-    int#(FROM: 0,TO: 65536) ioc_score_top2
-    int#(FROM: 0,TO: 26)[9] best_settings2
-    int#(FROM: 0,TO: 65536) ioc_score_top3
-    int#(FROM: 0,TO: 26)[9] best_settings3
-    int#(FROM: 0,TO: 65536) ioc_score_top4
-    int#(FROM: 0,TO: 26)[9] best_settings4
-    int#(FROM: 0,TO: 65536) ioc_score_top5
-    int#(FROM: 0,TO: 26)[9] best_settings5
+        int#(FROM: 0,TO: 65536) ioc_score_top1
+        int#(FROM: 0,TO: 26)[9] best_settings1
+        int#(FROM: 0,TO: 65536) ioc_score_top2
+        int#(FROM: 0,TO: 26)[9] best_settings2
+        int#(FROM: 0,TO: 65536) ioc_score_top3
+        int#(FROM: 0,TO: 26)[9] best_settings3
+        int#(FROM: 0,TO: 65536) ioc_score_top4
+        int#(FROM: 0,TO: 26)[9] best_settings4
+        int#(FROM: 0,TO: 65536) ioc_score_top5
+        int#(FROM: 0,TO: 26)[9] best_settings5
         ioc_score_top1,best_settings1=best_config_to_plug1.update_check(score_safe[scoreindex][machindex], setting_safe[:][scoreindex][machindex])
         ioc_score_top2,best_settings2=best_config_to_plug2.update_check(ioc_score_top1, best_settings1)
         ioc_score_top3,best_settings3=best_config_to_plug3.update_check(ioc_score_top2, best_settings2)
@@ -858,7 +1028,7 @@ module plug_guessing{
 
     state int#(FROM: 0,TO: 281474976710656)dummy_score     // 48 bit
     state int#(FROM: 0,TO: 26)[2] dummy_plugs
-
+    domain plug_setup
     action reset{
         plug_one=0
         plug_two=1
@@ -913,13 +1083,14 @@ module plug_guessing{
         plug_one=plug_two
         plug_two=plug_one
     }
-    action machine_change_plugs{
-        enigma_machine_plugboard.change_plugs(plug_one, plug_two)
-    }
     action check_alphabet:-> bool plugs_not_used_yet{
         when alphabet[plug_one] & alphabet[plug_two]{
             plugs_not_used_yet=true
         }
+    }
+    domain machine_changes
+    action machine_change_plugs{
+        enigma_machine_plugboard.change_plugs(plug_one, plug_two)
     }
     action machine_prep_encode{
         enigma_machine_plugboard.prep_message_encode()
@@ -927,6 +1098,7 @@ module plug_guessing{
     action decode_letter_pb: int#(FROM: 0,TO: 26) input_letter -> int#(FROM: 0,TO: 26) decoded_letter_pb{
         decoded_letter_pb=enigma_machine_plugboard.parse_letter(input_letter)
     }
+    domain score_calculation
     action calculate_score: int#(FROM: 0,TO: 26) decoded_letter_new{
         last_decoded_letter=decoded_letter_new
         bigram_score_temp=bigram_scores_inst.get_bigram_score([decoded_letter_new,last_decoded_letter])
