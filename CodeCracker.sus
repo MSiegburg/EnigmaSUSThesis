@@ -192,38 +192,43 @@ module cracker_top{
         last_letter=message_count
     }
     // Go over the various possible rotor settings in order 
+    bool tempbool
     when cur_state==1{              
-        when rigth_rotor_pos<25{                                    // if we dont go into this right rotor is at 25
+        when rigth_rotor_pos<=25{                                    // if we dont go into this right rotor is at 25
             rigth_rotor_pos=rigth_rotor_pos+1 mod 26
-            when rigth_rotor_pos+1==25{
+            when rigth_rotor_pos==25{
                 right_lap=true
             }
-        }else when middle_rotor_pos<25 & right_lap {                // if we dont go into this middle rotor is at 25
+        }
+        when middle_rotor_pos<=25 & right_lap {                // if we dont go into this middle rotor is at 25
             rigth_rotor_pos=0
             middle_rotor_pos=middle_rotor_pos+1 mod 26
             right_lap=false
-            when middle_rotor_pos+1==25{
+            when middle_rotor_pos==25{
                 middle_lap=true
             }
-        }else when left_rotor_pos<25 & middle_lap{                  // if we dont go into this left rotor is at 25
+        }
+        when left_rotor_pos<=25 & middle_lap{                  // if we dont go into this left rotor is at 25
             middle_rotor_pos=0
             left_rotor_pos=left_rotor_pos+1 mod 26
             middle_lap=false
-            when left_rotor_pos+1==25{
+            when left_rotor_pos==25{
                 left_lap=true                                                  
             }
-        }else when right_lap&middle_lap&left_lap{                   // if all rotors are at 25 we have reached the last config
-            all_config_done=true
         }
+        
 
         // instantiate an enigma machine with the given rotors
-        when enigma_machine_driver_inst.machine_setup_rotor(left_rotor_pos, middle_rotor_pos, rigth_rotor_pos){
-            cur_state = 2
-        }
+        tempbool=enigma_machine_driver_inst.machine_setup_rotor(left_rotor_pos, middle_rotor_pos, rigth_rotor_pos){
+        cur_state = 2
+        
     }
 
     // calculate our version of the IoC score 
     when cur_state==2{
+        when rigth_rotor_pos==25&middle_rotor_pos==25&left_rotor_pos==25{                   // if all rotors are at 25 we have reached the last config
+            all_config_done=true
+        }
         input_letter=message_memory.read(message_counter)
         ioc_count_letter=enigma_machine_driver_inst.parse_letter_ioc_count(input_letter)
         enigma_machine_driver_inst.ioc_count_input(ioc_count_letter)
@@ -300,7 +305,7 @@ module cracker_top{
                     to_save[0]=IntToBits(ioc_score_top1)
                     writer.write(to_save, 32, 0, false)
                     score_done=true
-                }else when score_done&setting_count<4{                          // write settings to memory 
+                }else when score_done&setting_count<9{                          // write settings to memory 
                     bool[32][1] to_save
                     to_save[0]=IntToBits(best_settings1[setting_count])
                     writer.write(to_save, 32, 0, false)
@@ -318,7 +323,7 @@ module cracker_top{
                     to_save[0]=IntToBits(ioc_score_top2)
                     writer.write(to_save, 32, 0, false)
                     score_done=true
-                }else when score_done&setting_count<4{
+                }else when score_done&setting_count<9{
                     bool[32][1] to_save
                     to_save[0]=IntToBits(best_settings2[setting_count])
                     writer.write(to_save, 32, 0, false)
@@ -337,7 +342,7 @@ module cracker_top{
                     to_save[0]=IntToBits(ioc_score_top3)
                     writer.write(to_save, 32, 0, false)
                     score_done=true
-                }else when score_done&setting_count<4{
+                }else when score_done&setting_count<9{
                     bool[32][1] to_save
                     to_save[0]=IntToBits(best_settings3[setting_count])
                     writer.write(to_save, 32, 0, false)
@@ -355,7 +360,7 @@ module cracker_top{
                     to_save[0]=IntToBits(ioc_score_top4)
                     writer.write(to_save, 32, 0, false)
                     score_done=true
-                }else when score_done&setting_count<4{
+                }else when score_done&setting_count<9{
                     bool[32][1] to_save
                     to_save[0]=IntToBits(best_settings4[setting_count])
                     writer.write(to_save, 32, 0, false)
@@ -373,7 +378,7 @@ module cracker_top{
                     to_save[0]=IntToBits(ioc_score_top5)
                     writer.write(to_save, 32, 0, false)
                     score_done=true
-                }else when score_done&setting_count<4{
+                }else when score_done&setting_count<9{
                     bool[32][1] to_save
                     to_save[0]=IntToBits(best_settings5[setting_count])
                     writer.write(to_save, 32, 0, false)
@@ -761,11 +766,11 @@ module enigma_machine_driver#(){
         best_settings best_settings_inst4
         best_settings best_settings_inst5
 
-        best_settings best_settings_inst6
+        /*best_settings best_settings_inst6
         best_settings best_settings_inst7
         best_settings best_settings_inst8
         best_settings best_settings_inst9
-        best_settings best_settings_inst10
+        best_settings best_settings_inst10*/
 
         //state int#(FROM: 0,TO: 5)[3] rotor_config 
         gen int[3] rotor_config_compile
@@ -896,7 +901,7 @@ module enigma_machine_driver#(){
         }
 
         // seperate action since were saving to different setting instances from the rotor position testing
-        action safe_result_ioc_rings{
+        /*action safe_result_ioc_rings{
             ioc_score_temp1,temp_settings1=best_settings_inst6.update_check(multiplication_result, score_settings)
             ioc_score_temp2,temp_settings2=best_settings_inst7.update_check(ioc_score_temp1,temp_settings1)     
             ioc_score_temp3,temp_settings3=best_settings_inst8.update_check(ioc_score_temp2,temp_settings2)  
@@ -904,7 +909,7 @@ module enigma_machine_driver#(){
             ioc_score_temp5,temp_settings5=best_settings_inst10.update_check(ioc_score_temp4,temp_settings4) 
             multiplication_result=0
             ioc_count_inst.reset()
-        }
+        }*/
                 
         state int#(FROM: 0,TO: 26)[9] concat_temp1
         state int#(FROM: 0,TO: 26)[9] concat_temp2
@@ -947,11 +952,11 @@ module enigma_machine_driver#(){
             best_settings_inst3.reset()
             best_settings_inst4.reset()
             best_settings_inst5.reset()
-            best_settings_inst6.reset()
+            /*best_settings_inst6.reset()
             best_settings_inst7.reset()
             best_settings_inst8.reset()
             best_settings_inst9.reset()
-            best_settings_inst10.reset()
+            best_settings_inst10.reset()*/
 
         }
     }
