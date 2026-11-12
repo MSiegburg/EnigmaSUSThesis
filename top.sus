@@ -95,14 +95,6 @@ module enigma_top {
 
 
 
-    //int start_addr = BitsToUInt(message_adress)
-    /*int num_to_transfer = BitsToUInt(ctrl.input_regs[4])        
-    int offset = BitsToUInt(ctrl.input_regs[5])                 
-    int num_repeats = BitsToUInt(ctrl.input_regs[6])
-    int repeat_offset = BitsToUInt(ctrl.input_regs[7])
-    bool[32] config_bits_r = ctrl.input_regs[8]*/
-    //SlowState#(T: type int#(FROM: 0, TO: pow2#(E: 64))) cur_experiment_addr   
-
     bool[64] message_adress
     message_adress[:32] = ctrl.input_regs[0]
     message_adress[32:] = ctrl.input_regs[1]
@@ -121,7 +113,6 @@ module enigma_top {
     state int#(FROM: 0,TO: 26)[26] plugboard_config
     state int#(FROM: 0,TO: 26) plugboard_iterator
 
-    //state bool last_letter_in_message
     state int number_to_transfer
 
     enigma_machine_runtime enigma_machine
@@ -130,7 +121,6 @@ module enigma_top {
     when ctrl.start {                                                           // setting initial values when xrt control starts 
         plugboard_iterator=0
         current_state=1
-        //last_letter_in_message=false
         number_to_transfer=BitsToUInt(ctrl.input_regs[4])
         writer.request_new_write(write_start_addr)
         
@@ -196,22 +186,4 @@ module enigma_top {
         //last_letter_in_message=false
     }
     
-    /*when reader.may_request_new_read{                    
-        when cur_experiment_addr.is_stable : int cur_addr {
-            reader.request_new_read(cur_addr, num_to_transfer)
-            reg int new_addr = cur_addr + repeat_offset mod pow2#(E: 64)
-            cur_experiment_addr.set_slow(new_addr)
-            num_repeats_remaining = num_repeats_remaining - 1 mod pow2#(E: 32)
-        }
-    }*/
-
 }
-/*
-module all_read_benchmarks_axi4 {
-    bench_burst_reader_axi4#(AXI_WIDTH: 32) burst32
-    bench_burst_reader_axi4#(AXI_WIDTH: 64) burst64
-    bench_burst_reader_axi4#(AXI_WIDTH: 128) burst128
-    bench_burst_reader_axi4#(AXI_WIDTH: 256) burst256
-    bench_burst_reader_axi4#(AXI_WIDTH: 512) burst512
-}*/
-
