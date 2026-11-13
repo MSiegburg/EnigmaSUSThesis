@@ -1,0 +1,606 @@
+module cracker_rotors_top{
+
+    clock aclk
+    input bool aresetn
+
+    gen int CTRL_AXI_WIDTH = 32
+    gen int CTRL_ADDR_WIDTH = 12
+    gen int MEM_ADDR_WIDTH = 64
+    gen int AXI_WIDTH = 32
+
+    gen int ELEM_BYTE_SIZE = 4
+    gen int ELEM_BITWIDTH = ELEM_BYTE_SIZE * 8
+    gen int NUM_PARALLEL_ELEMENTS = AXI_WIDTH / ELEM_BITWIDTH
+
+    xrt_ctrl_slave #(NUM_INPUT_REGS: 45, NUM_OUTPUT_REGS: 0, ADDR_WIDTH: CTRL_ADDR_WIDTH, AXI_WIDTH: CTRL_AXI_WIDTH) ctrl  // what does numinput/output regs do ?
+
+    // Export AXI4-Lite interface
+    domain axi_control
+    input  int#(FROM: 0, TO: 1 << CTRL_ADDR_WIDTH)    s_axi_control_awaddr
+    input  bool                     s_axi_control_awvalid
+    output bool                     s_axi_control_awready = ctrl.awready
+    input  bool[CTRL_AXI_WIDTH]     s_axi_control_wdata
+    input  bool[CTRL_AXI_WIDTH / 8] s_axi_control_wstrb
+    input  bool                     s_axi_control_wvalid
+    output bool                     s_axi_control_wready  = ctrl.wready
+    output bool[2]                  s_axi_control_bresp   = ctrl.bresp
+    output bool                     s_axi_control_bvalid  = ctrl.bvalid
+    input  bool                     s_axi_control_bready
+    input  int#(FROM: 0, TO: 1 << CTRL_ADDR_WIDTH)    s_axi_control_araddr
+    input  bool                     s_axi_control_arvalid
+    output bool                     s_axi_control_arready = ctrl.arready
+    output bool[CTRL_AXI_WIDTH]     s_axi_control_rdata   = ctrl.rdata
+    output bool[2]                  s_axi_control_rresp   = ctrl.rresp
+    output bool                     s_axi_control_rvalid  = ctrl.rvalid
+    input  bool                     s_axi_control_rready
+    ctrl.awaddr  =         s_axi_control_awaddr
+    ctrl.awvalid =         s_axi_control_awvalid
+    ctrl.wdata   =         s_axi_control_wdata
+    ctrl.wstrb   =         s_axi_control_wstrb
+    ctrl.wvalid  =         s_axi_control_wvalid
+    ctrl.bready  =         s_axi_control_bready
+    ctrl.araddr  =         s_axi_control_araddr
+    ctrl.arvalid =         s_axi_control_arvalid
+    ctrl.rready  =         s_axi_control_rready
+
+    axi4_burst_reader#(AXI_WIDTH, ADDR_WIDTH: MEM_ADDR_WIDTH, ADDR_ALIGN: 4, MAX_IN_FLIGHT: 412) reader
+    axi4_burst_writer#(AXI_WIDTH, ADDR_WIDTH: MEM_ADDR_WIDTH, ADDR_ALIGN: 4, ADDR_MAY_PUSH_LATENCY: 0) writer
+
+    domain mem_write
+    output bool                     m_axi_awvalid = writer.awvalid
+    input  bool                     m_axi_awready
+    output int#(FROM: 0, TO: 1 << MEM_ADDR_WIDTH)     m_axi_awaddr = writer.awaddr
+    output int#(FROM: 0, TO: 256)   m_axi_awlen = writer.awlen
+    output int#(FROM: 0, TO: 8)     m_axi_awsize  = writer.awsize
+    output bool[2]                  m_axi_awburst = writer.awburst
+    output bool[3]                  m_axi_awprot = writer.awprot
+    output bool[4]                  m_axi_awcache = writer.awcache
+    output int#(FROM: 0, TO: 16)    m_axi_awqos = writer.awqos
+    output bool                     m_axi_awlock = writer.awlock
+    output int#(FROM: 0, TO: 16)    m_axi_awregion = writer.awregion
+    output bool                     m_axi_wvalid = writer.wvalid
+    input  bool                     m_axi_wready
+    output bool[AXI_WIDTH]          m_axi_wdata = writer.wdata
+    output bool[AXI_WIDTH / 8]      m_axi_wstrb = writer.wstrb
+    output bool                     m_axi_wlast = writer.wlast
+    input  bool                     m_axi_bvalid
+    output bool                     m_axi_bready = writer.bready
+    input  bool[2]                  m_axi_bresp
+    writer.awready =                m_axi_awready
+    writer.wready =                 m_axi_wready
+    writer.bvalid =                 m_axi_bvalid
+    writer.bresp =                  m_axi_bresp
+
+    domain mem_read
+    output bool                     m_axi_arvalid'0 = reader.arvalid
+    input  bool                     m_axi_arready
+    output int#(FROM: 0, TO: 1 << MEM_ADDR_WIDTH)     m_axi_araddr = reader.araddr
+    output int#(FROM: 0, TO: 256)   m_axi_arlen = reader.arlen
+    output int#(FROM: 0, TO: 8)     m_axi_arsize  = reader.arsize
+    output bool[2]                  m_axi_arburst = reader.arburst
+    output bool[3]                        m_axi_arprot = reader.arprot
+    output bool[4]                        m_axi_arcache = reader.arcache
+    output int#(FROM: 0, TO: 16)          m_axi_arqos = reader.arqos
+    output bool                           m_axi_arlock = reader.arlock
+    output int#(FROM: 0, TO: 16)          m_axi_arregion = reader.arregion
+    input  bool                     m_axi_rvalid
+    output bool                     m_axi_rready = reader.rready
+    input  bool[AXI_WIDTH]          m_axi_rdata
+    input  bool[2]                  m_axi_rresp
+    input  bool                     m_axi_rlast
+    reader.arready =                m_axi_arready
+    reader.rvalid =                 m_axi_rvalid
+    reader.rdata =                  m_axi_rdata
+    reader.rresp =                  m_axi_rresp
+    reader.rlast =                  m_axi_rlast
+
+
+    RAM#(DEPTH: 1024,T:type int#(FROM: 0,TO: 26)) message_memory
+    state int#(FROM: 0,TO: 1024) message_count
+    enigma_machine_driver_rotors enigma_machine_driver_rotors_inst    
+    state bool start_guessing
+    initial start_guessing =true
+
+
+    bool[64] message_adress
+    message_adress[:32] = ctrl.input_regs[0]
+    message_adress[32:] = ctrl.input_regs[1]
+    int read_start_addr = BitsToUInt(message_adress)
+
+    bool[64] settings_address
+    settings_address[:32] = ctrl.input_regs[2]
+    settings_address[32:] = ctrl.input_regs[3]
+    int write_start_addr = BitsToUInt(settings_address)
+
+    state int number_to_transfer
+
+    state bool xrt_setup_done
+
+
+    when ctrl.start {                                                           // setting initial values when xrt control starts 
+        number_to_transfer=BitsToUInt(ctrl.input_regs[4])
+        writer.request_new_write(write_start_addr)
+        xrt_setup_done=true
+        reader.request_new_read(read_start_addr, number_to_transfer, [])
+
+    }
+    
+    when xrt_setup_done{
+        reader.ready_for_lots_of_data=true
+        when reader.chunk_valid : bool[ELEM_BITWIDTH][NUM_PARALLEL_ELEMENTS] elements, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS+1) chunk_length, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS) chunk_offset, bool last, bool[0] _unused_extra_data{
+            message_count=message_count+1 mod 1024
+            int#(FROM: 0,TO: 26) letter
+            letter=IntNarrow#(FROM: 0, TO: 26)(BitsToInt(elements[0]))
+            message_memory.write(message_count, letter)
+            when last{
+                start_guessing=true
+
+                
+            }
+        }
+    }
+        
+        
+    // needs to be in top module
+    state int#(FROM: 0,TO: 18) cur_state
+    initial cur_state = 0
+    // counting letters for IOC
+    state int#(FROM: 0,TO: 26) cur_letter
+    initial cur_letter = 0
+
+
+    // can be kept in Top module since allways the same for actions in submodules
+    int#(FROM: 0,TO: 26) input_letter'1
+
+    
+    // variables for machine setup kept in Top module
+    state int#(FROM: 0,TO: 26) rigth_rotor_pos
+    state int#(FROM: 0,TO: 26) middle_rotor_pos
+    state int#(FROM: 0,TO: 26) left_rotor_pos
+    initial rigth_rotor_pos=0
+    initial middle_rotor_pos=0
+    initial left_rotor_pos=0
+
+
+    state int#(FROM: 0,TO:1024) message_counter
+    initial message_counter=0
+
+    state int#(FROM: 0,TO:1024) last_letter
+
+    //state int#(FROM: 0,TO: 26)[5][9] best_settings_pb
+    //state int#(FROM: 0,TO: 1048576)[5] best_scores_pb
+    
+    when start_guessing{
+        cur_state=1
+        start_guessing=false
+        last_letter=message_count
+    }
+    // Go over the various possible rotor settings in order 
+    when cur_state==1{              
+        when rigth_rotor_pos<=25{            
+            rigth_rotor_pos=rigth_rotor_pos+1 mod 26
+            when rigth_rotor_pos==25{
+                when middle_rotor_pos<=25{                
+                    rigth_rotor_pos=0
+                    middle_rotor_pos=middle_rotor_pos+1 mod 26
+                    when middle_rotor_pos==25{
+                        when left_rotor_pos<=25{                  
+                            middle_rotor_pos=0
+                            left_rotor_pos=left_rotor_pos+1 mod 26                           
+                        }
+                    }
+                }
+            }
+        }
+        // instantiate an enigma machine with the given rotors
+        enigma_machine_driver_rotors_inst.machine_setup_rotor_a(left_rotor_pos, middle_rotor_pos, rigth_rotor_pos)
+
+        cur_state = 2
+        
+    }
+
+    // calculate our version of the IoC score 
+    when cur_state==2{
+        input_letter=message_memory.read(message_counter)
+        enigma_machine_driver_rotors_inst.parse_letter_ioc_count(input_letter,left_rotor_pos, middle_rotor_pos, rigth_rotor_pos)
+        when message_counter==last_letter{
+            //enigma_machine_driver_rotors_inst.last_letter_save_settings_rotor(left_rotor_pos, middle_rotor_pos, rigth_rotor_pos)
+            message_counter=0
+            cur_state=3
+        }else{
+            message_counter=message_counter+1 mod 1024
+        }
+    }
+    // sum up our letter counts until we reach the end of the alphaet
+    when cur_state==3{
+        cur_letter=cur_letter+1 mod 26
+        enigma_machine_driver_rotors_inst.iterate_alphabet_a(cur_letter)
+        when cur_letter==25{
+            enigma_machine_driver_rotors_inst.save_result_ioc_rotors_a()
+            cur_letter=0
+            when rigth_rotor_pos==25&middle_rotor_pos==25&left_rotor_pos==25{
+                enigma_machine_driver_rotors_inst.safe_best_settings_at_end_a()
+                cur_state=4
+            }else {
+                cur_state=1
+            }
+        }
+    }
+    
+    state int#(FROM:0, TO:60) machine_number
+    state int#(FROM:0, TO:5) top_choice
+    
+    when cur_state==4{
+        top_choice=top_choice+1 mod 5
+        when top_choice<4{
+            machine_number=machine_number+1 mod 60
+            enigma_machine_driver_rotors_inst.sort_results(machine_number, top_choice)
+        }else when machine_number<59{
+            enigma_machine_driver_rotors_inst.sort_results(machine_number, top_choice)
+        }else{
+            cur_state=5
+        } 
+
+    
+    }
+    state int#(FROM: 0,TO: 1048576) ioc_score_top1
+    state int#(FROM: 0,TO: 26)[9] best_settings1
+    state int#(FROM: 0,TO: 1048576) ioc_score_top2
+    state int#(FROM: 0,TO: 26)[9] best_settings2
+    state int#(FROM: 0,TO: 1048576) ioc_score_top3
+    state int#(FROM: 0,TO: 26)[9] best_settings3
+    state int#(FROM: 0,TO: 1048576) ioc_score_top4
+    state int#(FROM: 0,TO: 26)[9] best_settings4
+    state int#(FROM: 0,TO: 1048576) ioc_score_top5
+    state int#(FROM: 0,TO: 26)[9] best_settings5
+
+    state int#(FROM: 0,TO:6) top_count
+    state int#(FROM: 0,TO:9) setting_count
+    state bool score_done
+    when cur_state==5{
+        ioc_score_top1,best_settings1,ioc_score_top2,best_settings2,ioc_score_top3,best_settings3,ioc_score_top4,best_settings4,ioc_score_top5, best_settings5=enigma_machine_driver_rotors_inst.get_top_settings()
+        cur_state=6
+    }
+    when cur_state==6{
+        when writer.may_write & top_count<6{
+            when top_count==0{
+                when !score_done{                                               //write score to memory
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(ioc_score_top1)
+                    writer.write(to_save, 1, 0, false)
+                    score_done=true
+                }else when score_done&setting_count<9{                          // write settings to memory 
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings1[setting_count])
+                    writer.write(to_save, 1, 0, false)
+                    setting_count=setting_count+1 mod 9
+                }else{                                                          // last setting of current top and move to next
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings1[setting_count])
+                    writer.write(to_save, 1, 0, false)
+                    score_done=false
+                    top_count=top_count+1 mod 6
+                }
+            }
+            when top_count==1{
+                when !score_done{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(ioc_score_top2)
+                    writer.write(to_save, 1, 0, false)
+                    score_done=true
+                }else when score_done&setting_count<9{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings2[setting_count])
+                    writer.write(to_save, 1, 0, false)
+                    setting_count=setting_count+1 mod 9
+                }else{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings2[setting_count])
+                    writer.write(to_save, 1, 0, false)
+                    score_done=false
+                    top_count=top_count+1 mod 6
+                }
+            }
+            when top_count==2{
+                when !score_done{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(ioc_score_top3)
+                    writer.write(to_save, 1, 0, false)
+                    score_done=true
+                }else when score_done&setting_count<9{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings3[setting_count])
+                    writer.write(to_save, 1, 0, false)
+                    setting_count=setting_count+1 mod 9
+                }else{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings3[setting_count])
+                    writer.write(to_save, 1, 0, false)
+                    score_done=false
+                    top_count=top_count+1 mod 6
+                }
+            }
+            when top_count==3{
+                when !score_done{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(ioc_score_top4)
+                    writer.write(to_save, 1, 0, false)
+                    score_done=true
+                }else when score_done&setting_count<9{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings4[setting_count])
+                    writer.write(to_save, 1, 0, false)
+                    setting_count=setting_count+1 mod 9
+                }else{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings4[setting_count])
+                    writer.write(to_save, 1, 0, false)
+                    score_done=false
+                    top_count=top_count+1 mod 6
+                }
+            }
+            when top_count==4{
+                when !score_done{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(ioc_score_top5)
+                    writer.write(to_save, 1, 0, false)
+                    score_done=true
+                }else when score_done&setting_count<9{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings5[setting_count])
+                    writer.write(to_save, 1, 0, false)
+                    setting_count=setting_count+1 mod 9
+                }else{
+                    bool[32][1] to_save
+                    to_save[0]=IntToBits(best_settings5[setting_count])
+                    writer.write(to_save, 1, 0, true)
+                    score_done=false
+                    top_count=top_count+1 mod 6
+                }
+            }
+        }
+        when top_count==5{
+            when writer.write_has_been_committed{
+                ctrl.finish([])
+            }
+        }
+    }
+    when !aresetn {             // setting the nessecary variables on reset
+        reader.rst()
+        writer.rst()
+        ctrl.rst()
+        cur_state=0
+        top_count=0
+        start_guessing=false
+        rigth_rotor_pos=0
+        middle_rotor_pos=0
+        left_rotor_pos=0        
+    }
+}
+module enigma_machine_driver_rotors#(){
+    // logic for creating all fixed enigma machines and giving them new incrementing settings for each time the message has been fully parsed
+
+    best_configs best_config_to_plug1
+    best_configs best_config_to_plug2
+    best_configs best_config_to_plug3
+    best_configs best_config_to_plug4
+    best_configs best_config_to_plug5
+
+    //seperate rotors and rings setting search do ring settings with prelim "good" rotor settings
+    state int#(FROM: 0,TO: 26)[60][5][9] setting_safe
+    state int#(FROM: 0,TO: 1048576)[60][5] score_safe
+    bool reset = false
+    
+
+    bool machine_setup_rotor = false
+    int#(FROM: 0,TO: 26) lrop
+    int#(FROM: 0,TO: 26) mrop
+    int#(FROM: 0,TO: 26) rrop
+    action machine_setup_rotor_a'0: int#(FROM: 0,TO: 26) lrop_s'0, int#(FROM: 0,TO: 26) mrop_s'0, int#(FROM: 0,TO: 26) rrop_s'0{
+        machine_setup_rotor=true
+        lrop=lrop_s
+        mrop=mrop_s
+        rrop=rrop_s
+    }    
+    
+    
+    bool parse_input_letter = false
+    int input_letter
+    int#(FROM: 0,TO: 26) lrops
+    int#(FROM: 0,TO: 26) mrops
+    int#(FROM: 0,TO: 26) rrops
+
+    action parse_letter_ioc_count'0: int#(FROM: 0,TO: 26) input_letter_p'0, int#(FROM: 0,TO: 26) lrop_p'0, int#(FROM: 0,TO: 26) mrop_p'0, int#(FROM: 0,TO: 26) rrop_p'0 { 
+        parse_input_letter = true
+        input_letter = input_letter_p
+        lrops=lrop_p
+        mrops=mrop_p
+        rrops=rrop_p
+    }
+
+    bool iterate_alphabet = false
+    int#(FROM: 0,TO: 26) cur_letter
+    action iterate_alphabet_a:  int#(FROM: 0,TO: 26) cur_letter_a{
+        cur_letter=cur_letter_a
+        iterate_alphabet=true
+    }
+    bool safe_best_settings_at_end = false
+    action safe_best_settings_at_end_a{
+        safe_best_settings_at_end=true
+    }
+
+    bool save_result_ioc_rotors = false
+    action save_result_ioc_rotors_a{
+        save_result_ioc_rotors=true
+    }
+
+
+    for int I in 0..60{
+        ioc_count ioc_count_inst
+        ioc_calc ioc_calc_inst
+        enigma_machine_runtime enigma_machine_inst
+        //to avoide enigma machine warnings about unused ports
+        bool porst_use
+        int#(FROM: 0,TO: 5)[3] cur_rotors
+        when porst_use{
+            enigma_machine_inst.change_plugs(0,0)
+            cur_rotors=enigma_machine_inst.cur_settings()
+        }
+        best_settings best_settings_inst1
+        best_settings best_settings_inst2
+        best_settings best_settings_inst3
+        best_settings best_settings_inst4
+        best_settings best_settings_inst5
+
+        Concat concat_inst1
+        Concat concat_inst2
+        Concat concat_inst3
+        Concat concat_inst4
+        Concat concat_inst5
+
+
+        gen int[3] rotor_config_compile
+        gen int[60][3] config_array
+        config_array=[[0, 1, 2],[0, 1, 3],[0, 1, 4],[0, 2, 1],[0, 2, 3],[0, 2, 4],[0, 3, 1],[0, 3, 2],[0, 3, 4],[0, 4, 1],[0, 4, 2],[0, 4, 3],[1, 0, 2],[1, 0, 3],[1, 0, 4],[1, 2, 0],[1, 2, 3],[1, 2, 4],[1, 3, 0],[1, 3, 2],
+        [1, 3, 4],[1, 4, 0],[1, 4, 2],[1, 4, 3],[2, 0, 1],[2, 0, 3],[2, 0, 4],[2, 1, 0],[2, 1, 3],[2, 1, 4],[2, 3, 0],[2, 3, 1],[2, 3, 4],[2, 4, 0],[2, 4, 1],[2, 4, 3],[3, 0, 1],[3, 0, 2],[3, 0, 4],[3, 1, 0],[3, 1, 2],[3, 1, 4],
+        [3, 2, 0],[3, 2, 1],[3, 2, 4],[3, 4, 0],[3, 4, 1],[3, 4, 2],[4, 0, 1],[4, 0, 2],[4, 0, 3],[4, 1, 0],[4, 1, 2],[4, 1, 3],[4, 2, 0],[4, 2, 1],[4, 2, 3],[4, 3, 0],[4, 3, 1],[4, 3, 2]]
+        rotor_config_compile=config_array[I]
+
+
+        // needed for internal ioc calculations
+        state int#(FROM: 0,TO: 1048576) multiplication_result
+        initial multiplication_result = 0
+
+
+        // states for saving machine settings and ioc values temporarily
+        state int#(FROM: 0,TO: 26)[6] score_settings
+
+
+        state int#(FROM: 0,TO: 1048576) ioc_score_temp1
+        state int#(FROM: 0,TO: 26)[6] temp_settings1
+        state int#(FROM: 0,TO: 1048576) ioc_score_temp2
+        state int#(FROM: 0,TO: 26)[6] temp_settings2
+        state int#(FROM: 0,TO: 1048576) ioc_score_temp3
+        state int#(FROM: 0,TO: 26)[6] temp_settings3
+        state int#(FROM: 0,TO: 1048576) ioc_score_temp4
+        state int#(FROM: 0,TO: 26)[6] temp_settings4
+        state int#(FROM: 0,TO: 1048576) ioc_score_temp5
+        state int#(FROM: 0,TO: 26)[6] temp_settings5
+        
+
+        // instantiate an enigma machine with the given rotors
+        when machine_setup_rotor{
+            enigma_machine_inst.setup(rotor_config_compile,[lrop,mrop,rrop],[0,0,0]) 
+            enigma_machine_inst.prep_message_encode()
+        }
+
+        when parse_input_letter {
+            int#(FROM: 0,TO: 26) decoded_letter=enigma_machine_inst.parse_letter(input_letter)
+            ioc_count_inst.letter_input(decoded_letter)
+            ioc_calc_inst.set_letter_count(ioc_count_inst.pass_letter_count())                                                      // calculate our version of the IoC score 
+            score_settings=[rotor_config_compile[0],rotor_config_compile[1],rotor_config_compile[2],lrops,mrops,rrops,0,0,0]        // safe settings once we get to the last letter of the message
+            ioc_count_inst.reset()
+                   
+
+        }
+        when iterate_alphabet{
+            multiplication_result = multiplication_result + ioc_calc_inst.ioc_calc_individual_letter(cur_letter) mod 1048576        // sum up our letter counts until we reach the end of the alphabet
+        }
+
+        when save_result_ioc_rotors{
+            // fill our IoC score modules with the sum result passing down values in order thereby effectively geting a sortet list 
+            ioc_score_temp1,temp_settings1=best_settings_inst1.update_check(multiplication_result, score_settings)
+            ioc_score_temp2,temp_settings2=best_settings_inst2.update_check(ioc_score_temp1,temp_settings1)     
+            ioc_score_temp3,temp_settings3=best_settings_inst3.update_check(ioc_score_temp2,temp_settings2)  
+            ioc_score_temp4,temp_settings4=best_settings_inst4.update_check(ioc_score_temp3,temp_settings3)  
+            ioc_score_temp5,temp_settings5=best_settings_inst5.update_check(ioc_score_temp4,temp_settings4)  
+            // reset relevant values so we can do this again for the next config
+            multiplication_result=0
+        }
+
+        int#(FROM: 0,TO: 26)[9] concat_temp1
+        int#(FROM: 0,TO: 26)[9] concat_temp2
+        int#(FROM: 0,TO: 26)[9] concat_temp3
+        int#(FROM: 0,TO: 26)[9] concat_temp4
+        int#(FROM: 0,TO: 26)[9] concat_temp5    
+    
+        // get all the best settings out of the setting modules and assign them to our temp values 
+        when safe_best_settings_at_end {
+            
+
+            ioc_score_temp1,temp_settings1=best_settings_inst1.give_settings()
+            ioc_score_temp2,temp_settings2=best_settings_inst2.give_settings()
+            ioc_score_temp3,temp_settings3=best_settings_inst3.give_settings()
+            ioc_score_temp4,temp_settings4=best_settings_inst4.give_settings()
+            ioc_score_temp5,temp_settings5=best_settings_inst5.give_settings()
+
+            concat_temp1=concat_inst1(temp_settings1, rotor_config_compile)
+            concat_temp2=concat_inst2(temp_settings2, rotor_config_compile)
+            concat_temp3=concat_inst3(temp_settings3, rotor_config_compile)
+            concat_temp4=concat_inst4(temp_settings4, rotor_config_compile)
+            concat_temp5=concat_inst5(temp_settings5, rotor_config_compile)
+            
+            setting_safe[:][0][I]=concat_temp1
+            setting_safe[:][1][I]=concat_temp2
+            setting_safe[:][2][I]=concat_temp3
+            setting_safe[:][3][I]=concat_temp4
+            setting_safe[:][4][I]=concat_temp5
+
+
+            score_safe[0][I] = ioc_score_temp1
+            score_safe[1][I] = ioc_score_temp2
+            score_safe[2][I] = ioc_score_temp3
+            score_safe[3][I] = ioc_score_temp4
+            score_safe[4][I] = ioc_score_temp5
+
+        }
+        when reset{
+            multiplication_result = 0
+            best_settings_inst1.reset()
+            best_settings_inst2.reset()
+            best_settings_inst3.reset()
+            best_settings_inst4.reset()
+            best_settings_inst5.reset()
+        }
+        
+        
+    }   
+
+    // sort out the score safe array to get top 5 configs
+
+    action sort_results: int#(FROM: 0,TO: 60) machindex, int#(FROM: 0, TO: 5) scoreindex{
+        int#(FROM: 0,TO: 1048576) ioc_score_top1
+        int#(FROM: 0,TO: 26)[9] best_settings1
+        int#(FROM: 0,TO: 1048576) ioc_score_top2
+        int#(FROM: 0,TO: 26)[9] best_settings2
+        int#(FROM: 0,TO: 1048576) ioc_score_top3
+        int#(FROM: 0,TO: 26)[9] best_settings3
+        int#(FROM: 0,TO: 1048576) ioc_score_top4
+        int#(FROM: 0,TO: 26)[9] best_settings4
+        int#(FROM: 0,TO: 1048576) ioc_score_top5
+        int#(FROM: 0,TO: 26)[9] best_settings5
+        ioc_score_top1,best_settings1=best_config_to_plug1.update_check(score_safe[scoreindex][machindex], setting_safe[:][scoreindex][machindex])
+        ioc_score_top2,best_settings2=best_config_to_plug2.update_check(ioc_score_top1, best_settings1)
+        ioc_score_top3,best_settings3=best_config_to_plug3.update_check(ioc_score_top2, best_settings2)
+        ioc_score_top4,best_settings4=best_config_to_plug4.update_check(ioc_score_top3, best_settings3)
+        ioc_score_top5,best_settings5=best_config_to_plug5.update_check(ioc_score_top4, best_settings4)
+    }
+
+    action get_top_settings'0:->int#(FROM: 0,TO: 1048576) ioc_score_top1'0,int#(FROM: 0,TO: 26)[9] best_settings1'0,int#(FROM: 0,TO: 1048576) ioc_score_top2'0,int#(FROM: 0,TO: 26)[9] best_settings2'0,int#(FROM: 0,TO: 1048576) ioc_score_top3'0,int#(FROM: 0,TO: 26)[9] best_settings3'0,int#(FROM: 0,TO: 1048576) ioc_score_top4'0,int#(FROM: 0,TO: 26)[9] best_settings4'0,int#(FROM: 0,TO: 1048576) ioc_score_top5'0,int#(FROM: 0,TO: 26)[9] best_settings5'0{
+        ioc_score_top1,best_settings1=best_config_to_plug1.give_settings()
+        ioc_score_top2,best_settings2=best_config_to_plug2.give_settings()
+        ioc_score_top3,best_settings3=best_config_to_plug3.give_settings()
+        ioc_score_top4,best_settings4=best_config_to_plug4.give_settings()
+        ioc_score_top5,best_settings5=best_config_to_plug5.give_settings()
+    }
+
+    action rst{
+        reset=true
+        best_config_to_plug1.reset()
+        best_config_to_plug2.reset()
+        best_config_to_plug3.reset()
+        best_config_to_plug4.reset()
+        best_config_to_plug5.reset()
+    
+    }    
+}

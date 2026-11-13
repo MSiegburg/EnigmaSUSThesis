@@ -71,10 +71,10 @@ module enigma_machine_runtime{
             doublestepping = true
         }
         middle_rotor_advance=middle_rotor_inst.advance()
-        when middle_rotor_advance{                              // check if left rotor needs to advance
+        when middle_rotor_advance{                          // check if left rotor needs to advance
             left_rotor_inst.turnover()
             left_rotor_advance=left_rotor_inst.advance()
-            when doublestepping{                                // double stepping check and resolution
+            when doublestepping{                              // double stepping check and resolution
                 middle_rotor_inst.turnover()
                 doublestepping=false
             }
@@ -118,7 +118,7 @@ module enigma_rotor_runtime#(int backward_lat){
     state int#(FROM: 0,TO: 26) ring_position'0
     state int#(FROM: 0,TO: 26) rotor_position'0
 
-    /*                                                                                                      
+    /*                                                                                                      // not needed for now
     action reset{                                                                                           // reset action to set rotor to 0
         rotor_position=0
     }

@@ -1,0 +1,103 @@
+module ioc_count#(){
+    domain score_counting
+    state int#(FROM: 0,TO: 256)[26] letter_count
+    action letter_input'0: int#(FROM: 0,TO: 26) decoded_letter'0{
+        letter_count[decoded_letter]=letter_count[decoded_letter]+1 mod 256
+    }
+    domain passing_score
+    action pass_letter_count'0:-> int#(FROM: 0,TO: 256)[26] letter_count_cur'0{
+        letter_count_cur=letter_count
+    }
+    domain rst
+    action reset'0{
+        letter_count[:]=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]     
+    }
+}
+
+module ioc_calc{
+    state int#(FROM: 0,TO: 256)[26] letter_count
+
+    action set_letter_count:int#(FROM: 0,TO: 256)[26] letter_count_new{
+        letter_count=letter_count_new
+    }
+    // add one latency reg to account for multiplication
+    action ioc_calc_individual_letter'0:int#(FROM: 0,TO: 26) cur_index'0 -> int#(FROM: 0,TO: 65536) mult_result'1{
+        when letter_count[cur_index]==0{
+            mult_result=0
+        }else when letter_count[cur_index]==1{
+            mult_result=0
+        }else when letter_count[cur_index]==2{
+            mult_result=2
+        }else{
+            reg mult_result=letter_count[cur_index]*(letter_count[cur_index]-1) mod 65536
+        } 
+    }
+}
+
+/* instantiate as many as i wanna save best settings for each machine variant 
+and have them be sitting in a row passing along the data down the line*/
+module best_settings{   
+    state int#(FROM: 0,TO: 1048576) best_IOC_score
+    state int#(FROM: 0,TO: 26)[6] score_settings_saved
+    initial best_IOC_score = 0
+    initial score_settings_saved[:] = [0,0,0,0,0,0]
+    domain check_updates
+    action update_check'0: int#(FROM: 0,TO: 1048576) IOC_score, int#(FROM: 0,TO: 26)[6] score_settings->int#(FROM: 0,TO: 1048576) IOC_score_passing, int#(FROM: 0,TO: 26)[6] score_settings_passing{
+        int#(FROM: 0,TO: 1048576) temp_new_score = IOC_score_passing
+        int#(FROM: 0,TO: 1048576) temp_cur_score = best_IOC_score
+
+        when temp_new_score> temp_cur_score{
+            IOC_score_passing=best_IOC_score
+            best_IOC_score = IOC_score
+            score_settings_passing=score_settings_saved
+            score_settings_saved[:]=score_settings[:]                   
+        }else{
+            score_settings_passing=score_settings
+            IOC_score_passing = IOC_score
+        }
+    }
+    domain get_data
+    action give_settings'0:->int#(FROM: 0,TO: 1048576) best_IOC_score_cur, int#(FROM: 0,TO: 26)[6] cur_settings_saved{
+        best_IOC_score_cur=best_IOC_score
+        cur_settings_saved=score_settings_saved
+    }
+    domain rst
+    action reset'0{
+        best_IOC_score=0
+        score_settings_saved[:]=[0,0,0,0,0,0]
+    }
+}
+
+module best_configs{                                // saving the best IoC score configurations  
+    state int#(FROM: 0,TO: 1048576) best_IOC_score
+    state int#(FROM: 0,TO: 26)[9] score_settings_saved
+    initial best_IOC_score = 0
+    initial score_settings_saved[:] = [0,0,0,0,0,0,0,0,0]
+    domain check_updates
+    // check for updated better values and save the corresponding config
+    action update_check: int#(FROM: 0,TO: 1048576) IOC_score, int#(FROM: 0,TO: 26)[9] score_settings->int#(FROM: 0,TO: 1048576) IOC_score_passing, int#(FROM: 0,TO: 26)[9] score_settings_passing{
+        int#(FROM: 0,TO: 1048576) temp_new_score = IOC_score_passing
+        int#(FROM: 0,TO: 1048576) temp_cur_score = best_IOC_score
+
+        when temp_new_score> temp_cur_score{
+            IOC_score_passing=best_IOC_score
+            best_IOC_score = IOC_score
+            score_settings_passing=score_settings_saved
+            score_settings_saved[:]=score_settings[:]                   
+        }else{
+            score_settings_passing=score_settings
+            IOC_score_passing = IOC_score
+        }
+    }
+    domain get_data
+    // used to get settings out of a given instance
+    action give_settings:->int#(FROM: 0,TO: 1048576) best_IOC_score_cur, int#(FROM: 0,TO: 26)[9] cur_settings_saved{
+        best_IOC_score_cur=best_IOC_score
+        cur_settings_saved=score_settings_saved
+    }
+    domain rst
+    action reset{
+        best_IOC_score=0
+        score_settings_saved[:]=[0,0,0,0,0,0,0,0,0]
+    }
+}

@@ -101,6 +101,7 @@ module cracker_top{
     state int#(FROM: 0,TO: 1024) message_count
     enigma_machine_driver enigma_machine_driver_inst    
     state bool start_guessing
+    initial start_guessing =true
 
 
     bool[64] message_adress
@@ -173,14 +174,6 @@ module cracker_top{
     initial left_rotor_pos=0
 
 
-    state bool right_lap
-    state bool middle_lap
-    state bool left_lap
-
-    initial right_lap=false
-    initial middle_lap=false
-    initial left_lap=false
-
     state int#(FROM: 0,TO:1024) message_counter
     initial message_counter=0
 
@@ -199,25 +192,25 @@ module cracker_top{
         when rigth_rotor_pos<=25{            
             rigth_rotor_pos=rigth_rotor_pos+1 mod 26
             when rigth_rotor_pos==25{
-                right_lap=true
+
+                when middle_rotor_pos<=25{                
+                    rigth_rotor_pos=0
+                    middle_rotor_pos=middle_rotor_pos+1 mod 26
+
+                    when middle_rotor_pos==25{
+                        
+                        when left_rotor_pos<=25{                  
+                            middle_rotor_pos=0
+                            left_rotor_pos=left_rotor_pos+1 mod 26
+                                                                 
+                            
+                        }
+                    }
+                }
             }
         }
-        when middle_rotor_pos<=25 & right_lap {                
-            rigth_rotor_pos=0
-            middle_rotor_pos=middle_rotor_pos+1 mod 26
-            right_lap=false
-            when middle_rotor_pos==25{
-                middle_lap=true
-            }
-        }
-        when left_rotor_pos<=25 & middle_lap{                  
-            middle_rotor_pos=0
-            left_rotor_pos=left_rotor_pos+1 mod 26
-            middle_lap=false
-            when left_rotor_pos==25{
-                left_lap=true                                                  
-            }
-        }
+        
+        
         
 
         // instantiate an enigma machine with the given rotors
@@ -292,7 +285,7 @@ module cracker_top{
     state int#(FROM: 0,TO: 1048576) ioc_score_top5
     state int#(FROM: 0,TO: 26)[9] best_settings5
 
-    state int#(FROM: 0,TO:6) top_count
+    state int#(FROM: 0,TO:7) top_count
     state int#(FROM: 0,TO:9) setting_count
     state bool score_done
     when cur_state==5{
@@ -317,7 +310,7 @@ module cracker_top{
                     to_save[0]=IntToBits(best_settings1[setting_count])
                     writer.write(to_save, 32, 0, false)
                     score_done=false
-                    top_count=top_count+1 mod 6
+                    top_count=top_count+1 mod 7
                 }
             }
             when top_count==1{
@@ -336,7 +329,7 @@ module cracker_top{
                     to_save[0]=IntToBits(best_settings2[setting_count])
                     writer.write(to_save, 32, 0, false)
                     score_done=false
-                    top_count=top_count+1 mod 6
+                    top_count=top_count+1 mod 7
                 }
             }
             when top_count==2{
@@ -355,7 +348,7 @@ module cracker_top{
                     to_save[0]=IntToBits(best_settings3[setting_count])
                     writer.write(to_save, 32, 0, false)
                     score_done=false
-                    top_count=top_count+1 mod 6
+                    top_count=top_count+1 mod 7
                 }
             }
             when top_count==3{
@@ -374,7 +367,7 @@ module cracker_top{
                     to_save[0]=IntToBits(best_settings4[setting_count])
                     writer.write(to_save, 32, 0, false)
                     score_done=false
-                    top_count=top_count+1 mod 6
+                    top_count=top_count+1 mod 7
                 }
             }
             when top_count==4{
@@ -393,7 +386,7 @@ module cracker_top{
                     to_save[0]=IntToBits(best_settings5[setting_count])
                     writer.write(to_save, 32, 0, true)
                     score_done=false
-                    top_count=top_count+1 mod 6
+                    top_count=top_count+1 mod 7
                 }
             }
         }
@@ -402,6 +395,14 @@ module cracker_top{
                 ctrl.finish([])
             }
         }
+    }
+    when !aresetn {             // setting the nessecary variables on reset
+        reader.rst()
+        writer.rst()
+        ctrl.rst()
+        cur_state=0
+        top_count=0
+        start_guessing=false
     }
 
 /*
@@ -577,178 +578,7 @@ module cracker_top{
 
 }
 
-module ioc_count#(){
-    domain score_counting
-    state int#(FROM: 0,TO: 256)[26] letter_count
-    action letter_input'0: int#(FROM: 0,TO: 26) decoded_letter'0{
-        letter_count[decoded_letter]=letter_count[decoded_letter]+1 mod 256
-    }
-    domain passing_score
-    action pass_letter_count:-> int#(FROM: 0,TO: 256)[26] letter_count_cur{
-        letter_count_cur=letter_count
-    }
-    action reset'0{
-        letter_count[:]=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]     
-    }
-}
 
-module ioc_calc{
-    state int#(FROM: 0,TO: 256)[26] letter_count
-
-    action set_letter_count:int#(FROM: 0,TO: 256)[26] letter_count_new{
-        letter_count=letter_count_new
-    }
-    
-    action ioc_calc_individual_letter:int#(FROM: 0,TO: 26) cur_index -> int#(FROM: 0,TO: 65536) mult_result{
-        when letter_count[cur_index]==0{
-            mult_result=0
-        }else when letter_count[cur_index]==1{
-            mult_result=0
-        }else when letter_count[cur_index]==2{
-            mult_result=2
-        }else{
-            mult_result=letter_count[cur_index]*(letter_count[cur_index]-1) mod 65536
-        } 
-    }
-}
-
-/* instantiate as many as i wanna save best settings for each machine variant 
-and have them be sitting in a row passing along the data down the line*/
-module best_settings{   
-    state int#(FROM: 0,TO: 1048576) best_IOC_score
-    state int#(FROM: 0,TO: 26)[6] score_settings_saved
-    initial best_IOC_score = 0
-    initial score_settings_saved[:] = [0,0,0,0,0,0]
-    
-    action update_check: int#(FROM: 0,TO: 1048576) IOC_score, int#(FROM: 0,TO: 26)[6] score_settings->int#(FROM: 0,TO: 1048576) IOC_score_passing, int#(FROM: 0,TO: 26)[6] score_settings_passing{
-        int#(FROM: 0,TO: 1048576) temp_new_score = IOC_score_passing
-        int#(FROM: 0,TO: 1048576) temp_cur_score = best_IOC_score
-
-        when temp_new_score> temp_cur_score{
-            IOC_score_passing=best_IOC_score
-            best_IOC_score = IOC_score
-            score_settings_passing=score_settings_saved
-            score_settings_saved[:]=score_settings[:]                   
-        }else{
-            score_settings_passing=score_settings
-            IOC_score_passing = IOC_score
-        }
-    }
-    action give_settings:->int#(FROM: 0,TO: 1048576) best_IOC_score_cur, int#(FROM: 0,TO: 26)[6] cur_settings_saved{
-        best_IOC_score_cur=best_IOC_score
-        cur_settings_saved=score_settings_saved
-    }
-    action reset{
-        best_IOC_score=0
-        score_settings_saved[:]=[0,0,0,0,0,0]
-    }
-}
-
-module best_configs{                                // saving the best IoC score configurations  
-    state int#(FROM: 0,TO: 1048576) best_IOC_score
-    state int#(FROM: 0,TO: 26)[9] score_settings_saved
-    initial best_IOC_score = 0
-    initial score_settings_saved[:] = [0,0,0,0,0,0,0,0,0]
-    
-    // check for updated better values and save the corresponding config
-    action update_check: int#(FROM: 0,TO: 1048576) IOC_score, int#(FROM: 0,TO: 26)[9] score_settings->int#(FROM: 0,TO: 1048576) IOC_score_passing, int#(FROM: 0,TO: 26)[9] score_settings_passing{
-        int#(FROM: 0,TO: 1048576) temp_new_score = IOC_score_passing
-        int#(FROM: 0,TO: 1048576) temp_cur_score = best_IOC_score
-
-        when temp_new_score> temp_cur_score{
-            IOC_score_passing=best_IOC_score
-            best_IOC_score = IOC_score
-            score_settings_passing=score_settings_saved
-            score_settings_saved[:]=score_settings[:]                   
-        }else{
-            score_settings_passing=score_settings
-            IOC_score_passing = IOC_score
-        }
-    }
-    // used to get settings out of a given instance
-    action give_settings:->int#(FROM: 0,TO: 1048576) best_IOC_score_cur, int#(FROM: 0,TO: 26)[9] cur_settings_saved{
-        best_IOC_score_cur=best_IOC_score
-        cur_settings_saved=score_settings_saved
-    }
-    action reset{
-        best_IOC_score=0
-        score_settings_saved[:]=[0,0,0,0,0,0,0,0,0]
-    }
-}
-
-module best_ngram_score{
-    state int#(FROM: 0,TO: 281474976710656)cur_best     //48bit
-    state int#(FROM: 0,TO: 26)[2] plugs_cur
-    action update:int#(FROM: 0,TO: 26)[2]plugs_used, int#(FROM: 0,TO: 281474976710656)ngram_score->int#(FROM: 0,TO: 26)[2]plugs_new, int#(FROM: 0,TO: 281474976710656)ngram_score_worse{
-        when cur_best<ngram_score{
-            ngram_score_worse=cur_best
-            cur_best=ngram_score
-            plugs_new=plugs_cur
-            plugs_cur=plugs_used
-        }
-    }
-    // gives the two plugs used in the ngram score
-    action give_plugs:->int#(FROM: 0,TO: 26)plug_one_best,int#(FROM: 0,TO: 26)plug_two_best{
-        plug_one_best=plugs_cur[0]
-        plug_two_best=plugs_cur[1]
-    }
-    // gives the score of the current best achieved score for a message
-    action give_score:->int#(FROM: 0,TO: 281474976710656)best_score_recorded{
-        best_score_recorded=cur_best
-    }
-    action reset{
-        cur_best=0
-        plugs_cur=[0,0]
-    }
-}
-
-module bigram_scores{
-    gen int[][] bigram_score_array
-    bigram_score_array=[[7979, 647920, 1262567, 1037513, 34954, 209240, 577255, 38469, 892276, 33138, 295217, 3066241, 803226, 5597457, 13044, 571957, 6328, 3030851, 2456194, 4192084, 335632, 577841, 168944, 53121, 612884, 33467], 
-    [412247, 30828, 5328, 6976, 1624926, 411, 720, 2980, 300568, 65485, 264, 658110, 8823, 5906, 550992, 1543, 35, 314561, 129232, 48227, 521480, 10839, 832, 78, 497581, 101], 
-    [1517441, 1775, 234422, 6291, 1836777, 3970, 2498, 1685499, 793692, 296, 331666, 420162, 7514, 2425, 2238417, 3707, 15436, 421415, 64353, 1299785, 458517, 587, 391, 88, 117632, 2060], 
-    [425959, 7819, 7103, 120545, 2156530, 7835, 87419, 15334, 1389999, 13483, 949, 91189, 51252, 21343, 530759, 4886, 1993, 240940, 356013, 8165, 418609, 53722, 23015, 130, 142175, 220], 
-    [1940394, 76338, 1345776, 3293714, 1064720, 458850, 337052, 74224, 516990, 12819, 46445, 1495272, 1053605, 4100490, 204427, 483780, 161431, 5775416, 3776639, 1163416, 87840, 718404, 329353, 603534, 405314, 12754], 
-    [462424, 773, 1625, 1397, 667057, 412563, 1442, 517, 802436, 207, 329, 183010, 1934, 1182, 1375301, 626, 15, 601120, 15535, 230266, 270617, 81, 645, 81, 25654, 26], 
-    [417527, 1394, 646, 8909, 1086105, 3396, 69800, 641483, 427564, 109, 734, 170975, 27797, 185080, 372556, 1161, 35, 554847, 144347, 43430, 241841, 119, 1826, 56, 73142, 343], 
-    [2610341, 12378, 3463, 8054, 8669734, 6325, 779, 1473, 2152085, 128, 660, 35505, 35932, 72629, 1367260, 1670, 1193, 237958, 41404, 367080, 207789, 629, 13462, 26, 141234, 1073], 
-    [807220, 278027, 1970120, 833221, 1084573, 573115, 718905, 5897, 64238, 3132, 120999, 1216782, 895976, 6859522, 2354226, 251546, 31873, 888680, 3181792, 3167253, 49087, 811635, 1761, 62123, 625, 181416], 
-    [72921, 213, 345, 262, 146305, 242, 103, 354, 7790, 298, 174, 319, 366, 415, 151669, 613, 0, 685, 333, 292, 165521, 172, 117, 16, 112, 22], 
-    [47810, 2541, 633, 1889, 602754, 4476, 7227, 8981, 275984, 347, 1278, 29803, 5045, 145040, 17132, 2049, 19, 7674, 133959, 2913, 8531, 441, 6142, 56, 16776, 15], 
-    [1487455, 18864, 33334, 712265, 2338217, 150787, 17166, 4564, 1760463, 317, 55588, 1625736, 64911, 16551, 1090883, 53660, 358, 28341, 399020, 348615, 381188, 98423, 35637, 861, 1198395, 1177], 
-    [1593869, 254490, 12159, 1893, 2236011, 10766, 3454, 1503, 895783, 292, 396, 12989, 270882, 24785, 949881, 674394, 71, 8758, 261758, 3854, 323186, 817, 1647, 99, 175345, 97], 
-    [979086, 12226, 1172263, 3812978, 1950424, 189427, 2687181, 30688, 956465, 31260, 145510, 179849, 78244, 205172, 1309945, 17019, 16777, 25805, 1435032, 2935977, 221751, 146643, 16346, 7390, 276094, 12319], 
-    [162091, 272579, 469206, 551101, 108925, 3313034, 265117, 60212, 247428, 19670, 181338, 1030566, 1540260, 4957098, 592860, 631354, 2923, 3599410, 817609, 1246582, 2453113, 502144, 931837, 52376, 102019, 9790], 
-    [912365, 3690, 3316, 3380, 1347768, 4102, 1335, 266148, 347084, 281, 2310, 741535, 44991, 3354, 1018951, 385013, 108, 1337848, 153872, 298270, 294768, 622, 3404, 147, 33170, 638], 
-    [430, 108, 113, 52, 57, 95, 0, 26, 895, 24, 0, 671, 99, 186, 132, 27, 171, 174, 445, 139, 416017, 64, 16, 16, 0, 0], 
-    [1933254, 75319, 342269, 533808, 5228566, 90963, 281327, 42610, 2051640, 1560, 273604, 243237, 493816, 452164, 2049118, 117354, 2815, 340455, 1118073, 1019806, 361844, 195356, 35971, 3299, 698544, 1799], 
-    [614736, 22321, 436341, 14828, 2628249, 48398, 6959, 888871, 1550976, 762, 111277, 157565, 183839, 25870, 1121471, 539272, 20989, 16890, 1142176, 2970446, 877413, 3501, 66342, 50, 160283, 704], 
-    [1494100, 7175, 73696, 3654, 3397326, 15963, 5552, 10027295, 3785620, 317, 1308, 277594, 74662, 28227, 2936021, 12109, 252, 1200669, 951603, 481269, 718751, 3281, 232262, 333, 640845, 10853], 
-    [384414, 249767, 529116, 257721, 415845, 52255, 360656, 3010, 285218, 1455, 12982, 975123, 390192, 1112112, 30048, 383509, 724, 1530366, 1280852, 1142390, 2201, 8225, 782, 11095, 12878, 5387], 
-    [394697, 250, 657, 843, 2327013, 155, 296, 269, 760024, 72, 34, 1162, 318, 432, 200498, 551, 21, 2470, 1626, 618, 6238, 262, 74, 45, 13809, 50], 
-    [1086521, 2993, 1901, 9977, 1017614, 4533, 275, 1068070, 1055740, 91, 3010, 42919, 3073, 222718, 625272, 2098, 16, 86736, 98925, 18445, 1960, 39, 738, 15, 6837, 0], 
-    [83465, 216, 74608, 17, 61453, 5237, 54, 11762, 111146, 51, 28, 1673, 657, 161, 7610, 188533, 823, 91, 180, 131567, 13453, 5508, 629, 7907, 7265, 14], 
-    [44454, 12122, 38067, 19225, 261294, 2125, 7310, 1468, 81262, 56, 929, 41608, 66755, 37260, 422672, 70250, 38, 21970, 273034, 47043, 3744, 512, 9507, 421, 199, 5110], 
-    [70220, 586, 210, 142, 140229, 61, 473, 1878, 34167, 31, 91, 3546, 471, 430, 20248, 136, 91, 532, 840, 663, 6069, 462, 628, 11, 6647, 7501]
-    ]
-
-    action get_bigram_score:int#(FROM: 0,TO: 26)[2]cur_bigram->int#(FROM: 0,TO: 4294967296) cur_bigram_score {
-        cur_bigram_score=bigram_score_array[cur_bigram[0]][cur_bigram[1]]
-    }
-
-}
-
-/*module trigram_scores{                          // 
-    gen int[][][] trigram_score_array              
-    trigram_score_array=[[[]]]
-    
-    
-    action get_trigram_score:int#(FROM: 0,TO: 26)[3]cur_trigram->int#(FROM: 0,TO: 4294967296) cur_trigram_score {
-        cur_trigram_score=trigram_score_array[cur_trigram[0],cur_trigram[1],cur_trigram[2]]
-    
-    }
-
-}*/
 
 module enigma_machine_driver#(){
     // logic for creating all fixed enigma machines and giving them new incrementing settings for each time the message has been fully parsed
@@ -758,6 +588,13 @@ module enigma_machine_driver#(){
     state int#(FROM: 0,TO: 1048576)[60][5] score_safe
     //gen int[3] rotor_setup1
     
+    bool parse_input_letter = false
+    int input_letter
+    action parse_letter_ioc_count: int#(FROM: 0,TO: 26) input_letter_v { 
+        parse_input_letter = true
+        input_letter = input_letter_v
+    }
+
     for int I in 0..60{
         ioc_count ioc_count_inst
         ioc_calc ioc_calc_inst
@@ -791,7 +628,6 @@ module enigma_machine_driver#(){
         // states for saving machine settings and ioc values temporarily
         state int#(FROM: 0,TO: 26)[6] score_settings
 
-        state int#(FROM: 0,TO: 1024) letters_throughput'0
 
         state int#(FROM: 0,TO: 1048576) ioc_score_temp1
         state int#(FROM: 0,TO: 26)[6] temp_settings1
@@ -805,6 +641,12 @@ module enigma_machine_driver#(){
         state int#(FROM: 0,TO: 26)[6] temp_settings5
 
 
+        when parse_input_letter {
+            int#(FROM: 0,TO: 26) decoded_letter=enigma_machine_inst.parse_letter(input_letter)
+            ioc_count_inst.letter_input(decoded_letter)
+
+        }
+
         // instantiate an enigma machine with the given rotors
         action machine_setup_rotor: int#(FROM: 0,TO: 26) lrop, int#(FROM: 0,TO: 26) mrop, int#(FROM: 0,TO: 26) rrop{
             enigma_machine_inst.setup(rotor_config_compile,[lrop,mrop,rrop],[0,0,0]) 
@@ -813,15 +655,8 @@ module enigma_machine_driver#(){
 
         
         // calculate our version of the IoC score 
-        action parse_letter_ioc_count: int#(FROM: 0,TO: 26) input_letter-> int#(FROM: 0,TO: 26) decoded_letter{ 
-            decoded_letter=enigma_machine_inst.parse_letter(input_letter)
-        }
-        action ioc_count_input'0:int#(FROM: 0,TO: 26) input_letter_count'0/*->bool done_counting'0*/{ //TODO: what is the issue here ?
-            ioc_count_inst.letter_input(input_letter_count)
-            /*letters_throughput=letters_throughput+1 mod 1024
-            when letters_throughput==input_letter_count{
-                done_counting=true
-            }*/
+        
+        action ioc_count_input'0:int#(FROM: 0,TO: 26) input_letter_count'0{ //TODO: what is the issue here ?
         }
         // safe settings once we get to the last letter of the message
         action last_letter_save_settings_rotor: int#(FROM: 0,TO: 26) lrops, int#(FROM: 0,TO: 26) mrops, int#(FROM: 0,TO: 26) rrops{
@@ -928,7 +763,7 @@ module enigma_machine_driver#(){
             ioc_score_temp4,temp_settings4=best_settings_inst4.give_settings()
             ioc_score_temp5,temp_settings5=best_settings_inst5.give_settings()
 
-            concat_temp1=concat_inst(temp_settings1, rotor_config_compile)
+            concat_temp1=Concat concat_inst1(temp_settings1, rotor_config_compile)
             concat_temp2=concat_inst(temp_settings2, rotor_config_compile)
             concat_temp3=concat_inst(temp_settings3, rotor_config_compile)
             concat_temp4=concat_inst(temp_settings4, rotor_config_compile)
