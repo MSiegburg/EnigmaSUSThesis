@@ -99,7 +99,7 @@ module cracker_rotors_top{
     state int#(FROM: 0,TO: 1024) message_count
     enigma_machine_driver_rotors enigma_machine_driver_rotors_inst    
     state bool start_guessing
-    initial start_guessing =true
+    
 
 
     bool[64] message_adress
@@ -135,8 +135,6 @@ module cracker_rotors_top{
             message_memory.write(message_count, letter)
             when last{
                 start_guessing=true
-
-                
             }
         }
     }
