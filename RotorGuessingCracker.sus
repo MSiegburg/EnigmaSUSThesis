@@ -120,12 +120,13 @@ module cracker_rotors_top{
     when ctrl.start {                                                           // setting initial values when xrt control starts 
         number_to_transfer=BitsToUInt(ctrl.input_regs[4])
         writer.request_new_write(write_start_addr)
-        xrt_setup_done=true
         reader.request_new_read(read_start_addr, number_to_transfer, [])
+        xrt_setup_done=true
 
     }
     
     when xrt_setup_done{
+        xrt_setup_done=false
         reader.ready_for_lots_of_data=true
         when reader.chunk_valid : bool[ELEM_BITWIDTH][NUM_PARALLEL_ELEMENTS] elements, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS+1) chunk_length, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS) chunk_offset, bool last, bool[0] _unused_extra_data{
             message_count=message_count+1 mod 1024
@@ -374,7 +375,8 @@ module cracker_rotors_top{
         start_guessing=false
         rigth_rotor_pos=0
         middle_rotor_pos=0
-        left_rotor_pos=0        
+        left_rotor_pos=0
+        enigma_machine_driver_rotors_inst.rst()   
     }
 }
 module enigma_machine_driver_rotors#(){

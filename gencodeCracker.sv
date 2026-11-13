@@ -1,4 +1,4 @@
-// THIS IS A GENERATED FILE (Generated at 2026-11-13T10:42:47+01:00)
+// THIS IS A GENERATED FILE (Generated at 2026-11-13T16:26:19+01:00)
 // This file was generated with SUS Compiler 0.6.0-dev (8c2e9c201cc10fc6686c39ac760ada7e43680583) built at 2026-10-29_14:08:47
 // cracker_rotors_top #()
 module cracker_rotors_top(
@@ -986,9 +986,12 @@ wire _writer_write_has_been_committed;
 // (zero sized) _410
 wire _412;
 assign _412 = ~aresetn;
+/*latency*/ logic __412_D1; always_ff @(posedge aclk) begin __412_D1 <= _412; end
+/*latency*/ logic __412_D2; always_ff @(posedge aclk) begin __412_D2 <= __412_D1; end
 /*mux_wire*/ logic _reader_rst;
 /*mux_wire*/ logic _writer_rst;
 /*mux_wire*/ logic _ctrl_rst;
+/*mux_wire*/ logic _enigma_machine_driver_rotors_inst_rst;
 xrt_ctrl_slave_NUM_INPUT_REGS_45_NUM_OUTPUT_REGS_0_ADDR_WIDTH_12_AXI_WIDTH_32 ctrl(
 	.clk(aclk),
 	.awaddr(_ctrl_awaddr),
@@ -1117,7 +1120,7 @@ enigma_machine_driver_rotors enigma_machine_driver_rotors_inst(
 	.best_settings4_2(_enigma_machine_driver_rotors_inst_best_settings4),
 	.ioc_score_top5_2(_enigma_machine_driver_rotors_inst_ioc_score_top5),
 	.best_settings5_2(_enigma_machine_driver_rotors_inst_best_settings5),
-	.rst()
+	.rst(_enigma_machine_driver_rotors_inst_rst)
 );
 BitsToUInt_NUM_BITS_64 BitsToUInt(
 	.clk(aclk),
@@ -1580,6 +1583,7 @@ always_ff @(posedge aclk) begin // state number_to_transfer
 end
 always_ff @(posedge aclk) begin // state xrt_setup_done
 	if(_ctrl_start) xrt_setup_done <= 1'b1;
+	if(xrt_setup_done) xrt_setup_done <= 1'b0;
 end
 always_comb begin // combinatorial _BitsToUInt_3_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -2207,6 +2211,14 @@ always_comb begin // combinatorial _ctrl_rst
 	if(_412) _ctrl_rst = 1'b1;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_ctrl_rst = _ctrl_rst;
+end
+always_comb begin // combinatorial _enigma_machine_driver_rotors_inst_rst
+	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
+	_enigma_machine_driver_rotors_inst_rst = 1'bx;
+	_enigma_machine_driver_rotors_inst_rst = 1'b0;
+	if(__412_D2) _enigma_machine_driver_rotors_inst_rst = 1'b1;
+	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
+	_enigma_machine_driver_rotors_inst_rst = _enigma_machine_driver_rotors_inst_rst;
 end
 endmodule // cracker_rotors_top #()
 
