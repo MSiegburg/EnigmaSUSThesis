@@ -98,7 +98,6 @@ module cracker_rotors_top{
     RAM#(DEPTH: 1024,T:type int#(FROM: 0,TO: 26)) message_memory
     state int#(FROM: 0,TO: 1024) message_count
     enigma_machine_driver_rotors enigma_machine_driver_rotors_inst    
-    state bool start_guessing
     
 
 
@@ -114,68 +113,52 @@ module cracker_rotors_top{
 
     state int number_to_transfer
 
-    state bool xrt_setup_done
+    state int#(FROM: 0,TO: 18) cur_state
+
+    state int#(FROM: 0,TO:1024) last_letter
 
 
     when ctrl.start {                                                           // setting initial values when xrt control starts 
         number_to_transfer=BitsToUInt(ctrl.input_regs[4])
         writer.request_new_write(write_start_addr)
         reader.request_new_read(read_start_addr, number_to_transfer, [])
-        xrt_setup_done=true
-
+        cur_state=1
     }
-    
-    when xrt_setup_done{
-        xrt_setup_done=false
-        reader.ready_for_lots_of_data=true
-        when reader.chunk_valid : bool[ELEM_BITWIDTH][NUM_PARALLEL_ELEMENTS] elements, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS+1) chunk_length, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS) chunk_offset, bool last, bool[0] _unused_extra_data{
-            message_count=message_count+1 mod 1024
-            int#(FROM: 0,TO: 26) letter
-            letter=IntNarrow#(FROM: 0, TO: 26)(BitsToInt(elements[0]))
-            message_memory.write(message_count, letter)
-            when last{
-                start_guessing=true
-            }
-        }
-    }
-        
-        
-    // needs to be in top module
-    state int#(FROM: 0,TO: 18) cur_state
-    initial cur_state = 0
     // counting letters for IOC
     state int#(FROM: 0,TO: 26) cur_letter
-    initial cur_letter = 0
 
 
     // can be kept in Top module since allways the same for actions in submodules
-    int#(FROM: 0,TO: 26) input_letter'1
+    int#(FROM: 0,TO: 26) input_letter'0
 
     
     // variables for machine setup kept in Top module
     state int#(FROM: 0,TO: 26) rigth_rotor_pos
     state int#(FROM: 0,TO: 26) middle_rotor_pos
     state int#(FROM: 0,TO: 26) left_rotor_pos
-    initial rigth_rotor_pos=0
-    initial middle_rotor_pos=0
-    initial left_rotor_pos=0
 
 
     state int#(FROM: 0,TO:1024) message_counter
-    initial message_counter=0
+    
 
-    state int#(FROM: 0,TO:1024) last_letter
 
     //state int#(FROM: 0,TO: 26)[5][9] best_settings_pb
     //state int#(FROM: 0,TO: 1048576)[5] best_scores_pb
-    
-    when start_guessing{
-        cur_state=1
-        start_guessing=false
-        last_letter=message_count
+    reader.ready_for_lots_of_data=true
+    when cur_state==1{
+        when reader.chunk_valid : bool[ELEM_BITWIDTH][NUM_PARALLEL_ELEMENTS] elements, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS+1) chunk_length, int#(FROM: 0, TO: NUM_PARALLEL_ELEMENTS) chunk_offset, bool last, bool[0] _unused_extra_data{
+            message_count=message_count+1 mod 1024
+            int#(FROM: 0,TO: 26) letter
+            letter=IntNarrow#(FROM: 0, TO: 26)(BitsToInt(elements[0]))
+            message_memory.write(message_count, letter)
+            when last{
+                cur_state=2
+                last_letter=message_count
+            }
+        }
     }
     // Go over the various possible rotor settings in order 
-    when cur_state==1{              
+    when cur_state==2{              
         when rigth_rotor_pos<=25{            
             rigth_rotor_pos=rigth_rotor_pos+1 mod 26
             when rigth_rotor_pos==25{
@@ -194,24 +177,24 @@ module cracker_rotors_top{
         // instantiate an enigma machine with the given rotors
         enigma_machine_driver_rotors_inst.machine_setup_rotor_a(left_rotor_pos, middle_rotor_pos, rigth_rotor_pos)
 
-        cur_state = 2
+        cur_state = 3
         
     }
 
     // calculate our version of the IoC score 
-    when cur_state==2{
+    when cur_state==3{
         input_letter=message_memory.read(message_counter)
         enigma_machine_driver_rotors_inst.parse_letter_ioc_count(input_letter,left_rotor_pos, middle_rotor_pos, rigth_rotor_pos)
         when message_counter==last_letter{
             //enigma_machine_driver_rotors_inst.last_letter_save_settings_rotor(left_rotor_pos, middle_rotor_pos, rigth_rotor_pos)
             message_counter=0
-            cur_state=3
+            cur_state=4
         }else{
             message_counter=message_counter+1 mod 1024
         }
     }
     // sum up our letter counts until we reach the end of the alphaet
-    when cur_state==3{
+    when cur_state==4{
         cur_letter=cur_letter+1 mod 26
         enigma_machine_driver_rotors_inst.iterate_alphabet_a(cur_letter)
         when cur_letter==25{
@@ -219,9 +202,9 @@ module cracker_rotors_top{
             cur_letter=0
             when rigth_rotor_pos==25&middle_rotor_pos==25&left_rotor_pos==25{
                 enigma_machine_driver_rotors_inst.safe_best_settings_at_end_a()
-                cur_state=4
+                cur_state=5
             }else {
-                cur_state=1
+                cur_state=2
             }
         }
     }
@@ -229,7 +212,7 @@ module cracker_rotors_top{
     state int#(FROM:0, TO:60) machine_number
     state int#(FROM:0, TO:5) top_choice
     
-    when cur_state==4{
+    when cur_state==5{
         top_choice=top_choice+1 mod 5
         when top_choice<4{
             machine_number=machine_number+1 mod 60
@@ -237,7 +220,7 @@ module cracker_rotors_top{
         }else when machine_number<59{
             enigma_machine_driver_rotors_inst.sort_results(machine_number, top_choice)
         }else{
-            cur_state=5
+            cur_state=6
         } 
 
     
@@ -256,11 +239,11 @@ module cracker_rotors_top{
     state int#(FROM: 0,TO:6) top_count
     state int#(FROM: 0,TO:9) setting_count
     state bool score_done
-    when cur_state==5{
-        ioc_score_top1,best_settings1,ioc_score_top2,best_settings2,ioc_score_top3,best_settings3,ioc_score_top4,best_settings4,ioc_score_top5, best_settings5=enigma_machine_driver_rotors_inst.get_top_settings()
-        cur_state=6
-    }
     when cur_state==6{
+        ioc_score_top1,best_settings1,ioc_score_top2,best_settings2,ioc_score_top3,best_settings3,ioc_score_top4,best_settings4,ioc_score_top5, best_settings5=enigma_machine_driver_rotors_inst.get_top_settings()
+        cur_state=7
+    }
+    when cur_state==7{
         when writer.may_write & top_count<6{
             when top_count==0{
                 when !score_done{                                               //write score to memory
@@ -370,10 +353,11 @@ module cracker_rotors_top{
         ctrl.rst()
         cur_state=0
         top_count=0
-        start_guessing=false
         rigth_rotor_pos=0
         middle_rotor_pos=0
         left_rotor_pos=0
+        message_counter=0
+        cur_letter = 0
         enigma_machine_driver_rotors_inst.rst()   
     }
 }
@@ -440,9 +424,9 @@ module enigma_machine_driver_rotors#(){
         ioc_calc ioc_calc_inst
         enigma_machine_runtime enigma_machine_inst
         //to avoide enigma machine warnings about unused ports
-        bool porst_use
+        bool ports_use
         int#(FROM: 0,TO: 5)[3] cur_rotors
-        when porst_use{
+        when ports_use{
             enigma_machine_inst.change_plugs(0,0)
             cur_rotors=enigma_machine_inst.cur_settings()
         }
