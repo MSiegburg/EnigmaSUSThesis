@@ -1,5 +1,5 @@
-// THIS IS A GENERATED FILE (Generated at 2026-07-28T23:32:00+02:00)
-// This file was generated with SUS Compiler 0.4.0
+// THIS IS A GENERATED FILE (Generated at 2026-11-19T11:17:28+01:00)
+// This file was generated with SUS Compiler 0.6.0-dev (8c2e9c201cc10fc6686c39ac760ada7e43680583) built at 2026-10-29_14:08:47
 // enigma_top #()
 module enigma_top(
 	/* clock */ input aclk,
@@ -58,6 +58,50 @@ module enigma_top(
 	input wire m_axi_rlast
 );
 
+/*mux_wire*/ logic[63:0] message_adress;
+/*mux_wire*/ logic[63:0] read_start_addr;
+/*mux_wire*/ logic[63:0] encode_adress;
+/*mux_wire*/ logic[63:0] write_start_addr;
+/*state*/ logic[2:0] current_state;
+/*state*/ logic[2:0] rotors_to_use[0:2];
+/*state*/ logic[4:0] rotor_positions_to_use[0:2];
+/*state*/ logic[4:0] ring_positions_to_use[0:2];
+/*state*/ logic[4:0] plugboard_config[0:25];
+/*state*/ logic[4:0] plugboard_iterator;
+/*state*/ logic[31:0] number_to_transfer;
+/*mux_wire*/ logic[31:0] elements[0:0];
+/*mux_wire*/ logic[0:0] chunk_length;
+// (zero sized) chunk_offset
+/*mux_wire*/ logic last;
+/*mux_wire*/ logic[4:0] letter_to_parse;
+/*mux_wire*/ logic[4:0] encoded_letter;
+/*mux_wire*/ logic[31:0] to_save[0:0];
+/*latency*/ logic[0:0] _chunk_length_D1000; always_ff @(posedge aclk) begin _chunk_length_D1000 <= chunk_length; end
+/*latency*/ logic[0:0] _chunk_length_D1001; always_ff @(posedge aclk) begin _chunk_length_D1001 <= _chunk_length_D1000; end
+/*latency*/ logic[0:0] _chunk_length_D1002; always_ff @(posedge aclk) begin _chunk_length_D1002 <= _chunk_length_D1001; end
+/*latency*/ logic[0:0] _chunk_length_D1003; always_ff @(posedge aclk) begin _chunk_length_D1003 <= _chunk_length_D1002; end
+/*latency*/ logic[0:0] _chunk_length_D1004; always_ff @(posedge aclk) begin _chunk_length_D1004 <= _chunk_length_D1003; end
+/*latency*/ logic[0:0] _chunk_length_D1005; always_ff @(posedge aclk) begin _chunk_length_D1005 <= _chunk_length_D1004; end
+/*latency*/ logic[0:0] _chunk_length_D1006; always_ff @(posedge aclk) begin _chunk_length_D1006 <= _chunk_length_D1005; end
+/*latency*/ logic[0:0] _chunk_length_D1007; always_ff @(posedge aclk) begin _chunk_length_D1007 <= _chunk_length_D1006; end
+/*latency*/ logic[0:0] _chunk_length_D1008; always_ff @(posedge aclk) begin _chunk_length_D1008 <= _chunk_length_D1007; end
+/*latency*/ logic[0:0] _chunk_length_D1009; always_ff @(posedge aclk) begin _chunk_length_D1009 <= _chunk_length_D1008; end
+/*latency*/ logic[0:0] _chunk_length_D1010; always_ff @(posedge aclk) begin _chunk_length_D1010 <= _chunk_length_D1009; end
+/*latency*/ logic[0:0] _chunk_length_D1011; always_ff @(posedge aclk) begin _chunk_length_D1011 <= _chunk_length_D1010; end
+/*latency*/ logic[0:0] _chunk_length_D1012; always_ff @(posedge aclk) begin _chunk_length_D1012 <= _chunk_length_D1011; end
+/*latency*/ logic _last_D1000; always_ff @(posedge aclk) begin _last_D1000 <= last; end
+/*latency*/ logic _last_D1001; always_ff @(posedge aclk) begin _last_D1001 <= _last_D1000; end
+/*latency*/ logic _last_D1002; always_ff @(posedge aclk) begin _last_D1002 <= _last_D1001; end
+/*latency*/ logic _last_D1003; always_ff @(posedge aclk) begin _last_D1003 <= _last_D1002; end
+/*latency*/ logic _last_D1004; always_ff @(posedge aclk) begin _last_D1004 <= _last_D1003; end
+/*latency*/ logic _last_D1005; always_ff @(posedge aclk) begin _last_D1005 <= _last_D1004; end
+/*latency*/ logic _last_D1006; always_ff @(posedge aclk) begin _last_D1006 <= _last_D1005; end
+/*latency*/ logic _last_D1007; always_ff @(posedge aclk) begin _last_D1007 <= _last_D1006; end
+/*latency*/ logic _last_D1008; always_ff @(posedge aclk) begin _last_D1008 <= _last_D1007; end
+/*latency*/ logic _last_D1009; always_ff @(posedge aclk) begin _last_D1009 <= _last_D1008; end
+/*latency*/ logic _last_D1010; always_ff @(posedge aclk) begin _last_D1010 <= _last_D1009; end
+/*latency*/ logic _last_D1011; always_ff @(posedge aclk) begin _last_D1011 <= _last_D1010; end
+/*latency*/ logic _last_D1012; always_ff @(posedge aclk) begin _last_D1012 <= _last_D1011; end
 wire _ctrl_awready;
 wire _ctrl_wready;
 wire[1:0] _ctrl_bresp;
@@ -110,26 +154,15 @@ wire _reader_rready;
 /*mux_wire*/ logic[31:0] _reader_rdata;
 /*mux_wire*/ logic[1:0] _reader_rresp;
 /*mux_wire*/ logic _reader_rlast;
-/*mux_wire*/ logic[63:0] message_adress;
 wire[31:0] _ctrl_input_regs[0:44];
 wire[31:0] _53 = _ctrl_input_regs[0];
 wire[31:0] _54 = _ctrl_input_regs[1];
-/*mux_wire*/ logic[63:0] read_start_addr;
 /*mux_wire*/ logic[63:0] _BitsToUInt_bits;
 wire[63:0] _BitsToUInt_value;
-/*mux_wire*/ logic[63:0] encode_adress;
 wire[31:0] _56 = _ctrl_input_regs[2];
 wire[31:0] _57 = _ctrl_input_regs[3];
-/*mux_wire*/ logic[63:0] write_start_addr;
 /*mux_wire*/ logic[63:0] _BitsToUInt_2_bits;
 wire[63:0] _BitsToUInt_2_value;
-/*state*/ logic[2:0] current_state;
-/*state*/ logic[2:0] rotors_to_use[0:2];
-/*state*/ logic[4:0] rotor_positions_to_use[0:2];
-/*state*/ logic[4:0] ring_positions_to_use[0:2];
-/*state*/ logic[4:0] plugboard_config[0:25];
-/*state*/ logic[4:0] plugboard_iterator;
-/*state*/ logic[31:0] number_to_transfer;
 wire _ctrl_start;
 wire[31:0] _61 = _ctrl_input_regs[4];
 /*mux_wire*/ logic[31:0] _BitsToUInt_3_bits;
@@ -359,48 +392,12 @@ wire _reader_chunk_valid;
 /*latency*/ logic __reader_chunk_valid_D1007; always_ff @(posedge aclk) begin __reader_chunk_valid_D1007 <= __reader_chunk_valid_D1006; end
 /*latency*/ logic __reader_chunk_valid_D1008; always_ff @(posedge aclk) begin __reader_chunk_valid_D1008 <= __reader_chunk_valid_D1007; end
 /*latency*/ logic __reader_chunk_valid_D1009; always_ff @(posedge aclk) begin __reader_chunk_valid_D1009 <= __reader_chunk_valid_D1008; end
-/*latency*/ logic __reader_chunk_valid_D1010; always_ff @(posedge aclk) begin __reader_chunk_valid_D1010 <= __reader_chunk_valid_D1009; end
-/*latency*/ logic __reader_chunk_valid_D1011; always_ff @(posedge aclk) begin __reader_chunk_valid_D1011 <= __reader_chunk_valid_D1010; end
-/*latency*/ logic __reader_chunk_valid_D1012; always_ff @(posedge aclk) begin __reader_chunk_valid_D1012 <= __reader_chunk_valid_D1011; end
-/*latency*/ logic __reader_chunk_valid_D1013; always_ff @(posedge aclk) begin __reader_chunk_valid_D1013 <= __reader_chunk_valid_D1012; end
 wire[31:0] _reader_elements[0:0];
 wire[0:0] _reader_chunk_length;
 // (zero sized) _reader_chunk_offset
 wire _reader_last;
 // (zero sized) _reader_extra_data_out
-/*mux_wire*/ logic[31:0] elements[0:0];
-/*mux_wire*/ logic[0:0] chunk_length;
-/*latency*/ logic[0:0] _chunk_length_D1000; always_ff @(posedge aclk) begin _chunk_length_D1000 <= chunk_length; end
-/*latency*/ logic[0:0] _chunk_length_D1001; always_ff @(posedge aclk) begin _chunk_length_D1001 <= _chunk_length_D1000; end
-/*latency*/ logic[0:0] _chunk_length_D1002; always_ff @(posedge aclk) begin _chunk_length_D1002 <= _chunk_length_D1001; end
-/*latency*/ logic[0:0] _chunk_length_D1003; always_ff @(posedge aclk) begin _chunk_length_D1003 <= _chunk_length_D1002; end
-/*latency*/ logic[0:0] _chunk_length_D1004; always_ff @(posedge aclk) begin _chunk_length_D1004 <= _chunk_length_D1003; end
-/*latency*/ logic[0:0] _chunk_length_D1005; always_ff @(posedge aclk) begin _chunk_length_D1005 <= _chunk_length_D1004; end
-/*latency*/ logic[0:0] _chunk_length_D1006; always_ff @(posedge aclk) begin _chunk_length_D1006 <= _chunk_length_D1005; end
-/*latency*/ logic[0:0] _chunk_length_D1007; always_ff @(posedge aclk) begin _chunk_length_D1007 <= _chunk_length_D1006; end
-/*latency*/ logic[0:0] _chunk_length_D1008; always_ff @(posedge aclk) begin _chunk_length_D1008 <= _chunk_length_D1007; end
-/*latency*/ logic[0:0] _chunk_length_D1009; always_ff @(posedge aclk) begin _chunk_length_D1009 <= _chunk_length_D1008; end
-/*latency*/ logic[0:0] _chunk_length_D1010; always_ff @(posedge aclk) begin _chunk_length_D1010 <= _chunk_length_D1009; end
-/*latency*/ logic[0:0] _chunk_length_D1011; always_ff @(posedge aclk) begin _chunk_length_D1011 <= _chunk_length_D1010; end
-/*latency*/ logic[0:0] _chunk_length_D1012; always_ff @(posedge aclk) begin _chunk_length_D1012 <= _chunk_length_D1011; end
-// (zero sized) chunk_offset
-/*mux_wire*/ logic last;
-/*latency*/ logic _last_D1000; always_ff @(posedge aclk) begin _last_D1000 <= last; end
-/*latency*/ logic _last_D1001; always_ff @(posedge aclk) begin _last_D1001 <= _last_D1000; end
-/*latency*/ logic _last_D1002; always_ff @(posedge aclk) begin _last_D1002 <= _last_D1001; end
-/*latency*/ logic _last_D1003; always_ff @(posedge aclk) begin _last_D1003 <= _last_D1002; end
-/*latency*/ logic _last_D1004; always_ff @(posedge aclk) begin _last_D1004 <= _last_D1003; end
-/*latency*/ logic _last_D1005; always_ff @(posedge aclk) begin _last_D1005 <= _last_D1004; end
-/*latency*/ logic _last_D1006; always_ff @(posedge aclk) begin _last_D1006 <= _last_D1005; end
-/*latency*/ logic _last_D1007; always_ff @(posedge aclk) begin _last_D1007 <= _last_D1006; end
-/*latency*/ logic _last_D1008; always_ff @(posedge aclk) begin _last_D1008 <= _last_D1007; end
-/*latency*/ logic _last_D1009; always_ff @(posedge aclk) begin _last_D1009 <= _last_D1008; end
-/*latency*/ logic _last_D1010; always_ff @(posedge aclk) begin _last_D1010 <= _last_D1009; end
-/*latency*/ logic _last_D1011; always_ff @(posedge aclk) begin _last_D1011 <= _last_D1010; end
-/*latency*/ logic _last_D1012; always_ff @(posedge aclk) begin _last_D1012 <= _last_D1011; end
 // (zero sized) _unused_extra_data
-/*mux_wire*/ logic[4:0] letter_to_parse;
-/*mux_wire*/ logic[4:0] encoded_letter;
 wire[31:0] _150 = elements[0];
 /*mux_wire*/ logic[31:0] _BitsToInt_33_bits;
 wire signed[31:0] _BitsToInt_33_value;
@@ -409,7 +406,6 @@ wire[4:0] _IntNarrow_36_dout;
 /*mux_wire*/ logic _enigma_machine_parse_letter;
 /*mux_wire*/ logic[4:0] _enigma_machine_input_letter;
 wire[4:0] _enigma_machine_encode_letter_final;
-/*mux_wire*/ logic[31:0] to_save[0:0];
 /*mux_wire*/ logic signed[31:0] _IntToBits_value;
 wire[31:0] _IntToBits_bits;
 /*mux_wire*/ logic _writer_write;
@@ -1321,7 +1317,7 @@ end
 always_comb begin // combinatorial _BitsToUInt_3_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToUInt_3_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToUInt_3_bits = _61;
+	_BitsToUInt_3_bits = _61;
 end
 always_comb begin // combinatorial _writer_request_new_write
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -1334,357 +1330,357 @@ end
 always_comb begin // combinatorial _writer_start_addr
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_writer_start_addr = 64'dx;
-	if(_ctrl_start) _writer_start_addr = write_start_addr;
+	_writer_start_addr = write_start_addr;
 end
 always_comb begin // combinatorial _BitsToUInt_4_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToUInt_4_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToUInt_4_bits = _65;
+	_BitsToUInt_4_bits = _65;
 end
 always_comb begin // combinatorial _IntNarrow_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_din = 32'dx;
-	if(_ctrl_start) _IntNarrow_din = _BitsToUInt_4_value;
+	_IntNarrow_din = _BitsToUInt_4_value;
 end
 always_comb begin // combinatorial _BitsToInt_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_bits = _66;
+	_BitsToInt_bits = _66;
 end
 always_comb begin // combinatorial _IntNarrow_2_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_2_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_2_din = _BitsToInt_value;
+	_IntNarrow_2_din = _BitsToInt_value;
 end
 always_comb begin // combinatorial _BitsToInt_2_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_2_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_2_bits = _67;
+	_BitsToInt_2_bits = _67;
 end
 always_comb begin // combinatorial _IntNarrow_3_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_3_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_3_din = _BitsToInt_2_value;
+	_IntNarrow_3_din = _BitsToInt_2_value;
 end
 always_comb begin // combinatorial _BitsToUInt_5_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToUInt_5_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToUInt_5_bits = _68;
+	_BitsToUInt_5_bits = _68;
 end
 always_comb begin // combinatorial _IntNarrow_4_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_4_din = 32'dx;
-	if(_ctrl_start) _IntNarrow_4_din = _BitsToUInt_5_value;
+	_IntNarrow_4_din = _BitsToUInt_5_value;
 end
 always_comb begin // combinatorial _BitsToInt_3_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_3_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_3_bits = _69;
+	_BitsToInt_3_bits = _69;
 end
 always_comb begin // combinatorial _IntNarrow_5_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_5_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_5_din = _BitsToInt_3_value;
+	_IntNarrow_5_din = _BitsToInt_3_value;
 end
 always_comb begin // combinatorial _BitsToInt_4_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_4_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_4_bits = _70;
+	_BitsToInt_4_bits = _70;
 end
 always_comb begin // combinatorial _IntNarrow_6_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_6_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_6_din = _BitsToInt_4_value;
+	_IntNarrow_6_din = _BitsToInt_4_value;
 end
 always_comb begin // combinatorial _BitsToUInt_6_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToUInt_6_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToUInt_6_bits = _71;
+	_BitsToUInt_6_bits = _71;
 end
 always_comb begin // combinatorial _IntNarrow_7_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_7_din = 32'dx;
-	if(_ctrl_start) _IntNarrow_7_din = _BitsToUInt_6_value;
+	_IntNarrow_7_din = _BitsToUInt_6_value;
 end
 always_comb begin // combinatorial _BitsToInt_5_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_5_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_5_bits = _72;
+	_BitsToInt_5_bits = _72;
 end
 always_comb begin // combinatorial _IntNarrow_8_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_8_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_8_din = _BitsToInt_5_value;
+	_IntNarrow_8_din = _BitsToInt_5_value;
 end
 always_comb begin // combinatorial _BitsToInt_6_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_6_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_6_bits = _73;
+	_BitsToInt_6_bits = _73;
 end
 always_comb begin // combinatorial _IntNarrow_9_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_9_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_9_din = _BitsToInt_6_value;
+	_IntNarrow_9_din = _BitsToInt_6_value;
 end
 always_comb begin // combinatorial _BitsToInt_7_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_7_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_7_bits = _74;
+	_BitsToInt_7_bits = _74;
 end
 always_comb begin // combinatorial _IntNarrow_10_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_10_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_10_din = _BitsToInt_7_value;
+	_IntNarrow_10_din = _BitsToInt_7_value;
 end
 always_comb begin // combinatorial _BitsToInt_8_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_8_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_8_bits = _75;
+	_BitsToInt_8_bits = _75;
 end
 always_comb begin // combinatorial _IntNarrow_11_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_11_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_11_din = _BitsToInt_8_value;
+	_IntNarrow_11_din = _BitsToInt_8_value;
 end
 always_comb begin // combinatorial _BitsToInt_9_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_9_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_9_bits = _76;
+	_BitsToInt_9_bits = _76;
 end
 always_comb begin // combinatorial _IntNarrow_12_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_12_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_12_din = _BitsToInt_9_value;
+	_IntNarrow_12_din = _BitsToInt_9_value;
 end
 always_comb begin // combinatorial _BitsToInt_10_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_10_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_10_bits = _77;
+	_BitsToInt_10_bits = _77;
 end
 always_comb begin // combinatorial _IntNarrow_13_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_13_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_13_din = _BitsToInt_10_value;
+	_IntNarrow_13_din = _BitsToInt_10_value;
 end
 always_comb begin // combinatorial _BitsToInt_11_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_11_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_11_bits = _78;
+	_BitsToInt_11_bits = _78;
 end
 always_comb begin // combinatorial _IntNarrow_14_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_14_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_14_din = _BitsToInt_11_value;
+	_IntNarrow_14_din = _BitsToInt_11_value;
 end
 always_comb begin // combinatorial _BitsToInt_12_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_12_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_12_bits = _79;
+	_BitsToInt_12_bits = _79;
 end
 always_comb begin // combinatorial _IntNarrow_15_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_15_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_15_din = _BitsToInt_12_value;
+	_IntNarrow_15_din = _BitsToInt_12_value;
 end
 always_comb begin // combinatorial _BitsToInt_13_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_13_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_13_bits = _80;
+	_BitsToInt_13_bits = _80;
 end
 always_comb begin // combinatorial _IntNarrow_16_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_16_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_16_din = _BitsToInt_13_value;
+	_IntNarrow_16_din = _BitsToInt_13_value;
 end
 always_comb begin // combinatorial _BitsToInt_14_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_14_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_14_bits = _81;
+	_BitsToInt_14_bits = _81;
 end
 always_comb begin // combinatorial _IntNarrow_17_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_17_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_17_din = _BitsToInt_14_value;
+	_IntNarrow_17_din = _BitsToInt_14_value;
 end
 always_comb begin // combinatorial _BitsToInt_15_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_15_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_15_bits = _82;
+	_BitsToInt_15_bits = _82;
 end
 always_comb begin // combinatorial _IntNarrow_18_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_18_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_18_din = _BitsToInt_15_value;
+	_IntNarrow_18_din = _BitsToInt_15_value;
 end
 always_comb begin // combinatorial _BitsToInt_16_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_16_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_16_bits = _83;
+	_BitsToInt_16_bits = _83;
 end
 always_comb begin // combinatorial _IntNarrow_19_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_19_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_19_din = _BitsToInt_16_value;
+	_IntNarrow_19_din = _BitsToInt_16_value;
 end
 always_comb begin // combinatorial _BitsToInt_17_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_17_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_17_bits = _84;
+	_BitsToInt_17_bits = _84;
 end
 always_comb begin // combinatorial _IntNarrow_20_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_20_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_20_din = _BitsToInt_17_value;
+	_IntNarrow_20_din = _BitsToInt_17_value;
 end
 always_comb begin // combinatorial _BitsToInt_18_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_18_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_18_bits = _85;
+	_BitsToInt_18_bits = _85;
 end
 always_comb begin // combinatorial _IntNarrow_21_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_21_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_21_din = _BitsToInt_18_value;
+	_IntNarrow_21_din = _BitsToInt_18_value;
 end
 always_comb begin // combinatorial _BitsToInt_19_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_19_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_19_bits = _86;
+	_BitsToInt_19_bits = _86;
 end
 always_comb begin // combinatorial _IntNarrow_22_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_22_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_22_din = _BitsToInt_19_value;
+	_IntNarrow_22_din = _BitsToInt_19_value;
 end
 always_comb begin // combinatorial _BitsToInt_20_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_20_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_20_bits = _87;
+	_BitsToInt_20_bits = _87;
 end
 always_comb begin // combinatorial _IntNarrow_23_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_23_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_23_din = _BitsToInt_20_value;
+	_IntNarrow_23_din = _BitsToInt_20_value;
 end
 always_comb begin // combinatorial _BitsToInt_21_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_21_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_21_bits = _88;
+	_BitsToInt_21_bits = _88;
 end
 always_comb begin // combinatorial _IntNarrow_24_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_24_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_24_din = _BitsToInt_21_value;
+	_IntNarrow_24_din = _BitsToInt_21_value;
 end
 always_comb begin // combinatorial _BitsToInt_22_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_22_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_22_bits = _89;
+	_BitsToInt_22_bits = _89;
 end
 always_comb begin // combinatorial _IntNarrow_25_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_25_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_25_din = _BitsToInt_22_value;
+	_IntNarrow_25_din = _BitsToInt_22_value;
 end
 always_comb begin // combinatorial _BitsToInt_23_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_23_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_23_bits = _90;
+	_BitsToInt_23_bits = _90;
 end
 always_comb begin // combinatorial _IntNarrow_26_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_26_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_26_din = _BitsToInt_23_value;
+	_IntNarrow_26_din = _BitsToInt_23_value;
 end
 always_comb begin // combinatorial _BitsToInt_24_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_24_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_24_bits = _91;
+	_BitsToInt_24_bits = _91;
 end
 always_comb begin // combinatorial _IntNarrow_27_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_27_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_27_din = _BitsToInt_24_value;
+	_IntNarrow_27_din = _BitsToInt_24_value;
 end
 always_comb begin // combinatorial _BitsToInt_25_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_25_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_25_bits = _92;
+	_BitsToInt_25_bits = _92;
 end
 always_comb begin // combinatorial _IntNarrow_28_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_28_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_28_din = _BitsToInt_25_value;
+	_IntNarrow_28_din = _BitsToInt_25_value;
 end
 always_comb begin // combinatorial _BitsToInt_26_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_26_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_26_bits = _93;
+	_BitsToInt_26_bits = _93;
 end
 always_comb begin // combinatorial _IntNarrow_29_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_29_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_29_din = _BitsToInt_26_value;
+	_IntNarrow_29_din = _BitsToInt_26_value;
 end
 always_comb begin // combinatorial _BitsToInt_27_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_27_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_27_bits = _94;
+	_BitsToInt_27_bits = _94;
 end
 always_comb begin // combinatorial _IntNarrow_30_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_30_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_30_din = _BitsToInt_27_value;
+	_IntNarrow_30_din = _BitsToInt_27_value;
 end
 always_comb begin // combinatorial _BitsToInt_28_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_28_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_28_bits = _95;
+	_BitsToInt_28_bits = _95;
 end
 always_comb begin // combinatorial _IntNarrow_31_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_31_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_31_din = _BitsToInt_28_value;
+	_IntNarrow_31_din = _BitsToInt_28_value;
 end
 always_comb begin // combinatorial _BitsToInt_29_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_29_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_29_bits = _96;
+	_BitsToInt_29_bits = _96;
 end
 always_comb begin // combinatorial _IntNarrow_32_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_32_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_32_din = _BitsToInt_29_value;
+	_IntNarrow_32_din = _BitsToInt_29_value;
 end
 always_comb begin // combinatorial _BitsToInt_30_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_30_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_30_bits = _97;
+	_BitsToInt_30_bits = _97;
 end
 always_comb begin // combinatorial _IntNarrow_33_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_33_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_33_din = _BitsToInt_30_value;
+	_IntNarrow_33_din = _BitsToInt_30_value;
 end
 always_comb begin // combinatorial _BitsToInt_31_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_31_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_31_bits = _98;
+	_BitsToInt_31_bits = _98;
 end
 always_comb begin // combinatorial _IntNarrow_34_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_34_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_34_din = _BitsToInt_31_value;
+	_IntNarrow_34_din = _BitsToInt_31_value;
 end
 always_comb begin // combinatorial _BitsToInt_32_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_32_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_ctrl_start) _BitsToInt_32_bits = _99;
+	_BitsToInt_32_bits = _99;
 end
 always_comb begin // combinatorial _IntNarrow_35_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_35_din = 32'sdx;
-	if(_ctrl_start) _IntNarrow_35_din = _BitsToInt_32_value;
+	_IntNarrow_35_din = _BitsToInt_32_value;
 end
 always_comb begin // combinatorial _enigma_machine_setup
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -1698,21 +1694,21 @@ always_comb begin // combinatorial _enigma_machine_rotor_setup
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_enigma_machine_rotor_setup = '{3'dx, 3'dx, 3'dx};
 	for(int _v0 = 0; _v0 < 3; _v0 = _v0 + 1) begin
-if(_102) _enigma_machine_rotor_setup[_v0] = rotors_to_use[_v0];
+_enigma_machine_rotor_setup[_v0] = rotors_to_use[_v0];
 end
 end
 always_comb begin // combinatorial _enigma_machine_rotor_positions
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_enigma_machine_rotor_positions = '{5'dx, 5'dx, 5'dx};
 	for(int _v0 = 0; _v0 < 3; _v0 = _v0 + 1) begin
-if(_102) _enigma_machine_rotor_positions[_v0] = rotor_positions_to_use[_v0];
+_enigma_machine_rotor_positions[_v0] = rotor_positions_to_use[_v0];
 end
 end
 always_comb begin // combinatorial _enigma_machine_ring_positions
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_enigma_machine_ring_positions = '{5'dx, 5'dx, 5'dx};
 	for(int _v0 = 0; _v0 < 3; _v0 = _v0 + 1) begin
-if(_102) _enigma_machine_ring_positions[_v0] = ring_positions_to_use[_v0];
+_enigma_machine_ring_positions[_v0] = ring_positions_to_use[_v0];
 end
 end
 always_comb begin // combinatorial _enigma_machine_change_plugs
@@ -1755,12 +1751,12 @@ end
 always_comb begin // combinatorial _reader_start_addr
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_reader_start_addr = 64'dx;
-	if(_140) _reader_start_addr = read_start_addr;
+	_reader_start_addr = read_start_addr;
 end
 always_comb begin // combinatorial _reader_count
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_reader_count = 32'dx;
-	if(_140) _reader_count = number_to_transfer;
+	_reader_count = number_to_transfer;
 end
 always_comb begin // combinatorial _reader_ready_for_lots_of_data
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -1773,42 +1769,42 @@ always_comb begin // combinatorial elements
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	elements = '{32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx};
 	for(int _v0 = 0; _v0 < 1; _v0 = _v0 + 1) begin
-if(_reader_chunk_valid) elements[_v0] = _reader_elements[_v0];
+elements[_v0] = _reader_elements[_v0];
 end
 end
 always_comb begin // combinatorial chunk_length
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	chunk_length = 1'dx;
-	if(_reader_chunk_valid) chunk_length = _reader_chunk_length;
+	chunk_length = _reader_chunk_length;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	chunk_length = chunk_length;
 end
 always_comb begin // combinatorial last
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	last = 1'bx;
-	if(_reader_chunk_valid) last = _reader_last;
+	last = _reader_last;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	last = last;
 end
 always_comb begin // combinatorial letter_to_parse
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	letter_to_parse = 5'dx;
-	if(_reader_chunk_valid) letter_to_parse = _IntNarrow_36_dout;
+	letter_to_parse = _IntNarrow_36_dout;
 end
 always_comb begin // combinatorial encoded_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	encoded_letter = 5'dx;
-	if(__reader_chunk_valid_D1013) encoded_letter = _enigma_machine_encode_letter_final;
+	encoded_letter = _enigma_machine_encode_letter_final;
 end
 always_comb begin // combinatorial _BitsToInt_33_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitsToInt_33_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_reader_chunk_valid) _BitsToInt_33_bits = _150;
+	_BitsToInt_33_bits = _150;
 end
 always_comb begin // combinatorial _IntNarrow_36_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_36_din = 32'sdx;
-	if(_reader_chunk_valid) _IntNarrow_36_din = _BitsToInt_33_value;
+	_IntNarrow_36_din = _BitsToInt_33_value;
 end
 always_comb begin // combinatorial _enigma_machine_parse_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -1821,17 +1817,17 @@ end
 always_comb begin // combinatorial _enigma_machine_input_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_enigma_machine_input_letter = 5'dx;
-	if(_reader_chunk_valid) _enigma_machine_input_letter = letter_to_parse;
+	_enigma_machine_input_letter = letter_to_parse;
 end
 always_comb begin // combinatorial to_save
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	to_save = '{32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx};
-	if(__reader_chunk_valid_D1013) to_save[0] = _IntToBits_bits;
+	to_save[0] = _IntToBits_bits;
 end
 always_comb begin // combinatorial _IntToBits_value
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntToBits_value = 32'sdx;
-	if(__reader_chunk_valid_D1013) _IntToBits_value = encoded_letter;
+	_IntToBits_value = encoded_letter;
 end
 always_comb begin // combinatorial _writer_write
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -1845,20 +1841,20 @@ always_comb begin // combinatorial _writer_elements
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_writer_elements = '{32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx};
 	for(int _v0 = 0; _v0 < 1; _v0 = _v0 + 1) begin
-if(__reader_chunk_valid_D1013) _writer_elements[_v0] = to_save[_v0];
+_writer_elements[_v0] = to_save[_v0];
 end
 end
 always_comb begin // combinatorial _writer_chunk_length
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_writer_chunk_length = 1'dx;
-	if(__reader_chunk_valid_D1012) _writer_chunk_length = _chunk_length_D1012;
+	_writer_chunk_length = _chunk_length_D1012;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_writer_chunk_length = _writer_chunk_length;
 end
 always_comb begin // combinatorial _writer_last
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_writer_last = 1'bx;
-	if(__reader_chunk_valid_D1012) _writer_last = _last_D1012;
+	_writer_last = _last_D1012;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_writer_last = _writer_last;
 end
@@ -1964,6 +1960,26 @@ module enigma_machine_runtime(
 	output /*mux_wire*/ logic[2:0] cur_rotors[0:2]
 );
 
+/*state*/ logic[2:0] left_rotor_used;
+/*state*/ logic[2:0] middle_rotor_used;
+/*state*/ logic[2:0] right_rotor_used;
+/*mux_wire*/ logic right_rotor_advance;
+/*mux_wire*/ logic middle_rotor_advance;
+/*mux_wire*/ logic left_rotor_advance;
+/*state*/ logic doublestepping;
+/*mux_wire*/ logic[4:0] plugboard1;
+/*mux_wire*/ logic[4:0] rrotor1;
+/*mux_wire*/ logic[4:0] mrotor1;
+/*mux_wire*/ logic[4:0] lrotor1;
+/*mux_wire*/ logic[4:0] reflectout;
+/*mux_wire*/ logic[4:0] lrotor2;
+/*mux_wire*/ logic[4:0] mrotor2;
+/*mux_wire*/ logic[4:0] rrotor2;
+/*mux_wire*/ logic[4:0] plugboard2;
+/*latency*/ logic _right_rotor_advance_D1; always_ff @(posedge clk) begin _right_rotor_advance_D1 <= right_rotor_advance; end
+/*latency*/ logic _right_rotor_advance_D2; always_ff @(posedge clk) begin _right_rotor_advance_D2 <= _right_rotor_advance_D1; end
+/*latency*/ logic _middle_rotor_advance_D3; always_ff @(posedge clk) begin _middle_rotor_advance_D3 <= middle_rotor_advance; end
+/*latency*/ logic _middle_rotor_advance_D4; always_ff @(posedge clk) begin _middle_rotor_advance_D4 <= _middle_rotor_advance_D3; end
 /*latency*/ logic _setup_D1; always_ff @(posedge clk) begin _setup_D1 <= setup; end
 /*latency*/ logic _setup_D2; always_ff @(posedge clk) begin _setup_D2 <= _setup_D1; end
 /*latency*/ logic _setup_D3; always_ff @(posedge clk) begin _setup_D3 <= _setup_D2; end
@@ -1985,27 +2001,6 @@ module enigma_machine_runtime(
 /*latency*/ logic _parse_letter_D10; always_ff @(posedge clk) begin _parse_letter_D10 <= _parse_letter_D9; end
 /*latency*/ logic _parse_letter_D11; always_ff @(posedge clk) begin _parse_letter_D11 <= _parse_letter_D10; end
 /*latency*/ logic _parse_letter_D12; always_ff @(posedge clk) begin _parse_letter_D12 <= _parse_letter_D11; end
-/*latency*/ logic _parse_letter_D13; always_ff @(posedge clk) begin _parse_letter_D13 <= _parse_letter_D12; end
-/*state*/ logic[2:0] left_rotor_used;
-/*state*/ logic[2:0] middle_rotor_used;
-/*state*/ logic[2:0] right_rotor_used;
-/*mux_wire*/ logic right_rotor_advance;
-/*latency*/ logic _right_rotor_advance_D1; always_ff @(posedge clk) begin _right_rotor_advance_D1 <= right_rotor_advance; end
-/*latency*/ logic _right_rotor_advance_D2; always_ff @(posedge clk) begin _right_rotor_advance_D2 <= _right_rotor_advance_D1; end
-/*mux_wire*/ logic middle_rotor_advance;
-/*latency*/ logic _middle_rotor_advance_D3; always_ff @(posedge clk) begin _middle_rotor_advance_D3 <= middle_rotor_advance; end
-/*latency*/ logic _middle_rotor_advance_D4; always_ff @(posedge clk) begin _middle_rotor_advance_D4 <= _middle_rotor_advance_D3; end
-/*mux_wire*/ logic left_rotor_advance;
-/*state*/ logic doublestepping;
-/*mux_wire*/ logic[4:0] plugboard1;
-/*mux_wire*/ logic[4:0] rrotor1;
-/*mux_wire*/ logic[4:0] mrotor1;
-/*mux_wire*/ logic[4:0] lrotor1;
-/*mux_wire*/ logic[4:0] reflectout;
-/*mux_wire*/ logic[4:0] lrotor2;
-/*mux_wire*/ logic[4:0] mrotor2;
-/*mux_wire*/ logic[4:0] rrotor2;
-/*mux_wire*/ logic[4:0] plugboard2;
 wire[2:0] _1 = rotor_setup[0];
 wire[2:0] _2 = rotor_setup[1];
 wire[2:0] _3 = rotor_setup[2];
@@ -2196,47 +2191,47 @@ end
 always_comb begin // combinatorial plugboard1
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	plugboard1 = 5'dx;
-	if(_parse_letter_D0) plugboard1 = _plugboard_inst_output_letter1;
+	plugboard1 = _plugboard_inst_output_letter1;
 end
 always_comb begin // combinatorial rrotor1
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	rrotor1 = 5'dx;
-	if(_parse_letter_D2) rrotor1 = _right_rotor_inst_encode_letter;
+	rrotor1 = _right_rotor_inst_encode_letter;
 end
 always_comb begin // combinatorial mrotor1
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	mrotor1 = 5'dx;
-	if(_parse_letter_D4) mrotor1 = _middle_rotor_inst_encode_letter;
+	mrotor1 = _middle_rotor_inst_encode_letter;
 end
 always_comb begin // combinatorial lrotor1
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	lrotor1 = 5'dx;
-	if(_parse_letter_D6) lrotor1 = _left_rotor_inst_encode_letter;
+	lrotor1 = _left_rotor_inst_encode_letter;
 end
 always_comb begin // combinatorial reflectout
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	reflectout = 5'dx;
-	if(_parse_letter_D6) reflectout = _reflector_inst_output_letter;
+	reflectout = _reflector_inst_output_letter;
 end
 always_comb begin // combinatorial lrotor2
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	lrotor2 = 5'dx;
-	if(_parse_letter_D8) lrotor2 = _left_rotor_inst_rev_encode_letter;
+	lrotor2 = _left_rotor_inst_rev_encode_letter;
 end
 always_comb begin // combinatorial mrotor2
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	mrotor2 = 5'dx;
-	if(_parse_letter_D10) mrotor2 = _middle_rotor_inst_rev_encode_letter;
+	mrotor2 = _middle_rotor_inst_rev_encode_letter;
 end
 always_comb begin // combinatorial rrotor2
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	rrotor2 = 5'dx;
-	if(_parse_letter_D12) rrotor2 = _right_rotor_inst_rev_encode_letter;
+	rrotor2 = _right_rotor_inst_rev_encode_letter;
 end
 always_comb begin // combinatorial plugboard2
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	plugboard2 = 5'dx;
-	if(_parse_letter_D13) plugboard2 = _plugboard_inst_output_letter2;
+	plugboard2 = _plugboard_inst_output_letter2;
 end
 always_comb begin // combinatorial _right_rotor_inst_setup
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -2249,17 +2244,17 @@ end
 always_comb begin // combinatorial _right_rotor_inst_rotor_to_use
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_right_rotor_inst_rotor_to_use = 3'dx;
-	if(setup) _right_rotor_inst_rotor_to_use = _4;
+	_right_rotor_inst_rotor_to_use = _4;
 end
 always_comb begin // combinatorial _right_rotor_inst_rotor_starting_position
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_right_rotor_inst_rotor_starting_position = 5'dx;
-	if(setup) _right_rotor_inst_rotor_starting_position = _5;
+	_right_rotor_inst_rotor_starting_position = _5;
 end
 always_comb begin // combinatorial _right_rotor_inst_ring_position_in_use
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_right_rotor_inst_ring_position_in_use = 5'dx;
-	if(setup) _right_rotor_inst_ring_position_in_use = _6;
+	_right_rotor_inst_ring_position_in_use = _6;
 end
 always_comb begin // combinatorial _middle_rotor_inst_setup
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -2272,17 +2267,17 @@ end
 always_comb begin // combinatorial _middle_rotor_inst_rotor_to_use
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_middle_rotor_inst_rotor_to_use = 3'dx;
-	if(_setup_D2) _middle_rotor_inst_rotor_to_use = __9_D2;
+	_middle_rotor_inst_rotor_to_use = __9_D2;
 end
 always_comb begin // combinatorial _middle_rotor_inst_rotor_starting_position
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_middle_rotor_inst_rotor_starting_position = 5'dx;
-	if(_setup_D2) _middle_rotor_inst_rotor_starting_position = __10_D2;
+	_middle_rotor_inst_rotor_starting_position = __10_D2;
 end
 always_comb begin // combinatorial _middle_rotor_inst_ring_position_in_use
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_middle_rotor_inst_ring_position_in_use = 5'dx;
-	if(_setup_D2) _middle_rotor_inst_ring_position_in_use = __11_D2;
+	_middle_rotor_inst_ring_position_in_use = __11_D2;
 end
 always_comb begin // combinatorial _left_rotor_inst_setup
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -2295,17 +2290,17 @@ end
 always_comb begin // combinatorial _left_rotor_inst_rotor_to_use
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_left_rotor_inst_rotor_to_use = 3'dx;
-	if(_setup_D4) _left_rotor_inst_rotor_to_use = __14_D4;
+	_left_rotor_inst_rotor_to_use = __14_D4;
 end
 always_comb begin // combinatorial _left_rotor_inst_rotor_starting_position
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_left_rotor_inst_rotor_starting_position = 5'dx;
-	if(_setup_D4) _left_rotor_inst_rotor_starting_position = __15_D4;
+	_left_rotor_inst_rotor_starting_position = __15_D4;
 end
 always_comb begin // combinatorial _left_rotor_inst_ring_position_in_use
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_left_rotor_inst_ring_position_in_use = 5'dx;
-	if(_setup_D4) _left_rotor_inst_ring_position_in_use = __16_D4;
+	_left_rotor_inst_ring_position_in_use = __16_D4;
 end
 always_comb begin // combinatorial _plugboard_inst_set_plug
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -2318,12 +2313,12 @@ end
 always_comb begin // combinatorial _plugboard_inst_plug
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_plugboard_inst_plug = 5'dx;
-	if(change_plugs) _plugboard_inst_plug = plug;
+	_plugboard_inst_plug = plug;
 end
 always_comb begin // combinatorial _plugboard_inst_value
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_plugboard_inst_value = 5'dx;
-	if(change_plugs) _plugboard_inst_value = value;
+	_plugboard_inst_value = value;
 end
 always_comb begin // combinatorial _right_rotor_inst_turnover
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -2384,7 +2379,7 @@ end
 always_comb begin // combinatorial encode_letter_final
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	encode_letter_final = 5'dx;
-	if(_parse_letter_D13) encode_letter_final = plugboard2;
+	encode_letter_final = plugboard2;
 end
 always_comb begin // combinatorial _plugboard_inst_pass_letter_forward
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -2397,7 +2392,7 @@ end
 always_comb begin // combinatorial _plugboard_inst_input_letter1
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_plugboard_inst_input_letter1 = 5'dx;
-	if(parse_letter) _plugboard_inst_input_letter1 = input_letter;
+	_plugboard_inst_input_letter1 = input_letter;
 end
 always_comb begin // combinatorial _right_rotor_inst_encode_left
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -2410,7 +2405,7 @@ end
 always_comb begin // combinatorial _right_rotor_inst_letter_index
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_right_rotor_inst_letter_index = 5'dx;
-	if(_parse_letter_D0) _right_rotor_inst_letter_index = plugboard1;
+	_right_rotor_inst_letter_index = plugboard1;
 end
 always_comb begin // combinatorial _middle_rotor_inst_encode_left
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -2423,7 +2418,7 @@ end
 always_comb begin // combinatorial _middle_rotor_inst_letter_index
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_middle_rotor_inst_letter_index = 5'dx;
-	if(_parse_letter_D2) _middle_rotor_inst_letter_index = rrotor1;
+	_middle_rotor_inst_letter_index = rrotor1;
 end
 always_comb begin // combinatorial _left_rotor_inst_encode_left
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -2436,7 +2431,7 @@ end
 always_comb begin // combinatorial _left_rotor_inst_letter_index
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_left_rotor_inst_letter_index = 5'dx;
-	if(_parse_letter_D4) _left_rotor_inst_letter_index = mrotor1;
+	_left_rotor_inst_letter_index = mrotor1;
 end
 always_comb begin // combinatorial _reflector_inst_reflector
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -2449,7 +2444,7 @@ end
 always_comb begin // combinatorial _reflector_inst_input_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_reflector_inst_input_letter = 5'dx;
-	if(_parse_letter_D6) _reflector_inst_input_letter = lrotor1;
+	_reflector_inst_input_letter = lrotor1;
 end
 always_comb begin // combinatorial _left_rotor_inst_encode_right
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -2462,7 +2457,7 @@ end
 always_comb begin // combinatorial _left_rotor_inst_rev_letter_index
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_left_rotor_inst_rev_letter_index = 5'dx;
-	if(_parse_letter_D6) _left_rotor_inst_rev_letter_index = reflectout;
+	_left_rotor_inst_rev_letter_index = reflectout;
 end
 always_comb begin // combinatorial _middle_rotor_inst_encode_right
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -2475,7 +2470,7 @@ end
 always_comb begin // combinatorial _middle_rotor_inst_rev_letter_index
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_middle_rotor_inst_rev_letter_index = 5'dx;
-	if(_parse_letter_D8) _middle_rotor_inst_rev_letter_index = lrotor2;
+	_middle_rotor_inst_rev_letter_index = lrotor2;
 end
 always_comb begin // combinatorial _right_rotor_inst_encode_right
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -2488,7 +2483,7 @@ end
 always_comb begin // combinatorial _right_rotor_inst_rev_letter_index
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_right_rotor_inst_rev_letter_index = 5'dx;
-	if(_parse_letter_D10) _right_rotor_inst_rev_letter_index = mrotor2;
+	_right_rotor_inst_rev_letter_index = mrotor2;
 end
 always_comb begin // combinatorial _plugboard_inst_pass_letter_backward
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -2501,14 +2496,14 @@ end
 always_comb begin // combinatorial _plugboard_inst_input_letter2
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_plugboard_inst_input_letter2 = 5'dx;
-	if(_parse_letter_D12) _plugboard_inst_input_letter2 = rrotor2;
+	_plugboard_inst_input_letter2 = rrotor2;
 end
 always_comb begin // combinatorial cur_rotors
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	cur_rotors = '{3'dx, 3'dx, 3'dx};
-	if(cur_settings) cur_rotors[0] = right_rotor_used;
-	if(cur_settings) cur_rotors[1] = middle_rotor_used;
-	if(cur_settings) cur_rotors[2] = left_rotor_used;
+	cur_rotors[0] = right_rotor_used;
+	cur_rotors[1] = middle_rotor_used;
+	cur_rotors[2] = left_rotor_used;
 end
 endmodule // enigma_machine_runtime #()
 
@@ -2526,9 +2521,6 @@ module plugboard_plugboard_config_0_1_2_3_4_5_6_7_8_9_10_11_12_13_14_15_16_17_18
 	output /*mux_wire*/ logic[4:0] output_letter2
 );
 
-/*latency*/ logic _pass_letter_forward_D1; always_ff @(posedge clk) begin _pass_letter_forward_D1 <= pass_letter_forward; end
-/*latency*/ logic[4:0] _input_letter1_D1; always_ff @(posedge clk) begin _input_letter1_D1 <= input_letter1; end
-/*latency*/ logic _pass_letter_backward_D14; always_ff @(posedge clk) begin _pass_letter_backward_D14 <= pass_letter_backward; end
 /*state*/ logic[4:0] plugboard_settings[0:25] = '{5'd0, 5'd1, 5'd2, 5'd3, 5'd4, 5'd5, 5'd6, 5'd7, 5'd8, 5'd9, 5'd10, 5'd11, 5'd12, 5'd13, 5'd14, 5'd15, 5'd16, 5'd17, 5'd18, 5'd19, 5'd20, 5'd21, 5'd22, 5'd23, 5'd24, 5'd25};
 /*latency*/ logic[4:0] _plugboard_settings_D2[0:25]; always_ff @(posedge clk) begin _plugboard_settings_D2 <= plugboard_settings; end
 /*latency*/ logic[4:0] _plugboard_settings_D3[0:25]; always_ff @(posedge clk) begin _plugboard_settings_D3 <= _plugboard_settings_D2; end
@@ -2542,6 +2534,7 @@ module plugboard_plugboard_config_0_1_2_3_4_5_6_7_8_9_10_11_12_13_14_15_16_17_18
 /*latency*/ logic[4:0] _plugboard_settings_D11[0:25]; always_ff @(posedge clk) begin _plugboard_settings_D11 <= _plugboard_settings_D10; end
 /*latency*/ logic[4:0] _plugboard_settings_D12[0:25]; always_ff @(posedge clk) begin _plugboard_settings_D12 <= _plugboard_settings_D11; end
 /*latency*/ logic[4:0] _plugboard_settings_D13[0:25]; always_ff @(posedge clk) begin _plugboard_settings_D13 <= _plugboard_settings_D12; end
+/*latency*/ logic[4:0] _input_letter1_D1; always_ff @(posedge clk) begin _input_letter1_D1 <= input_letter1; end
 wire[4:0] _4 = plugboard_settings[_input_letter1_D1];
 wire[4:0] _6 = _plugboard_settings_D13[input_letter2];
 /*latency*/ logic[4:0] __6_D14; always_ff @(posedge clk) begin __6_D14 <= _6; end
@@ -2551,12 +2544,12 @@ end
 always_comb begin // combinatorial output_letter1
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	output_letter1 = 5'dx;
-	if(_pass_letter_forward_D1) output_letter1 = _4;
+	output_letter1 = _4;
 end
 always_comb begin // combinatorial output_letter2
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	output_letter2 = 5'dx;
-	if(_pass_letter_backward_D14) output_letter2 = __6_D14;
+	output_letter2 = __6_D14;
 end
 endmodule // plugboard #(plugboard_config: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25], backward_lat: 13)
 
@@ -2573,7 +2566,7 @@ wire[4:0] _2 = reflector_table[input_letter];
 always_comb begin // combinatorial output_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	output_letter = 5'dx;
-	if(reflector) output_letter = _2;
+	output_letter = _2;
 end
 endmodule // reflector #()
 
@@ -2595,19 +2588,24 @@ module enigma_rotor_runtime_backward_lat_2(
 	output /*mux_wire*/ logic[4:0] rev_encode_letter
 );
 
-/*latency*/ logic _encode_left_D1; always_ff @(posedge clk) begin _encode_left_D1 <= encode_left; end
-/*latency*/ logic _encode_left_D2; always_ff @(posedge clk) begin _encode_left_D2 <= _encode_left_D1; end
-/*latency*/ logic[4:0] _rev_letter_index_D3; always_ff @(posedge clk) begin _rev_letter_index_D3 <= rev_letter_index; end
-/*latency*/ logic[4:0] _rev_letter_index_D4; always_ff @(posedge clk) begin _rev_letter_index_D4 <= _rev_letter_index_D3; end
 /*state*/ logic[2:0] rotor_in_use;
 /*state*/ logic[4:0] ring_position;
 /*state*/ logic[4:0] rotor_position;
+/*mux_wire*/ logic[4:0] modified_advance_position;
+localparam[4:0] turnover_positions[0:4] = '{5'd16, 5'd4, 5'd21, 5'd9, 5'd25};
+/*mux_wire*/ logic[4:0] substitution_result_left;
+/*mux_wire*/ logic[4:0] offset;
+localparam[4:0] rotors[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
+/*mux_wire*/ logic[4:0] substitution_result_right;
+/*mux_wire*/ logic[4:0] offset_2;
+localparam[4:0] rotors_2[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
+/*latency*/ logic[4:0] _offset_D1; always_ff @(posedge clk) begin _offset_D1 <= offset; end
+/*latency*/ logic[4:0] _rev_letter_index_D3; always_ff @(posedge clk) begin _rev_letter_index_D3 <= rev_letter_index; end
+/*latency*/ logic[4:0] _rev_letter_index_D4; always_ff @(posedge clk) begin _rev_letter_index_D4 <= _rev_letter_index_D3; end
 wire[4:0] _3;
 assign _3 = rotor_position + 1'd1;
 wire[4:0] _5;
 assign _5 = (_3 == 26) ? 0 : _3; // == mod 26
-/*mux_wire*/ logic[4:0] modified_advance_position;
-localparam[4:0] turnover_positions[0:4] = '{5'd16, 5'd4, 5'd21, 5'd9, 5'd25};
 wire[4:0] _10 = turnover_positions[rotor_in_use];
 wire[5:0] _12;
 assign _12 = _10 + ring_position;
@@ -2615,9 +2613,6 @@ wire[4:0] _14;
 assign _14 = _12 - ((_12 >= 26) ? 26 : 0); // == mod 26
 wire _17;
 assign _17 = rotor_position == modified_advance_position;
-/*mux_wire*/ logic[4:0] substitution_result_left;
-/*mux_wire*/ logic[4:0] shift;
-/*latency*/ logic[4:0] _shift_D1; always_ff @(posedge clk) begin _shift_D1 <= shift; end
 wire signed[5:0] _20;
 assign _20 = rotor_position - ring_position;
 wire[5:0] _22;
@@ -2625,19 +2620,16 @@ assign _22 = _20 + $signed({1'b0, 5'd26});
 wire[4:0] _24;
 assign _24 = _22 - ((_22 >= 26) ? 26 : 0); // == mod 26
 wire[5:0] _28;
-assign _28 = letter_index + shift;
+assign _28 = letter_index + offset;
 wire[4:0] _30;
 assign _30 = _28 - ((_28 >= 26) ? 26 : 0); // == mod 26
-localparam[4:0] rotors[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
 wire[4:0] _31 = rotors[rotor_in_use][_30];
 /*latency*/ logic[4:0] __31_D1; always_ff @(posedge clk) begin __31_D1 <= _31; end
 wire signed[5:0] _34;
-assign _34 = substitution_result_left - _shift_D1;
+assign _34 = substitution_result_left - _offset_D1;
 wire[4:0] _36;
 assign _36 = _34 + ((_34 < 0) ? 26 : 0); // == mod 26
 /*latency*/ logic[4:0] __36_D2; always_ff @(posedge clk) begin __36_D2 <= _36; end
-/*mux_wire*/ logic[4:0] substitution_result_right;
-/*mux_wire*/ logic[4:0] shift_2;
 wire signed[5:0] _39;
 assign _39 = rotor_position - ring_position;
 wire[5:0] _41;
@@ -2655,13 +2647,12 @@ assign _46 = rotor_in_use + 3'd5;
 /*latency*/ logic[3:0] __46_D3; always_ff @(posedge clk) begin __46_D3 <= __46_D2; end
 /*latency*/ logic[3:0] __46_D4; always_ff @(posedge clk) begin __46_D4 <= __46_D3; end
 wire[5:0] _49;
-assign _49 = _rev_letter_index_D4 + shift_2;
+assign _49 = _rev_letter_index_D4 + offset_2;
 wire[4:0] _51;
 assign _51 = _49 - ((_49 >= 26) ? 26 : 0); // == mod 26
-localparam[4:0] rotors_2[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
 wire[4:0] _52 = rotors_2[__46_D4][_51];
 wire signed[5:0] _55;
-assign _55 = substitution_result_right - shift_2;
+assign _55 = substitution_result_right - offset_2;
 wire[4:0] _57;
 assign _57 = _55 + ((_55 < 0) ? 26 : 0); // == mod 26
 always_ff @(posedge clk) begin // state rotor_in_use
@@ -2685,37 +2676,37 @@ end
 always_comb begin // combinatorial modified_advance_position
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	modified_advance_position = 5'dx;
-	if(advance) modified_advance_position = _14;
+	modified_advance_position = _14;
 end
 always_comb begin // combinatorial encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	encode_letter = 5'dx;
-	if(_encode_left_D2) encode_letter = __36_D2;
+	encode_letter = __36_D2;
 end
 always_comb begin // combinatorial substitution_result_left
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	substitution_result_left = 5'dx;
-	if(_encode_left_D1) substitution_result_left = __31_D1;
+	substitution_result_left = __31_D1;
 end
-always_comb begin // combinatorial shift
+always_comb begin // combinatorial offset
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	shift = 5'dx;
-	if(encode_left) shift = _24;
+	offset = 5'dx;
+	offset = _24;
 end
 always_comb begin // combinatorial rev_encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	rev_encode_letter = 5'dx;
-	if(encode_right) rev_encode_letter = _57;
+	rev_encode_letter = _57;
 end
 always_comb begin // combinatorial substitution_result_right
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	substitution_result_right = 5'dx;
-	if(encode_right) substitution_result_right = _52;
+	substitution_result_right = _52;
 end
-always_comb begin // combinatorial shift_2
+always_comb begin // combinatorial offset_2
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	shift_2 = 5'dx;
-	if(encode_right) shift_2 = __43_D4;
+	offset_2 = 5'dx;
+	offset_2 = __43_D4;
 end
 endmodule // enigma_rotor_runtime #(backward_lat: 2)
 
@@ -2737,19 +2728,24 @@ module enigma_rotor_runtime_backward_lat_6(
 	output /*mux_wire*/ logic[4:0] rev_encode_letter
 );
 
-/*latency*/ logic _encode_left_D1; always_ff @(posedge clk) begin _encode_left_D1 <= encode_left; end
-/*latency*/ logic _encode_left_D2; always_ff @(posedge clk) begin _encode_left_D2 <= _encode_left_D1; end
-/*latency*/ logic[4:0] _rev_letter_index_D7; always_ff @(posedge clk) begin _rev_letter_index_D7 <= rev_letter_index; end
-/*latency*/ logic[4:0] _rev_letter_index_D8; always_ff @(posedge clk) begin _rev_letter_index_D8 <= _rev_letter_index_D7; end
 /*state*/ logic[2:0] rotor_in_use;
 /*state*/ logic[4:0] ring_position;
 /*state*/ logic[4:0] rotor_position;
+/*mux_wire*/ logic[4:0] modified_advance_position;
+localparam[4:0] turnover_positions[0:4] = '{5'd16, 5'd4, 5'd21, 5'd9, 5'd25};
+/*mux_wire*/ logic[4:0] substitution_result_left;
+/*mux_wire*/ logic[4:0] offset;
+localparam[4:0] rotors[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
+/*mux_wire*/ logic[4:0] substitution_result_right;
+/*mux_wire*/ logic[4:0] offset_2;
+localparam[4:0] rotors_2[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
+/*latency*/ logic[4:0] _offset_D1; always_ff @(posedge clk) begin _offset_D1 <= offset; end
+/*latency*/ logic[4:0] _rev_letter_index_D7; always_ff @(posedge clk) begin _rev_letter_index_D7 <= rev_letter_index; end
+/*latency*/ logic[4:0] _rev_letter_index_D8; always_ff @(posedge clk) begin _rev_letter_index_D8 <= _rev_letter_index_D7; end
 wire[4:0] _3;
 assign _3 = rotor_position + 1'd1;
 wire[4:0] _5;
 assign _5 = (_3 == 26) ? 0 : _3; // == mod 26
-/*mux_wire*/ logic[4:0] modified_advance_position;
-localparam[4:0] turnover_positions[0:4] = '{5'd16, 5'd4, 5'd21, 5'd9, 5'd25};
 wire[4:0] _10 = turnover_positions[rotor_in_use];
 wire[5:0] _12;
 assign _12 = _10 + ring_position;
@@ -2757,9 +2753,6 @@ wire[4:0] _14;
 assign _14 = _12 - ((_12 >= 26) ? 26 : 0); // == mod 26
 wire _17;
 assign _17 = rotor_position == modified_advance_position;
-/*mux_wire*/ logic[4:0] substitution_result_left;
-/*mux_wire*/ logic[4:0] shift;
-/*latency*/ logic[4:0] _shift_D1; always_ff @(posedge clk) begin _shift_D1 <= shift; end
 wire signed[5:0] _20;
 assign _20 = rotor_position - ring_position;
 wire[5:0] _22;
@@ -2767,19 +2760,16 @@ assign _22 = _20 + $signed({1'b0, 5'd26});
 wire[4:0] _24;
 assign _24 = _22 - ((_22 >= 26) ? 26 : 0); // == mod 26
 wire[5:0] _28;
-assign _28 = letter_index + shift;
+assign _28 = letter_index + offset;
 wire[4:0] _30;
 assign _30 = _28 - ((_28 >= 26) ? 26 : 0); // == mod 26
-localparam[4:0] rotors[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
 wire[4:0] _31 = rotors[rotor_in_use][_30];
 /*latency*/ logic[4:0] __31_D1; always_ff @(posedge clk) begin __31_D1 <= _31; end
 wire signed[5:0] _34;
-assign _34 = substitution_result_left - _shift_D1;
+assign _34 = substitution_result_left - _offset_D1;
 wire[4:0] _36;
 assign _36 = _34 + ((_34 < 0) ? 26 : 0); // == mod 26
 /*latency*/ logic[4:0] __36_D2; always_ff @(posedge clk) begin __36_D2 <= _36; end
-/*mux_wire*/ logic[4:0] substitution_result_right;
-/*mux_wire*/ logic[4:0] shift_2;
 wire signed[5:0] _39;
 assign _39 = rotor_position - ring_position;
 wire[5:0] _41;
@@ -2805,13 +2795,12 @@ assign _46 = rotor_in_use + 3'd5;
 /*latency*/ logic[3:0] __46_D7; always_ff @(posedge clk) begin __46_D7 <= __46_D6; end
 /*latency*/ logic[3:0] __46_D8; always_ff @(posedge clk) begin __46_D8 <= __46_D7; end
 wire[5:0] _49;
-assign _49 = _rev_letter_index_D8 + shift_2;
+assign _49 = _rev_letter_index_D8 + offset_2;
 wire[4:0] _51;
 assign _51 = _49 - ((_49 >= 26) ? 26 : 0); // == mod 26
-localparam[4:0] rotors_2[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
 wire[4:0] _52 = rotors_2[__46_D8][_51];
 wire signed[5:0] _55;
-assign _55 = substitution_result_right - shift_2;
+assign _55 = substitution_result_right - offset_2;
 wire[4:0] _57;
 assign _57 = _55 + ((_55 < 0) ? 26 : 0); // == mod 26
 always_ff @(posedge clk) begin // state rotor_in_use
@@ -2835,37 +2824,37 @@ end
 always_comb begin // combinatorial modified_advance_position
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	modified_advance_position = 5'dx;
-	if(advance) modified_advance_position = _14;
+	modified_advance_position = _14;
 end
 always_comb begin // combinatorial encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	encode_letter = 5'dx;
-	if(_encode_left_D2) encode_letter = __36_D2;
+	encode_letter = __36_D2;
 end
 always_comb begin // combinatorial substitution_result_left
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	substitution_result_left = 5'dx;
-	if(_encode_left_D1) substitution_result_left = __31_D1;
+	substitution_result_left = __31_D1;
 end
-always_comb begin // combinatorial shift
+always_comb begin // combinatorial offset
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	shift = 5'dx;
-	if(encode_left) shift = _24;
+	offset = 5'dx;
+	offset = _24;
 end
 always_comb begin // combinatorial rev_encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	rev_encode_letter = 5'dx;
-	if(encode_right) rev_encode_letter = _57;
+	rev_encode_letter = _57;
 end
 always_comb begin // combinatorial substitution_result_right
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	substitution_result_right = 5'dx;
-	if(encode_right) substitution_result_right = _52;
+	substitution_result_right = _52;
 end
-always_comb begin // combinatorial shift_2
+always_comb begin // combinatorial offset_2
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	shift_2 = 5'dx;
-	if(encode_right) shift_2 = __43_D8;
+	offset_2 = 5'dx;
+	offset_2 = __43_D8;
 end
 endmodule // enigma_rotor_runtime #(backward_lat: 6)
 
@@ -2887,19 +2876,24 @@ module enigma_rotor_runtime_backward_lat_10(
 	output /*mux_wire*/ logic[4:0] rev_encode_letter
 );
 
-/*latency*/ logic _encode_left_D1; always_ff @(posedge clk) begin _encode_left_D1 <= encode_left; end
-/*latency*/ logic _encode_left_D2; always_ff @(posedge clk) begin _encode_left_D2 <= _encode_left_D1; end
-/*latency*/ logic[4:0] _rev_letter_index_D11; always_ff @(posedge clk) begin _rev_letter_index_D11 <= rev_letter_index; end
-/*latency*/ logic[4:0] _rev_letter_index_D12; always_ff @(posedge clk) begin _rev_letter_index_D12 <= _rev_letter_index_D11; end
 /*state*/ logic[2:0] rotor_in_use;
 /*state*/ logic[4:0] ring_position;
 /*state*/ logic[4:0] rotor_position;
+/*mux_wire*/ logic[4:0] modified_advance_position;
+localparam[4:0] turnover_positions[0:4] = '{5'd16, 5'd4, 5'd21, 5'd9, 5'd25};
+/*mux_wire*/ logic[4:0] substitution_result_left;
+/*mux_wire*/ logic[4:0] offset;
+localparam[4:0] rotors[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
+/*mux_wire*/ logic[4:0] substitution_result_right;
+/*mux_wire*/ logic[4:0] offset_2;
+localparam[4:0] rotors_2[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
+/*latency*/ logic[4:0] _offset_D1; always_ff @(posedge clk) begin _offset_D1 <= offset; end
+/*latency*/ logic[4:0] _rev_letter_index_D11; always_ff @(posedge clk) begin _rev_letter_index_D11 <= rev_letter_index; end
+/*latency*/ logic[4:0] _rev_letter_index_D12; always_ff @(posedge clk) begin _rev_letter_index_D12 <= _rev_letter_index_D11; end
 wire[4:0] _3;
 assign _3 = rotor_position + 1'd1;
 wire[4:0] _5;
 assign _5 = (_3 == 26) ? 0 : _3; // == mod 26
-/*mux_wire*/ logic[4:0] modified_advance_position;
-localparam[4:0] turnover_positions[0:4] = '{5'd16, 5'd4, 5'd21, 5'd9, 5'd25};
 wire[4:0] _10 = turnover_positions[rotor_in_use];
 wire[5:0] _12;
 assign _12 = _10 + ring_position;
@@ -2907,9 +2901,6 @@ wire[4:0] _14;
 assign _14 = _12 - ((_12 >= 26) ? 26 : 0); // == mod 26
 wire _17;
 assign _17 = rotor_position == modified_advance_position;
-/*mux_wire*/ logic[4:0] substitution_result_left;
-/*mux_wire*/ logic[4:0] shift;
-/*latency*/ logic[4:0] _shift_D1; always_ff @(posedge clk) begin _shift_D1 <= shift; end
 wire signed[5:0] _20;
 assign _20 = rotor_position - ring_position;
 wire[5:0] _22;
@@ -2917,19 +2908,16 @@ assign _22 = _20 + $signed({1'b0, 5'd26});
 wire[4:0] _24;
 assign _24 = _22 - ((_22 >= 26) ? 26 : 0); // == mod 26
 wire[5:0] _28;
-assign _28 = letter_index + shift;
+assign _28 = letter_index + offset;
 wire[4:0] _30;
 assign _30 = _28 - ((_28 >= 26) ? 26 : 0); // == mod 26
-localparam[4:0] rotors[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
 wire[4:0] _31 = rotors[rotor_in_use][_30];
 /*latency*/ logic[4:0] __31_D1; always_ff @(posedge clk) begin __31_D1 <= _31; end
 wire signed[5:0] _34;
-assign _34 = substitution_result_left - _shift_D1;
+assign _34 = substitution_result_left - _offset_D1;
 wire[4:0] _36;
 assign _36 = _34 + ((_34 < 0) ? 26 : 0); // == mod 26
 /*latency*/ logic[4:0] __36_D2; always_ff @(posedge clk) begin __36_D2 <= _36; end
-/*mux_wire*/ logic[4:0] substitution_result_right;
-/*mux_wire*/ logic[4:0] shift_2;
 wire signed[5:0] _39;
 assign _39 = rotor_position - ring_position;
 wire[5:0] _41;
@@ -2963,13 +2951,12 @@ assign _46 = rotor_in_use + 3'd5;
 /*latency*/ logic[3:0] __46_D11; always_ff @(posedge clk) begin __46_D11 <= __46_D10; end
 /*latency*/ logic[3:0] __46_D12; always_ff @(posedge clk) begin __46_D12 <= __46_D11; end
 wire[5:0] _49;
-assign _49 = _rev_letter_index_D12 + shift_2;
+assign _49 = _rev_letter_index_D12 + offset_2;
 wire[4:0] _51;
 assign _51 = _49 - ((_49 >= 26) ? 26 : 0); // == mod 26
-localparam[4:0] rotors_2[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
 wire[4:0] _52 = rotors_2[__46_D12][_51];
 wire signed[5:0] _55;
-assign _55 = substitution_result_right - shift_2;
+assign _55 = substitution_result_right - offset_2;
 wire[4:0] _57;
 assign _57 = _55 + ((_55 < 0) ? 26 : 0); // == mod 26
 always_ff @(posedge clk) begin // state rotor_in_use
@@ -2993,37 +2980,37 @@ end
 always_comb begin // combinatorial modified_advance_position
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	modified_advance_position = 5'dx;
-	if(advance) modified_advance_position = _14;
+	modified_advance_position = _14;
 end
 always_comb begin // combinatorial encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	encode_letter = 5'dx;
-	if(_encode_left_D2) encode_letter = __36_D2;
+	encode_letter = __36_D2;
 end
 always_comb begin // combinatorial substitution_result_left
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	substitution_result_left = 5'dx;
-	if(_encode_left_D1) substitution_result_left = __31_D1;
+	substitution_result_left = __31_D1;
 end
-always_comb begin // combinatorial shift
+always_comb begin // combinatorial offset
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	shift = 5'dx;
-	if(encode_left) shift = _24;
+	offset = 5'dx;
+	offset = _24;
 end
 always_comb begin // combinatorial rev_encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	rev_encode_letter = 5'dx;
-	if(encode_right) rev_encode_letter = _57;
+	rev_encode_letter = _57;
 end
 always_comb begin // combinatorial substitution_result_right
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	substitution_result_right = 5'dx;
-	if(encode_right) substitution_result_right = _52;
+	substitution_result_right = _52;
 end
-always_comb begin // combinatorial shift_2
+always_comb begin // combinatorial offset_2
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	shift_2 = 5'dx;
-	if(encode_right) shift_2 = __43_D12;
+	offset_2 = 5'dx;
+	offset_2 = __43_D12;
 end
 endmodule // enigma_rotor_runtime #(backward_lat: 10)
 
@@ -3072,6 +3059,23 @@ module axi4_burst_writer_AXI_WIDTH_32_ADDR_WIDTH_64_ADDR_ALIGN_4_MAY_PUSH_LATENC
 	input wire rst
 );
 
+/*state*/ logic[61:0] awaddr_transfer;
+/*state*/ logic is_stored_for_fifo_manager;
+// (zero sized) stored_mgr_start_offset
+// (zero sized) stored_mgr_end_offset
+/*state*/ logic[7:0] stored_mgr_awlen;
+/*mux_wire*/ logic[61:0] mgr_awaddr;
+/*mux_wire*/ logic[7:0] mgr_awlen;
+// (zero sized) mgr_start_offset
+// (zero sized) mgr_end_offset
+/*mux_wire*/ logic mgr_is_last;
+/*mux_wire*/ logic is_empty_burst;
+/*mux_wire*/ logic[1:0] packed_info;
+/*mux_wire*/ logic last_burst_just_finished;
+/*mux_wire*/ logic burst_was_empty;
+/*mux_wire*/ logic[0:0] chunk_length_d;
+/*mux_wire*/ logic last_d;
+// (zero sized) fifo_offset
 /*latency*/ logic _write_N2; always_ff @(posedge clk) begin _write_N2 <= write; end
 /*latency*/ logic _write_N1; always_ff @(posedge clk) begin _write_N1 <= _write_N2; end
 /*latency*/ logic _write_D0; always_ff @(posedge clk) begin _write_D0 <= _write_N1; end
@@ -3080,7 +3084,7 @@ module axi4_burst_writer_AXI_WIDTH_32_ADDR_WIDTH_64_ADDR_ALIGN_4_MAY_PUSH_LATENC
 /*latency*/ logic[31:0] _elements_D2[0:0]; always_ff @(posedge clk) begin _elements_D2 <= elements; end
 /*latency*/ logic[0:0] _chunk_length_D1; always_ff @(posedge clk) begin _chunk_length_D1 <= chunk_length; end
 /*latency*/ logic _last_D1; always_ff @(posedge clk) begin _last_D1 <= last; end
-/*state*/ logic[61:0] awaddr_transfer;
+/*latency*/ logic[0:0] _chunk_length_d_D2; always_ff @(posedge clk) begin _chunk_length_d_D2 <= chunk_length_d; end
 wire[63:0] _2;
 assign _2 = awaddr_transfer << 2'd2;
 localparam[1:0] _3 = 2'b01;
@@ -3095,10 +3099,6 @@ wire[3:0] _fifo_manager_wstrb;
 wire _addr_manager_may_push_address;
 /*mux_wire*/ logic _addr_manager_push_address;
 /*mux_wire*/ logic[63:0] _addr_manager_new_addr;
-/*state*/ logic is_stored_for_fifo_manager;
-// (zero sized) stored_mgr_start_offset
-// (zero sized) stored_mgr_end_offset
-/*state*/ logic[7:0] stored_mgr_awlen;
 wire _21;
 assign _21 = ~awvalid;
 wire _23;
@@ -3116,12 +3116,6 @@ wire[7:0] _addr_manager_awlen;
 // (zero sized) _addr_manager_end_offset
 wire _addr_manager_is_last;
 wire _addr_manager_is_empty_burst;
-/*mux_wire*/ logic[61:0] mgr_awaddr;
-/*mux_wire*/ logic[7:0] mgr_awlen;
-// (zero sized) mgr_start_offset
-// (zero sized) mgr_end_offset
-/*mux_wire*/ logic mgr_is_last;
-/*mux_wire*/ logic is_empty_burst;
 wire _34;
 assign _34 = ~is_empty_burst;
 wire _36;
@@ -3140,18 +3134,11 @@ wire _fifo_manager_may_write_burst;
 // (zero sized) _fifo_manager_end_offset
 wire _burst_is_last_fifo_pop_available;
 wire[1:0] _burst_is_last_fifo_pop_data;
-/*mux_wire*/ logic[1:0] packed_info;
-/*mux_wire*/ logic last_burst_just_finished;
-/*mux_wire*/ logic burst_was_empty;
 /*mux_wire*/ logic[1:0] _burst_is_last_tuple_packed_i;
 wire _burst_is_last_tuple_v1_o;
 wire _burst_is_last_tuple_v2_o;
 /*mux_wire*/ logic _burst_is_last_fifo_pop;
 wire _fifo_manager_may_push;
-/*mux_wire*/ logic[0:0] chunk_length_d;
-/*latency*/ logic[0:0] _chunk_length_d_D2; always_ff @(posedge clk) begin _chunk_length_d_D2 <= chunk_length_d; end
-/*mux_wire*/ logic last_d;
-// (zero sized) fifo_offset
 /*mux_wire*/ logic _addr_manager_push_elements;
 /*mux_wire*/ logic[0:0] _addr_manager_num_elements;
 /*mux_wire*/ logic _addr_manager_is_last_elem;
@@ -3341,7 +3328,7 @@ end
 always_comb begin // combinatorial _addr_manager_new_addr
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_addr_manager_new_addr = 64'dx;
-	if(request_new_write) _addr_manager_new_addr = start_addr;
+	_addr_manager_new_addr = start_addr;
 end
 always_ff @(posedge clk) begin // state is_stored_for_fifo_manager
 	if(_addr_manager_push_burst) is_stored_for_fifo_manager <= _36;
@@ -3362,38 +3349,38 @@ end
 always_comb begin // combinatorial mgr_awaddr
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	mgr_awaddr = 62'dx;
-	if(_addr_manager_push_burst) mgr_awaddr = _addr_manager_awaddr;
+	mgr_awaddr = _addr_manager_awaddr;
 end
 always_comb begin // combinatorial mgr_awlen
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	mgr_awlen = 8'dx;
-	if(_addr_manager_push_burst) mgr_awlen = _addr_manager_awlen;
+	mgr_awlen = _addr_manager_awlen;
 end
 always_comb begin // combinatorial mgr_is_last
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	mgr_is_last = 1'bx;
-	if(_addr_manager_push_burst) mgr_is_last = _addr_manager_is_last;
+	mgr_is_last = _addr_manager_is_last;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	mgr_is_last = mgr_is_last;
 end
 always_comb begin // combinatorial is_empty_burst
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	is_empty_burst = 1'bx;
-	if(_addr_manager_push_burst) is_empty_burst = _addr_manager_is_empty_burst;
+	is_empty_burst = _addr_manager_is_empty_burst;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	is_empty_burst = is_empty_burst;
 end
 always_comb begin // combinatorial _burst_is_last_tuple_v1_i
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_burst_is_last_tuple_v1_i = 1'bx;
-	if(_addr_manager_push_burst) _burst_is_last_tuple_v1_i = mgr_is_last;
+	_burst_is_last_tuple_v1_i = mgr_is_last;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_burst_is_last_tuple_v1_i = _burst_is_last_tuple_v1_i;
 end
 always_comb begin // combinatorial _burst_is_last_tuple_v2_i
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_burst_is_last_tuple_v2_i = 1'bx;
-	if(_addr_manager_push_burst) _burst_is_last_tuple_v2_i = is_empty_burst;
+	_burst_is_last_tuple_v2_i = is_empty_burst;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_burst_is_last_tuple_v2_i = _burst_is_last_tuple_v2_i;
 end
@@ -3408,7 +3395,7 @@ end
 always_comb begin // combinatorial _burst_is_last_fifo_push_data
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_burst_is_last_fifo_push_data = 2'bxx;
-	if(_addr_manager_push_burst) _burst_is_last_fifo_push_data = _burst_is_last_tuple_packed_o;
+	_burst_is_last_fifo_push_data = _burst_is_last_tuple_packed_o;
 end
 always_comb begin // combinatorial _fifo_manager_write_burst
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -3421,7 +3408,7 @@ end
 always_comb begin // combinatorial _fifo_manager_transfer_awlen
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_fifo_manager_transfer_awlen = 8'dx;
-	if(_fifo_manager_may_write_burst) if(is_stored_for_fifo_manager) _fifo_manager_transfer_awlen = stored_mgr_awlen;
+	_fifo_manager_transfer_awlen = stored_mgr_awlen;
 end
 always_comb begin // combinatorial write_has_been_committed
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -3435,26 +3422,26 @@ end
 always_comb begin // combinatorial packed_info
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	packed_info = 2'bxx;
-	if(_burst_is_last_fifo_pop_available) packed_info = _burst_is_last_fifo_pop_data;
+	packed_info = _burst_is_last_fifo_pop_data;
 end
 always_comb begin // combinatorial last_burst_just_finished
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	last_burst_just_finished = 1'bx;
-	if(_burst_is_last_fifo_pop_available) last_burst_just_finished = _burst_is_last_tuple_v1_o;
+	last_burst_just_finished = _burst_is_last_tuple_v1_o;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	last_burst_just_finished = last_burst_just_finished;
 end
 always_comb begin // combinatorial burst_was_empty
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	burst_was_empty = 1'bx;
-	if(_burst_is_last_fifo_pop_available) burst_was_empty = _burst_is_last_tuple_v2_o;
+	burst_was_empty = _burst_is_last_tuple_v2_o;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	burst_was_empty = burst_was_empty;
 end
 always_comb begin // combinatorial _burst_is_last_tuple_packed_i
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_burst_is_last_tuple_packed_i = 2'bxx;
-	if(_burst_is_last_fifo_pop_available) _burst_is_last_tuple_packed_i = packed_info;
+	_burst_is_last_tuple_packed_i = packed_info;
 end
 always_comb begin // combinatorial _burst_is_last_fifo_pop
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -3475,14 +3462,14 @@ end
 always_comb begin // combinatorial chunk_length_d
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	chunk_length_d = 1'dx;
-	if(_write_D1) chunk_length_d = _chunk_length_D1;
+	chunk_length_d = _chunk_length_D1;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	chunk_length_d = chunk_length_d;
 end
 always_comb begin // combinatorial last_d
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	last_d = 1'bx;
-	if(_write_D1) last_d = _last_D1;
+	last_d = _last_D1;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	last_d = last_d;
 end
@@ -3497,14 +3484,14 @@ end
 always_comb begin // combinatorial _addr_manager_num_elements
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_addr_manager_num_elements = 1'dx;
-	if(_write_D1) _addr_manager_num_elements = chunk_length_d;
+	_addr_manager_num_elements = chunk_length_d;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_addr_manager_num_elements = _addr_manager_num_elements;
 end
 always_comb begin // combinatorial _addr_manager_is_last_elem
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_addr_manager_is_last_elem = 1'bx;
-	if(_write_D1) _addr_manager_is_last_elem = last_d;
+	_addr_manager_is_last_elem = last_d;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_addr_manager_is_last_elem = _addr_manager_is_last_elem;
 end
@@ -3520,13 +3507,13 @@ always_comb begin // combinatorial _fifo_manager_write_v
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_fifo_manager_write_v = '{32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx};
 	for(int _v0 = 0; _v0 < 1; _v0 = _v0 + 1) begin
-if(_write_D2) _fifo_manager_write_v[_v0] = _elements_D2[_v0];
+_fifo_manager_write_v[_v0] = _elements_D2[_v0];
 end
 end
 always_comb begin // combinatorial _fifo_manager_num_elems
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_fifo_manager_num_elems = 1'dx;
-	if(_write_D2) _fifo_manager_num_elems = _chunk_length_d_D2;
+	_fifo_manager_num_elems = _chunk_length_d_D2;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_fifo_manager_num_elems = _fifo_manager_num_elems;
 end
@@ -3576,6 +3563,7 @@ module FWFT_T_type_bool_2_DEPTH_256_MAY_PUSH_LATENCY_0(
 /*mux_wire*/ logic[2:0] outflow_path_valids;
 /*mux_wire*/ logic[1:0] outflow_path_elems[0:2];
 /*mux_wire*/ logic[2:0] will_shifts;
+/*mux_wire*/ logic[7:0] space_remaining;
 wire _3;
 assign _3 = read_addr != write_addr;
 wire[1:0] _5 = mem[read_addr];
@@ -3601,7 +3589,6 @@ assign _20 = _17 | _19;
 wire _21 = will_shifts[2];
 wire _22 = outflow_path_valids[2];
 wire[1:0] _23 = outflow_path_elems[2];
-/*mux_wire*/ logic[7:0] space_remaining;
 wire signed[8:0] _26;
 assign _26 = read_addr - write_addr;
 wire signed[8:0] _28;
@@ -3610,9 +3597,7 @@ wire[7:0] _29;
 assign _29 = _28; // == mod 256 (target is 8 bits wide)
 wire _32;
 assign _32 = space_remaining > 1'd1;
-/*mux_wire*/ logic _LatencyOffset_din;
-wire _LatencyOffset_dout;
-/*latency*/ logic __LatencyOffset_dout_D0; always_ff @(posedge clk) begin __LatencyOffset_dout_D0 <= _LatencyOffset_dout; end
+/*latency*/ logic __32_D1; always_ff @(posedge clk) begin __32_D1 <= _32; end
 /*mux_wire*/ logic[1:0] _ToBits_value;
 wire[1:0] _ToBits_bits;
 wire[8:0] _37;
@@ -3631,11 +3616,6 @@ wire _47 = outflow_path_valids[0];
 wire[1:0] _48 = outflow_path_elems[0];
 /*mux_wire*/ logic[1:0] _FromBits_bits;
 wire[1:0] _FromBits_value;
-LatencyOffset_T_type_bool_OFFSET_N1 LatencyOffset(
-	.clk(clk),
-	.din(_LatencyOffset_din),
-	.dout(_LatencyOffset_dout)
-);
 ToBits_T_type_bool_2 ToBits(
 	.clk(clk),
 	.value(_ToBits_value),
@@ -3697,21 +3677,14 @@ end
 always_comb begin // combinatorial may_push
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	may_push = 1'bx;
-	may_push = __LatencyOffset_dout_D0;
+	may_push = __32_D1;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	may_push = may_push;
-end
-always_comb begin // combinatorial _LatencyOffset_din
-	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	_LatencyOffset_din = 1'bx;
-	_LatencyOffset_din = _32;
-	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
-	_LatencyOffset_din = _LatencyOffset_din;
 end
 always_comb begin // combinatorial _ToBits_value
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_ToBits_value = 2'bxx;
-	if(push) _ToBits_value = push_data;
+	_ToBits_value = push_data;
 end
 always_comb begin // combinatorial pop_available
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -3724,12 +3697,12 @@ end
 always_comb begin // combinatorial pop_data
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	pop_data = 2'bxx;
-	if(_47) pop_data = _FromBits_value;
+	pop_data = _FromBits_value;
 end
 always_comb begin // combinatorial _FromBits_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_FromBits_bits = 2'bxx;
-	if(_47) _FromBits_bits = _48;
+	_FromBits_bits = _48;
 end
 endmodule // FWFT #(T: type bool #()[2], DEPTH: 256, MAY_PUSH_LATENCY: 0)
 
@@ -3860,7 +3833,6 @@ module burst_write_fifo_manager_AXI_WIDTH_32_NUM_PARALLEL_ELEMENTS_1_MAX_BURST_2
 	input wire rst
 );
 
-/*latency*/ logic _push_D1; always_ff @(posedge clk) begin _push_D1 <= push; end
 /*mux_wire*/ logic do_rst;
 /*state*/ logic[7:0] transfers_remaining;
 /*state*/ logic pop_strobe_valid;
@@ -3869,6 +3841,16 @@ module burst_write_fifo_manager_AXI_WIDTH_32_NUM_PARALLEL_ELEMENTS_1_MAX_BURST_2
 /*mux_wire*/ logic[31:0] push_elements[0:0];
 /*mux_wire*/ logic[0:0] push_strobe;
 /*mux_wire*/ logic[0:0] may_pushes;
+localparam[0:0] RepeatGen = 1'b0;
+/*mux_wire*/ logic[0:0] pop_available;
+localparam[0:0] RepeatGen_2 = 1'b0;
+/*mux_wire*/ logic do_commit_pop;
+/*mux_wire*/ logic may_write_strobe;
+/*mux_wire*/ logic[31:0] pop_data;
+localparam[0:0] RepeatGen_3 = 1'b1;
+/*mux_wire*/ logic[0:0] lower_mask;
+/*mux_wire*/ logic[0:0] upper_mask;
+/*latency*/ logic _push_D1; always_ff @(posedge clk) begin _push_D1 <= push; end
 wire _2;
 assign _2 = &may_pushes;
 /*latency*/ logic __2_N428; always_ff @(posedge clk) begin __2_N428 <= _2; end
@@ -3881,13 +3863,10 @@ wire[31:0] _RotateRight_rotated_data[0:0];
 // (zero sized) _MakeStrobe_chunk_offset
 wire[0:0] _MakeStrobe_strobe;
 /*latency*/ logic[0:0] __MakeStrobe_strobe_D1; always_ff @(posedge clk) begin __MakeStrobe_strobe_D1 <= _MakeStrobe_strobe; end
-localparam[0:0] RepeatGen = 1'b0;
 wire _7 = pop_strobe[0];
 wire _8 = pop_strobe[0];
 wire _9 = pop_strobe[0];
 wire _10 = pop_strobe[0];
-/*mux_wire*/ logic[0:0] pop_available;
-localparam[0:0] RepeatGen_2 = 1'b0;
 wire[0:0] _13;
 assign _13 = ~pop_strobe;
 wire[0:0] _14;
@@ -3896,10 +3875,8 @@ wire _15;
 assign _15 = &_14;
 wire _17;
 assign _17 = _15 & pop_strobe_valid;
-/*mux_wire*/ logic do_commit_pop;
 wire _20;
 assign _20 = wvalid & wready;
-/*mux_wire*/ logic may_write_strobe;
 wire _23;
 assign _23 = wvalid & wready;
 wire _25;
@@ -3915,7 +3892,6 @@ wire[31:0] _31 = push_elements[0];
 wire _fifo_may_push;
 wire _fifo_pop_available;
 wire[31:0] _fifo_pop_data;
-/*mux_wire*/ logic[31:0] pop_data;
 wire _37 = pop_strobe[0];
 wire _38;
 assign _38 = do_commit_pop & _37;
@@ -3933,13 +3909,10 @@ wire[0:0] _58;
 assign _58 = 1'd0 + 1'd1;
 /*mux_wire*/ logic[0:0] _MakeMask_up_to;
 wire[0:0] _MakeMask_bits;
-localparam[0:0] RepeatGen_3 = 1'b1;
-/*mux_wire*/ logic[0:0] lower_mask;
 /*mux_wire*/ logic[0:0] _MakeMask_2_up_to;
 wire[0:0] _MakeMask_2_bits;
 wire[0:0] _62;
 assign _62 = ~_MakeMask_2_bits;
-/*mux_wire*/ logic[0:0] upper_mask;
 wire[0:0] _65;
 assign _65 = 1'd0 + 1'd1;
 /*mux_wire*/ logic[0:0] _MakeMask_3_up_to;
@@ -4019,7 +3992,7 @@ always_comb begin // combinatorial push_elements
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	push_elements = '{32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx};
 	for(int _v0 = 0; _v0 < 1; _v0 = _v0 + 1) begin
-if(_push_D1) push_elements[_v0] = __RotateRight_rotated_data_D1[_v0];
+push_elements[_v0] = __RotateRight_rotated_data_D1[_v0];
 end
 end
 always_comb begin // combinatorial push_strobe
@@ -4048,13 +4021,13 @@ always_comb begin // combinatorial _RotateRight_data
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_RotateRight_data = '{32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx};
 	for(int _v0 = 0; _v0 < 1; _v0 = _v0 + 1) begin
-if(push) _RotateRight_data[_v0] = write_v[_v0];
+_RotateRight_data[_v0] = write_v[_v0];
 end
 end
 always_comb begin // combinatorial _MakeStrobe_chunk_length
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_MakeStrobe_chunk_length = 1'dx;
-	if(push) _MakeStrobe_chunk_length = num_elems;
+	_MakeStrobe_chunk_length = num_elems;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_MakeStrobe_chunk_length = _MakeStrobe_chunk_length;
 end
@@ -4075,7 +4048,7 @@ always_comb begin // combinatorial wdata
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	wdata = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
 	for(int _v0 = 0; _v0 < 32; _v0 = _v0 + 1) begin
-if(_fifo_pop_available) wdata[_v0] = pop_data[_v0];
+wdata[_v0] = pop_data[_v0];
 end
 end
 always_comb begin // combinatorial wstrb
@@ -4119,12 +4092,12 @@ end
 always_comb begin // combinatorial _fifo_push_data
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_fifo_push_data = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_30) _fifo_push_data = _31;
+	_fifo_push_data = _31;
 end
 always_comb begin // combinatorial pop_data
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	pop_data = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_fifo_pop_available) pop_data = _fifo_pop_data;
+	pop_data = _fifo_pop_data;
 end
 always_comb begin // combinatorial _fifo_pop
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -4153,40 +4126,40 @@ end
 always_comb begin // combinatorial _IntNarrow_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_din = 9'sdx;
-	if(may_write_strobe) if(!_48) _IntNarrow_din = _52;
+	_IntNarrow_din = _52;
 end
 always_comb begin // combinatorial _MakeMask_up_to
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_MakeMask_up_to = 1'dx;
-	if(may_write_strobe) if(_55) _MakeMask_up_to = _58;
+	_MakeMask_up_to = _58;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_MakeMask_up_to = _MakeMask_up_to;
 end
 always_comb begin // combinatorial lower_mask
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	lower_mask = 1'bx;
-	if(write_burst) lower_mask = _62;
+	lower_mask = _62;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	lower_mask = lower_mask;
 end
 always_comb begin // combinatorial _MakeMask_2_up_to
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_MakeMask_2_up_to = 1'dx;
-	if(write_burst) _MakeMask_2_up_to = 1'd0;
+	_MakeMask_2_up_to = 1'd0;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_MakeMask_2_up_to = _MakeMask_2_up_to;
 end
 always_comb begin // combinatorial upper_mask
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	upper_mask = 1'bx;
-	if(write_burst) upper_mask = _MakeMask_3_bits;
+	upper_mask = _MakeMask_3_bits;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	upper_mask = upper_mask;
 end
 always_comb begin // combinatorial _MakeMask_3_up_to
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_MakeMask_3_up_to = 1'dx;
-	if(write_burst) _MakeMask_3_up_to = _65;
+	_MakeMask_3_up_to = _65;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_MakeMask_3_up_to = _MakeMask_3_up_to;
 end
@@ -4222,6 +4195,7 @@ module FWFT_T_type_bool_32_DEPTH_1024_MAY_PUSH_LATENCY_430(
 /*mux_wire*/ logic[2:0] outflow_path_valids;
 /*mux_wire*/ logic[31:0] outflow_path_elems[0:2];
 /*mux_wire*/ logic[2:0] will_shifts;
+/*mux_wire*/ logic[9:0] space_remaining;
 wire _3;
 assign _3 = read_addr != write_addr;
 wire[31:0] _5 = mem[read_addr];
@@ -4247,7 +4221,6 @@ assign _20 = _17 | _19;
 wire _21 = will_shifts[2];
 wire _22 = outflow_path_valids[2];
 wire[31:0] _23 = outflow_path_elems[2];
-/*mux_wire*/ logic[9:0] space_remaining;
 wire signed[10:0] _26;
 assign _26 = read_addr - write_addr;
 wire signed[10:0] _28;
@@ -4256,9 +4229,7 @@ wire[9:0] _29;
 assign _29 = _28; // == mod 1024 (target is 10 bits wide)
 wire _32;
 assign _32 = space_remaining > 9'd431;
-/*mux_wire*/ logic _LatencyOffset_din;
-wire _LatencyOffset_dout;
-/*latency*/ logic __LatencyOffset_dout_N430; always_ff @(posedge clk) begin __LatencyOffset_dout_N430 <= _LatencyOffset_dout; end
+/*latency*/ logic __32_D1; always_ff @(posedge clk) begin __32_D1 <= _32; end
 /*mux_wire*/ logic[31:0] _ToBits_value;
 wire[31:0] _ToBits_bits;
 wire[10:0] _37;
@@ -4277,11 +4248,6 @@ wire _47 = outflow_path_valids[0];
 wire[31:0] _48 = outflow_path_elems[0];
 /*mux_wire*/ logic[31:0] _FromBits_bits;
 wire[31:0] _FromBits_value;
-LatencyOffset_T_type_bool_OFFSET_N431 LatencyOffset(
-	.clk(clk),
-	.din(_LatencyOffset_din),
-	.dout(_LatencyOffset_dout)
-);
 ToBits_T_type_bool_32 ToBits(
 	.clk(clk),
 	.value(_ToBits_value),
@@ -4343,21 +4309,14 @@ end
 always_comb begin // combinatorial may_push
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	may_push = 1'bx;
-	may_push = __LatencyOffset_dout_N430;
+	may_push = __32_D1;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	may_push = may_push;
-end
-always_comb begin // combinatorial _LatencyOffset_din
-	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	_LatencyOffset_din = 1'bx;
-	_LatencyOffset_din = _32;
-	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
-	_LatencyOffset_din = _LatencyOffset_din;
 end
 always_comb begin // combinatorial _ToBits_value
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_ToBits_value = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(push) _ToBits_value = push_data;
+	_ToBits_value = push_data;
 end
 always_comb begin // combinatorial pop_available
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -4370,12 +4329,12 @@ end
 always_comb begin // combinatorial pop_data
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	pop_data = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_47) pop_data = _FromBits_value;
+	pop_data = _FromBits_value;
 end
 always_comb begin // combinatorial _FromBits_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_FromBits_bits = 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_47) _FromBits_bits = _48;
+	_FromBits_bits = _48;
 end
 endmodule // FWFT #(T: type bool #()[32], DEPTH: 1024, MAY_PUSH_LATENCY: 430)
 
@@ -4398,16 +4357,6 @@ module ToBits_T_type_bool_32(
 
 assign bits = value;
 endmodule // ToBits #(T: type bool #()[32])
-
-// LatencyOffset #(T: type bool #(), OFFSET: -431)
-module LatencyOffset_T_type_bool_OFFSET_N431(
-	/* clock */ input clk,
-	input wire din,
-	output /*mux_wire*/ logic dout
-);
-
-	assign dout = din;
-endmodule // LatencyOffset #(T: type bool #(), OFFSET: -431)
 
 // MakeStrobe #(STROBE_WIDTH: 1)
 module MakeStrobe_STROBE_WIDTH_1(
@@ -4465,9 +4414,9 @@ module RotateRight_T_type_bool_ARRAY_LEN_1(
 );
 
 // (zero sized) offset_bits
+/*mux_wire*/ logic[0:0] rotate_stages[0:0];
 // (zero sized) _UIntToBits_value
 // (zero sized) _UIntToBits_bits
-/*mux_wire*/ logic[0:0] rotate_stages[0:0];
 wire[0:0] _3 = rotate_stages[0];
 UIntToBits_NUM_BITS_0 UIntToBits(
 	.clk(clk)
@@ -4518,9 +4467,9 @@ module RotateRight_T_type_bool_32_ARRAY_LEN_1(
 
 genvar _g0;
 // (zero sized) offset_bits
+/*mux_wire*/ logic[31:0] rotate_stages[0:0][0:0];
 // (zero sized) _UIntToBits_value
 // (zero sized) _UIntToBits_bits
-/*mux_wire*/ logic[31:0] rotate_stages[0:0][0:0];
 wire[31:0] _3[0:0];
 generate
 for(_g0 = 0; _g0 < 1; _g0 = _g0 + 1) begin
@@ -4586,43 +4535,60 @@ module write_burst_address_manager_AXI_WIDTH_32_ADDR_WIDTH_64_NUM_PARALLEL_ELEME
 /*state*/ logic current_command_chunk_end;
 /*state*/ logic current_command_is_last;
 /*state*/ logic current_command_is_empty_burst;
+/*mux_wire*/ logic[61:0] addr_begin_pipeline;
+/*mux_wire*/ logic[7:0] current_command_final_align_begin_pipeline;
+/*mux_wire*/ logic current_command_chunk_end_begin_pipeline;
+/*mux_wire*/ logic[53:0] cur_burst_idx;
+/*mux_wire*/ logic[7:0] element_in_burst;
+/*mux_wire*/ logic[7:0] first_transfer_idx;
+// (zero sized) start_element_offset
+/*mux_wire*/ logic[53:0] next_burst_idx;
+/*mux_wire*/ logic[61:0] next_burst_addr;
+/*mux_wire*/ logic[7:0] last_transfer_to_include;
+// (zero sized) last_chunk_offset
+/*mux_wire*/ logic[7:0] last_element_before_final_align;
+/*mux_wire*/ logic[7:0] awlen_w;
+/*mux_wire*/ logic cur_final_align_is_zero;
+/*mux_wire*/ logic should_push_burst;
+/*mux_wire*/ logic last;
+/*mux_wire*/ logic[61:0] transfer_addr;
+/*mux_wire*/ logic[61:0] element_aligned_addr;
+/*mux_wire*/ logic end_of_burst;
+/*mux_wire*/ logic is_last_burst;
+/*mux_wire*/ logic[7:0] final_align;
+/*mux_wire*/ logic burst_is_empty;
+/*mux_wire*/ logic[10:0] command;
+/*mux_wire*/ logic[61:0] new_addr_2;
+/*mux_wire*/ logic[10:0] command_2;
+/*mux_wire*/ logic chunk_end;
+/*mux_wire*/ logic is_last_2;
+/*mux_wire*/ logic[7:0] final_align_2;
+/*mux_wire*/ logic is_empty_burst_2;
+/*latency*/ logic _current_command_chunk_end_begin_pipeline_D0; always_ff @(posedge clk) begin _current_command_chunk_end_begin_pipeline_D0 <= current_command_chunk_end_begin_pipeline; end
 /*mux_wire*/ logic[61:0] _pack_feedback_loop_v1_i;
 /*mux_wire*/ logic[7:0] _pack_feedback_loop_v2_i;
 /*mux_wire*/ logic _pack_feedback_loop_v3_i;
 wire[70:0] _pack_feedback_loop_packed_o;
 /*mux_wire*/ logic[70:0] _feedback_loop_pipeline_in;
-/*mux_wire*/ logic[61:0] addr_begin_pipeline;
-/*mux_wire*/ logic[7:0] current_command_final_align_begin_pipeline;
-/*mux_wire*/ logic current_command_chunk_end_begin_pipeline;
-/*latency*/ logic _current_command_chunk_end_begin_pipeline_D0; always_ff @(posedge clk) begin _current_command_chunk_end_begin_pipeline_D0 <= current_command_chunk_end_begin_pipeline; end
 wire[70:0] _feedback_loop_pipeline_out;
 /*mux_wire*/ logic[70:0] _pack_feedback_loop_packed_i;
 wire[61:0] _pack_feedback_loop_v1_o;
 wire[7:0] _pack_feedback_loop_v2_o;
 wire _pack_feedback_loop_v3_o;
-/*mux_wire*/ logic[53:0] cur_burst_idx;
-/*mux_wire*/ logic[7:0] element_in_burst;
 /*mux_wire*/ logic[61:0] _BitwiseIntSplit_v;
 wire[53:0] _BitwiseIntSplit_upper;
 wire[7:0] _BitwiseIntSplit_lower;
-/*mux_wire*/ logic[7:0] first_transfer_idx;
-// (zero sized) start_element_offset
 /*mux_wire*/ logic[7:0] _BitwiseIntSplit_2_v;
 wire[7:0] _BitwiseIntSplit_2_upper;
 // (zero sized) _BitwiseIntSplit_2_lower
-/*mux_wire*/ logic[53:0] next_burst_idx;
 wire[54:0] _9;
 assign _9 = cur_burst_idx + 1'd1;
 wire[53:0] _11;
 assign _11 = _9; // == mod 18014398509481984 (target is 54 bits wide)
 /*latency*/ logic[53:0] __11_D0; always_ff @(posedge clk) begin __11_D0 <= _11; end
-/*mux_wire*/ logic[61:0] next_burst_addr;
 /*mux_wire*/ logic[53:0] _BitwiseIntConcat_upper;
 /*mux_wire*/ logic[7:0] _BitwiseIntConcat_lower;
 wire[61:0] _BitwiseIntConcat_v;
-/*mux_wire*/ logic[7:0] last_transfer_to_include;
-// (zero sized) last_chunk_offset
-/*mux_wire*/ logic[7:0] last_element_before_final_align;
 /*mux_wire*/ logic[7:0] _IntNarrow_din;
 wire[7:0] _IntNarrow_dout;
 wire[7:0] _19;
@@ -4630,30 +4596,24 @@ assign _19 = _IntNarrow_dout - 1'd1;
 /*mux_wire*/ logic[7:0] _BitwiseIntSplit_3_v;
 wire[7:0] _BitwiseIntSplit_3_upper;
 // (zero sized) _BitwiseIntSplit_3_lower
-/*mux_wire*/ logic[7:0] awlen_w;
 wire signed[8:0] _23;
 assign _23 = last_transfer_to_include - first_transfer_idx;
 /*mux_wire*/ logic signed[8:0] _IntNarrow_2_din;
 wire[7:0] _IntNarrow_2_dout;
 /*latency*/ logic[7:0] __IntNarrow_2_dout_D0; always_ff @(posedge clk) begin __IntNarrow_2_dout_D0 <= _IntNarrow_2_dout; end
-/*mux_wire*/ logic cur_final_align_is_zero;
 wire _26;
 assign _26 = current_command_final_align_begin_pipeline == 1'd0;
 /*latency*/ logic __26_D0; always_ff @(posedge clk) begin __26_D0 <= _26; end
 wire _feedback_loop_pipeline_stable;
 wire _30;
 assign _30 = current_addr_valid & _feedback_loop_pipeline_stable;
-/*mux_wire*/ logic should_push_burst;
-/*mux_wire*/ logic last;
 /*mux_wire*/ logic _feedback_loop_input_changed;
-/*mux_wire*/ logic[61:0] transfer_addr;
 // (zero sized) _
 /*mux_wire*/ logic[61:0] _BitwiseIntSplit_4_v;
 wire[61:0] _BitwiseIntSplit_4_upper;
 // (zero sized) _BitwiseIntSplit_4_lower
 /*mux_wire*/ logic __2;
 wire _command_fifo_may_push;
-/*mux_wire*/ logic[61:0] element_aligned_addr;
 /*mux_wire*/ logic[1:0] _addr_misalign;
 /*mux_wire*/ logic[63:0] _BitwiseIntSplit_5_v;
 wire[61:0] _BitwiseIntSplit_5_upper;
@@ -4679,11 +4639,6 @@ wire _burst_splitter_end_of_burst;
 wire _burst_splitter_is_last_burst;
 wire[7:0] _burst_splitter_final_align;
 wire _burst_splitter_burst_is_empty;
-/*mux_wire*/ logic end_of_burst;
-/*mux_wire*/ logic is_last_burst;
-/*mux_wire*/ logic[7:0] final_align;
-/*mux_wire*/ logic burst_is_empty;
-/*mux_wire*/ logic[10:0] command;
 /*mux_wire*/ logic _pack_command_v1_i;
 /*mux_wire*/ logic _pack_command_v2_i;
 /*mux_wire*/ logic[7:0] _pack_command_v3_i;
@@ -4696,7 +4651,6 @@ wire _77;
 assign _77 = ~current_addr_valid;
 wire _addr_fifo_pop_available;
 wire[61:0] _addr_fifo_pop_data;
-/*mux_wire*/ logic[61:0] new_addr_2;
 /*mux_wire*/ logic _addr_fifo_pop;
 wire _83;
 assign _83 = ~current_command_chunk_end;
@@ -4706,12 +4660,7 @@ wire _86;
 assign _86 = _83 & _85;
 wire _command_fifo_pop_available;
 wire[10:0] _command_fifo_pop_data;
-/*mux_wire*/ logic[10:0] command_2;
 /*mux_wire*/ logic _command_fifo_pop;
-/*mux_wire*/ logic chunk_end;
-/*mux_wire*/ logic is_last_2;
-/*mux_wire*/ logic[7:0] final_align_2;
-/*mux_wire*/ logic is_empty_burst_2;
 /*mux_wire*/ logic[10:0] _pack_command_packed_i;
 wire _pack_command_v1_o;
 wire _pack_command_v2_o;
@@ -4964,17 +4913,17 @@ end
 always_comb begin // combinatorial last_element_before_final_align
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	last_element_before_final_align = 8'dx;
-	if(!current_command_chunk_end_begin_pipeline) last_element_before_final_align = _19;
+	last_element_before_final_align = _19;
 end
 always_comb begin // combinatorial _IntNarrow_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_din = 8'dx;
-	if(!current_command_chunk_end_begin_pipeline) _IntNarrow_din = current_command_final_align_begin_pipeline;
+	_IntNarrow_din = current_command_final_align_begin_pipeline;
 end
 always_comb begin // combinatorial _BitwiseIntSplit_3_v
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitwiseIntSplit_3_v = 8'dx;
-	if(!current_command_chunk_end_begin_pipeline) _BitwiseIntSplit_3_v = last_element_before_final_align;
+	_BitwiseIntSplit_3_v = last_element_before_final_align;
 end
 always_comb begin // combinatorial awlen_w
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -5004,24 +4953,24 @@ end
 always_comb begin // combinatorial awaddr
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	awaddr = 62'dx;
-	if(may_push_burst) if(_30) if(should_push_burst) awaddr = transfer_addr;
+	awaddr = transfer_addr;
 end
 always_comb begin // combinatorial awlen
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	awlen = 8'dx;
-	if(may_push_burst) if(_30) if(should_push_burst) awlen = awlen_w;
+	awlen = awlen_w;
 end
 always_comb begin // combinatorial is_last
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	is_last = 1'bx;
-	if(may_push_burst) if(_30) if(should_push_burst) is_last = last;
+	is_last = last;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	is_last = is_last;
 end
 always_comb begin // combinatorial is_empty_burst
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	is_empty_burst = 1'bx;
-	if(may_push_burst) if(_30) if(should_push_burst) is_empty_burst = current_command_is_empty_burst;
+	is_empty_burst = current_command_is_empty_burst;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	is_empty_burst = is_empty_burst;
 end
@@ -5056,12 +5005,12 @@ end
 always_comb begin // combinatorial transfer_addr
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	transfer_addr = 62'dx;
-	if(may_push_burst) if(_30) if(should_push_burst) transfer_addr = _BitwiseIntSplit_4_upper;
+	transfer_addr = _BitwiseIntSplit_4_upper;
 end
 always_comb begin // combinatorial _BitwiseIntSplit_4_v
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitwiseIntSplit_4_v = 62'dx;
-	if(may_push_burst) if(_30) if(should_push_burst) _BitwiseIntSplit_4_v = current_addr;
+	_BitwiseIntSplit_4_v = current_addr;
 end
 always_comb begin // combinatorial __2
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -5081,17 +5030,17 @@ end
 always_comb begin // combinatorial element_aligned_addr
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	element_aligned_addr = 62'dx;
-	if(push_address) element_aligned_addr = _BitwiseIntSplit_5_upper;
+	element_aligned_addr = _BitwiseIntSplit_5_upper;
 end
 always_comb begin // combinatorial _addr_misalign
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_addr_misalign = 2'dx;
-	if(push_address) _addr_misalign = _BitwiseIntSplit_5_lower;
+	_addr_misalign = _BitwiseIntSplit_5_lower;
 end
 always_comb begin // combinatorial _BitwiseIntSplit_5_v
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitwiseIntSplit_5_v = 64'dx;
-	if(push_address) _BitwiseIntSplit_5_v = new_addr;
+	_BitwiseIntSplit_5_v = new_addr;
 end
 always_comb begin // combinatorial _assert_runtime_assert_runtime
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -5104,7 +5053,7 @@ end
 always_comb begin // combinatorial _assert_runtime__condition
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_assert_runtime__condition = 1'bx;
-	if(push_address) _assert_runtime__condition = _53;
+	_assert_runtime__condition = _53;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_assert_runtime__condition = _assert_runtime__condition;
 end
@@ -5119,7 +5068,7 @@ end
 always_comb begin // combinatorial _addr_fifo_push_data
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_addr_fifo_push_data = 62'dx;
-	if(push_address) _addr_fifo_push_data = element_aligned_addr;
+	_addr_fifo_push_data = element_aligned_addr;
 end
 always_comb begin // combinatorial _burst_splitter_push_new_align
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -5132,7 +5081,7 @@ end
 always_comb begin // combinatorial _burst_splitter_new_starting_align
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_burst_splitter_new_starting_align = 8'dx;
-	if(push_address) _burst_splitter_new_starting_align = _60;
+	_burst_splitter_new_starting_align = _60;
 end
 always_comb begin // combinatorial _burst_splitter_push_elements
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -5145,71 +5094,71 @@ end
 always_comb begin // combinatorial _burst_splitter_num_elements
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_burst_splitter_num_elements = 1'dx;
-	if(push_elements) _burst_splitter_num_elements = num_elements;
+	_burst_splitter_num_elements = num_elements;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_burst_splitter_num_elements = _burst_splitter_num_elements;
 end
 always_comb begin // combinatorial _burst_splitter_is_last
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_burst_splitter_is_last = 1'bx;
-	if(push_elements) _burst_splitter_is_last = is_last_elem;
+	_burst_splitter_is_last = is_last_elem;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_burst_splitter_is_last = _burst_splitter_is_last;
 end
 always_comb begin // combinatorial end_of_burst
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	end_of_burst = 1'bx;
-	if(_burst_splitter_output_command) end_of_burst = _burst_splitter_end_of_burst;
+	end_of_burst = _burst_splitter_end_of_burst;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	end_of_burst = end_of_burst;
 end
 always_comb begin // combinatorial is_last_burst
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	is_last_burst = 1'bx;
-	if(_burst_splitter_output_command) is_last_burst = _burst_splitter_is_last_burst;
+	is_last_burst = _burst_splitter_is_last_burst;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	is_last_burst = is_last_burst;
 end
 always_comb begin // combinatorial final_align
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	final_align = 8'dx;
-	if(_burst_splitter_output_command) final_align = _burst_splitter_final_align;
+	final_align = _burst_splitter_final_align;
 end
 always_comb begin // combinatorial burst_is_empty
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	burst_is_empty = 1'bx;
-	if(_burst_splitter_output_command) burst_is_empty = _burst_splitter_burst_is_empty;
+	burst_is_empty = _burst_splitter_burst_is_empty;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	burst_is_empty = burst_is_empty;
 end
 always_comb begin // combinatorial command
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	command = 11'bxxxxxxxxxxx;
-	if(__burst_splitter_output_command_D2000) command = __pack_command_packed_o_D2000;
+	command = __pack_command_packed_o_D2000;
 end
 always_comb begin // combinatorial _pack_command_v1_i
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_pack_command_v1_i = 1'bx;
-	if(_burst_splitter_output_command) _pack_command_v1_i = end_of_burst;
+	_pack_command_v1_i = end_of_burst;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_pack_command_v1_i = _pack_command_v1_i;
 end
 always_comb begin // combinatorial _pack_command_v2_i
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_pack_command_v2_i = 1'bx;
-	if(_burst_splitter_output_command) _pack_command_v2_i = is_last_burst;
+	_pack_command_v2_i = is_last_burst;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_pack_command_v2_i = _pack_command_v2_i;
 end
 always_comb begin // combinatorial _pack_command_v3_i
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_pack_command_v3_i = 8'dx;
-	if(_burst_splitter_output_command) _pack_command_v3_i = final_align;
+	_pack_command_v3_i = final_align;
 end
 always_comb begin // combinatorial _pack_command_v4_i
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_pack_command_v4_i = 1'bx;
-	if(_burst_splitter_output_command) _pack_command_v4_i = burst_is_empty;
+	_pack_command_v4_i = burst_is_empty;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_pack_command_v4_i = _pack_command_v4_i;
 end
@@ -5224,12 +5173,12 @@ end
 always_comb begin // combinatorial _command_fifo_push_data
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_command_fifo_push_data = 11'bxxxxxxxxxxx;
-	if(__burst_splitter_output_command_D2000) _command_fifo_push_data = command;
+	_command_fifo_push_data = command;
 end
 always_comb begin // combinatorial new_addr_2
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	new_addr_2 = 62'dx;
-	if(_77) if(_addr_fifo_pop_available) new_addr_2 = _addr_fifo_pop_data;
+	new_addr_2 = _addr_fifo_pop_data;
 end
 always_comb begin // combinatorial _addr_fifo_pop
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -5242,7 +5191,7 @@ end
 always_comb begin // combinatorial command_2
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	command_2 = 11'bxxxxxxxxxxx;
-	if(_86) if(_command_fifo_pop_available) command_2 = _command_fifo_pop_data;
+	command_2 = _command_fifo_pop_data;
 end
 always_comb begin // combinatorial _command_fifo_pop
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -5255,33 +5204,33 @@ end
 always_comb begin // combinatorial chunk_end
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	chunk_end = 1'bx;
-	if(_86) if(_command_fifo_pop_available) chunk_end = _pack_command_v1_o;
+	chunk_end = _pack_command_v1_o;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	chunk_end = chunk_end;
 end
 always_comb begin // combinatorial is_last_2
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	is_last_2 = 1'bx;
-	if(_86) if(_command_fifo_pop_available) is_last_2 = _pack_command_v2_o;
+	is_last_2 = _pack_command_v2_o;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	is_last_2 = is_last_2;
 end
 always_comb begin // combinatorial final_align_2
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	final_align_2 = 8'dx;
-	if(_86) if(_command_fifo_pop_available) final_align_2 = _pack_command_v3_o;
+	final_align_2 = _pack_command_v3_o;
 end
 always_comb begin // combinatorial is_empty_burst_2
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	is_empty_burst_2 = 1'bx;
-	if(_86) if(_command_fifo_pop_available) is_empty_burst_2 = _pack_command_v4_o;
+	is_empty_burst_2 = _pack_command_v4_o;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	is_empty_burst_2 = is_empty_burst_2;
 end
 always_comb begin // combinatorial _pack_command_packed_i
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_pack_command_packed_i = 11'bxxxxxxxxxxx;
-	if(_86) if(_command_fifo_pop_available) _pack_command_packed_i = command_2;
+	_pack_command_packed_i = command_2;
 end
 always_comb begin // combinatorial _addr_fifo_rst
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -5337,24 +5286,25 @@ module burst_write_splitter_MAX_ELEMENTS_IN_BURST_256_NUM_PARALLEL_ELEMENTS_1_AD
 /*state*/ logic[7:0] current_align;
 /*state*/ logic current_align_valid;
 /*state*/ logic current_burst_is_empty;
+/*mux_wire*/ logic new_addr_requested;
+/*mux_wire*/ logic[8:0] current_align_and;
+/*mux_wire*/ logic[7:0] next_align;
+/*mux_wire*/ logic push_end_of_burst;
+/*mux_wire*/ logic next_current_burst_is_empty;
+/*mux_wire*/ logic[7:0] new_addr_align;
 /*mux_wire*/ logic _;
 wire _align_queue_may_push;
 /*mux_wire*/ logic _align_queue_push;
 /*mux_wire*/ logic[7:0] _align_queue_push_data;
-/*mux_wire*/ logic new_addr_requested;
 /*mux_wire*/ logic _assert_runtime_assert_runtime;
 /*mux_wire*/ logic _assert_runtime__condition;
 // (zero sized) _10
-/*mux_wire*/ logic[8:0] current_align_and;
 wire[8:0] _13;
 assign _13 = current_align + num_elements;
-/*mux_wire*/ logic[7:0] next_align;
 wire[7:0] _15;
 assign _15 = current_align_and; // == mod 256 (target is 8 bits wide)
-/*mux_wire*/ logic push_end_of_burst;
 wire _17;
 assign _17 = current_align_and >= 9'd256;
-/*mux_wire*/ logic next_current_burst_is_empty;
 wire _21;
 assign _21 = num_elements == 1'd0;
 wire _22;
@@ -5365,7 +5315,6 @@ wire _35;
 assign _35 = ~current_align_valid;
 wire _align_queue_pop_available;
 wire[7:0] _align_queue_pop_data;
-/*mux_wire*/ logic[7:0] new_addr_align;
 /*mux_wire*/ logic _align_queue_pop;
 /*mux_wire*/ logic _align_queue_rst;
 FWFT_T_type_int_FROM_0_TO_256_DEPTH_32_MAY_PUSH_LATENCY_0 align_queue(
@@ -5414,7 +5363,7 @@ end
 always_comb begin // combinatorial _align_queue_push_data
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_align_queue_push_data = 8'dx;
-	if(push_new_align) _align_queue_push_data = new_starting_align;
+	_align_queue_push_data = new_starting_align;
 end
 always_comb begin // combinatorial output_command
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -5427,26 +5376,26 @@ end
 always_comb begin // combinatorial end_of_burst
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	end_of_burst = 1'bx;
-	if(push_elements) if(_26) end_of_burst = push_end_of_burst;
+	end_of_burst = push_end_of_burst;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	end_of_burst = end_of_burst;
 end
 always_comb begin // combinatorial is_last_burst
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	is_last_burst = 1'bx;
-	if(push_elements) if(_26) is_last_burst = is_last;
+	is_last_burst = is_last;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	is_last_burst = is_last_burst;
 end
 always_comb begin // combinatorial final_align
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	final_align = 8'dx;
-	if(push_elements) if(_26) final_align = next_align;
+	final_align = next_align;
 end
 always_comb begin // combinatorial burst_is_empty
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	burst_is_empty = 1'bx;
-	if(push_elements) if(_26) burst_is_empty = next_current_burst_is_empty;
+	burst_is_empty = next_current_burst_is_empty;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	burst_is_empty = burst_is_empty;
 end
@@ -5470,38 +5419,38 @@ end
 always_comb begin // combinatorial _assert_runtime__condition
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_assert_runtime__condition = 1'bx;
-	if(push_elements) _assert_runtime__condition = current_align_valid;
+	_assert_runtime__condition = current_align_valid;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_assert_runtime__condition = _assert_runtime__condition;
 end
 always_comb begin // combinatorial current_align_and
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	current_align_and = 9'dx;
-	if(push_elements) current_align_and = _13;
+	current_align_and = _13;
 end
 always_comb begin // combinatorial next_align
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	next_align = 8'dx;
-	if(push_elements) next_align = _15;
+	next_align = _15;
 end
 always_comb begin // combinatorial push_end_of_burst
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	push_end_of_burst = 1'bx;
-	if(push_elements) push_end_of_burst = _17;
+	push_end_of_burst = _17;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	push_end_of_burst = push_end_of_burst;
 end
 always_comb begin // combinatorial next_current_burst_is_empty
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	next_current_burst_is_empty = 1'bx;
-	if(push_elements) next_current_burst_is_empty = _22;
+	next_current_burst_is_empty = _22;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	next_current_burst_is_empty = next_current_burst_is_empty;
 end
 always_comb begin // combinatorial new_addr_align
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	new_addr_align = 8'dx;
-	if(new_addr_requested) if(_align_queue_pop_available) new_addr_align = _align_queue_pop_data;
+	new_addr_align = _align_queue_pop_data;
 end
 always_comb begin // combinatorial _align_queue_pop
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -5552,6 +5501,7 @@ module FWFT_T_type_int_FROM_0_TO_256_DEPTH_32_MAY_PUSH_LATENCY_0(
 /*mux_wire*/ logic[2:0] outflow_path_valids;
 /*mux_wire*/ logic[7:0] outflow_path_elems[0:2];
 /*mux_wire*/ logic[2:0] will_shifts;
+/*mux_wire*/ logic[4:0] space_remaining;
 wire _3;
 assign _3 = read_addr != write_addr;
 wire[7:0] _5 = mem[read_addr];
@@ -5577,7 +5527,6 @@ assign _20 = _17 | _19;
 wire _21 = will_shifts[2];
 wire _22 = outflow_path_valids[2];
 wire[7:0] _23 = outflow_path_elems[2];
-/*mux_wire*/ logic[4:0] space_remaining;
 wire signed[5:0] _26;
 assign _26 = read_addr - write_addr;
 wire signed[5:0] _28;
@@ -5586,9 +5535,7 @@ wire[4:0] _29;
 assign _29 = _28; // == mod 32 (target is 5 bits wide)
 wire _32;
 assign _32 = space_remaining > 1'd1;
-/*mux_wire*/ logic _LatencyOffset_din;
-wire _LatencyOffset_dout;
-/*latency*/ logic __LatencyOffset_dout_D0; always_ff @(posedge clk) begin __LatencyOffset_dout_D0 <= _LatencyOffset_dout; end
+/*latency*/ logic __32_D1; always_ff @(posedge clk) begin __32_D1 <= _32; end
 /*mux_wire*/ logic[7:0] _ToBits_value;
 wire[7:0] _ToBits_bits;
 wire[5:0] _37;
@@ -5607,11 +5554,6 @@ wire _47 = outflow_path_valids[0];
 wire[7:0] _48 = outflow_path_elems[0];
 /*mux_wire*/ logic[7:0] _FromBits_bits;
 wire[7:0] _FromBits_value;
-LatencyOffset_T_type_bool_OFFSET_N1 LatencyOffset(
-	.clk(clk),
-	.din(_LatencyOffset_din),
-	.dout(_LatencyOffset_dout)
-);
 ToBits_T_type_int_FROM_0_TO_256 ToBits(
 	.clk(clk),
 	.value(_ToBits_value),
@@ -5673,21 +5615,14 @@ end
 always_comb begin // combinatorial may_push
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	may_push = 1'bx;
-	may_push = __LatencyOffset_dout_D0;
+	may_push = __32_D1;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	may_push = may_push;
-end
-always_comb begin // combinatorial _LatencyOffset_din
-	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	_LatencyOffset_din = 1'bx;
-	_LatencyOffset_din = _32;
-	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
-	_LatencyOffset_din = _LatencyOffset_din;
 end
 always_comb begin // combinatorial _ToBits_value
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_ToBits_value = 8'dx;
-	if(push) _ToBits_value = push_data;
+	_ToBits_value = push_data;
 end
 always_comb begin // combinatorial pop_available
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -5700,12 +5635,12 @@ end
 always_comb begin // combinatorial pop_data
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	pop_data = 8'dx;
-	if(_47) pop_data = _FromBits_value;
+	pop_data = _FromBits_value;
 end
 always_comb begin // combinatorial _FromBits_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_FromBits_bits = 8'bxxxxxxxx;
-	if(_47) _FromBits_bits = _48;
+	_FromBits_bits = _48;
 end
 endmodule // FWFT #(T: type int #(FROM: 0, TO: 256), DEPTH: 32, MAY_PUSH_LATENCY: 0)
 
@@ -5921,6 +5856,7 @@ module FWFT_T_type_bool_11_DEPTH_128_MAY_PUSH_LATENCY_0(
 /*mux_wire*/ logic[2:0] outflow_path_valids;
 /*mux_wire*/ logic[10:0] outflow_path_elems[0:2];
 /*mux_wire*/ logic[2:0] will_shifts;
+/*mux_wire*/ logic[6:0] space_remaining;
 wire _3;
 assign _3 = read_addr != write_addr;
 wire[10:0] _5 = mem[read_addr];
@@ -5946,7 +5882,6 @@ assign _20 = _17 | _19;
 wire _21 = will_shifts[2];
 wire _22 = outflow_path_valids[2];
 wire[10:0] _23 = outflow_path_elems[2];
-/*mux_wire*/ logic[6:0] space_remaining;
 wire signed[7:0] _26;
 assign _26 = read_addr - write_addr;
 wire signed[7:0] _28;
@@ -5955,9 +5890,7 @@ wire[6:0] _29;
 assign _29 = _28; // == mod 128 (target is 7 bits wide)
 wire _32;
 assign _32 = space_remaining > 1'd1;
-/*mux_wire*/ logic _LatencyOffset_din;
-wire _LatencyOffset_dout;
-/*latency*/ logic __LatencyOffset_dout_D0; always_ff @(posedge clk) begin __LatencyOffset_dout_D0 <= _LatencyOffset_dout; end
+/*latency*/ logic __32_D1; always_ff @(posedge clk) begin __32_D1 <= _32; end
 /*mux_wire*/ logic[10:0] _ToBits_value;
 wire[10:0] _ToBits_bits;
 wire[7:0] _37;
@@ -5976,11 +5909,6 @@ wire _47 = outflow_path_valids[0];
 wire[10:0] _48 = outflow_path_elems[0];
 /*mux_wire*/ logic[10:0] _FromBits_bits;
 wire[10:0] _FromBits_value;
-LatencyOffset_T_type_bool_OFFSET_N1 LatencyOffset(
-	.clk(clk),
-	.din(_LatencyOffset_din),
-	.dout(_LatencyOffset_dout)
-);
 ToBits_T_type_bool_11 ToBits(
 	.clk(clk),
 	.value(_ToBits_value),
@@ -6042,21 +5970,14 @@ end
 always_comb begin // combinatorial may_push
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	may_push = 1'bx;
-	may_push = __LatencyOffset_dout_D0;
+	may_push = __32_D1;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	may_push = may_push;
-end
-always_comb begin // combinatorial _LatencyOffset_din
-	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	_LatencyOffset_din = 1'bx;
-	_LatencyOffset_din = _32;
-	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
-	_LatencyOffset_din = _LatencyOffset_din;
 end
 always_comb begin // combinatorial _ToBits_value
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_ToBits_value = 11'bxxxxxxxxxxx;
-	if(push) _ToBits_value = push_data;
+	_ToBits_value = push_data;
 end
 always_comb begin // combinatorial pop_available
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -6069,12 +5990,12 @@ end
 always_comb begin // combinatorial pop_data
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	pop_data = 11'bxxxxxxxxxxx;
-	if(_47) pop_data = _FromBits_value;
+	pop_data = _FromBits_value;
 end
 always_comb begin // combinatorial _FromBits_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_FromBits_bits = 11'bxxxxxxxxxxx;
-	if(_47) _FromBits_bits = _48;
+	_FromBits_bits = _48;
 end
 endmodule // FWFT #(T: type bool #()[11], DEPTH: 128, MAY_PUSH_LATENCY: 0)
 
@@ -6118,6 +6039,7 @@ module FWFT_T_type_int_FROM_0_TO_4611686018427387904_DEPTH_32_MAY_PUSH_LATENCY_0
 /*mux_wire*/ logic[2:0] outflow_path_valids;
 /*mux_wire*/ logic[61:0] outflow_path_elems[0:2];
 /*mux_wire*/ logic[2:0] will_shifts;
+/*mux_wire*/ logic[4:0] space_remaining;
 wire _3;
 assign _3 = read_addr != write_addr;
 wire[61:0] _5 = mem[read_addr];
@@ -6143,7 +6065,6 @@ assign _20 = _17 | _19;
 wire _21 = will_shifts[2];
 wire _22 = outflow_path_valids[2];
 wire[61:0] _23 = outflow_path_elems[2];
-/*mux_wire*/ logic[4:0] space_remaining;
 wire signed[5:0] _26;
 assign _26 = read_addr - write_addr;
 wire signed[5:0] _28;
@@ -6152,9 +6073,7 @@ wire[4:0] _29;
 assign _29 = _28; // == mod 32 (target is 5 bits wide)
 wire _32;
 assign _32 = space_remaining > 1'd1;
-/*mux_wire*/ logic _LatencyOffset_din;
-wire _LatencyOffset_dout;
-/*latency*/ logic __LatencyOffset_dout_D0; always_ff @(posedge clk) begin __LatencyOffset_dout_D0 <= _LatencyOffset_dout; end
+/*latency*/ logic __32_D1; always_ff @(posedge clk) begin __32_D1 <= _32; end
 /*mux_wire*/ logic[61:0] _ToBits_value;
 wire[61:0] _ToBits_bits;
 wire[5:0] _37;
@@ -6173,11 +6092,6 @@ wire _47 = outflow_path_valids[0];
 wire[61:0] _48 = outflow_path_elems[0];
 /*mux_wire*/ logic[61:0] _FromBits_bits;
 wire[61:0] _FromBits_value;
-LatencyOffset_T_type_bool_OFFSET_N1 LatencyOffset(
-	.clk(clk),
-	.din(_LatencyOffset_din),
-	.dout(_LatencyOffset_dout)
-);
 ToBits_T_type_int_FROM_0_TO_4611686018427387904 ToBits(
 	.clk(clk),
 	.value(_ToBits_value),
@@ -6239,21 +6153,14 @@ end
 always_comb begin // combinatorial may_push
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	may_push = 1'bx;
-	may_push = __LatencyOffset_dout_D0;
+	may_push = __32_D1;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	may_push = may_push;
-end
-always_comb begin // combinatorial _LatencyOffset_din
-	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	_LatencyOffset_din = 1'bx;
-	_LatencyOffset_din = _32;
-	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
-	_LatencyOffset_din = _LatencyOffset_din;
 end
 always_comb begin // combinatorial _ToBits_value
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_ToBits_value = 62'dx;
-	if(push) _ToBits_value = push_data;
+	_ToBits_value = push_data;
 end
 always_comb begin // combinatorial pop_available
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -6266,24 +6173,14 @@ end
 always_comb begin // combinatorial pop_data
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	pop_data = 62'dx;
-	if(_47) pop_data = _FromBits_value;
+	pop_data = _FromBits_value;
 end
 always_comb begin // combinatorial _FromBits_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_FromBits_bits = 62'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-	if(_47) _FromBits_bits = _48;
+	_FromBits_bits = _48;
 end
 endmodule // FWFT #(T: type int #(FROM: 0, TO: 4611686018427387904), DEPTH: 32, MAY_PUSH_LATENCY: 0)
-
-// LatencyOffset #(T: type bool #(), OFFSET: -1)
-module LatencyOffset_T_type_bool_OFFSET_N1(
-	/* clock */ input clk,
-	input wire din,
-	output /*mux_wire*/ logic dout
-);
-
-	assign dout = din;
-endmodule // LatencyOffset #(T: type bool #(), OFFSET: -1)
 
 // IntNarrow #(FROM_I: -255, TO_I: 256, FROM: 0, TO: 256)
 module IntNarrow_FROM_I_N255_TO_I_256_FROM_0_TO_256(
@@ -6387,10 +6284,10 @@ module SlowStablePipelineCustom_T_type_bool_71_PIPELINE_DEPTH_1(
 
 /*state*/ logic[0:0] cooldown;
 localparam[0:0] RepeatGen = 1'b0;
+localparam[0:0] RepeatGen_2 = 1'b0;
 wire _1 = cooldown[0];
 /*mux_wire*/ logic[70:0] _LatencyOffset_din;
 wire[70:0] _LatencyOffset_dout;
-localparam[0:0] RepeatGen_2 = 1'b0;
 LatencyOffset_T_type_bool_71_OFFSET_N1 LatencyOffset(
 	.clk(clk),
 	.din(_LatencyOffset_din),
@@ -6616,75 +6513,95 @@ module axi4_burst_reader_ExtraDataT_type_bool_0_AXI_WIDTH_32_ADDR_WIDTH_64_ADDR_
 
 genvar _g0;
 /*state*/ logic[61:0] araddr_transfer;
+/*state*/ logic cur_addr_valid;
+/*state*/ logic[61:0] cur_addr;
+/*state*/ logic[31:0] elements_remaining;
+// (zero sized) stored_extra_data
+/*mux_wire*/ logic[61:0] cur_addr_begin_pipeline;
+/*mux_wire*/ logic[31:0] elements_remaining_begin_pipeline;
+/*mux_wire*/ logic[53:0] addr_burst;
+/*mux_wire*/ logic[7:0] first_elem_in_burst;
+/*mux_wire*/ logic[7:0] first_transfer_idx;
+// (zero sized) first_elem_in_transfer
+/*mux_wire*/ logic[53:0] next_addr_burst_idx;
+/*mux_wire*/ logic[8:0] max_number_of_elements_in_this_burst;
+/*mux_wire*/ logic signed[32:0] reduced_elements_remaining;
+/*mux_wire*/ logic is_last;
+/*mux_wire*/ logic is_zero_sized_burst;
+/*mux_wire*/ logic signed[32:0] arlen_remaining;
+/*state*/ logic[8:0] in_flight_headroom;
+/*mux_wire*/ logic[61:0] elem_addr;
+/*mux_wire*/ logic signed[8:0] num_transfers_in_this_burst;
+/*mux_wire*/ logic enough_in_flight_headroom;
+/*mux_wire*/ logic offset_receiver_is_ready;
+// (zero sized) final_align
+/*mux_wire*/ logic[7:0] new_arlen;
+/*mux_wire*/ logic[7:0] final_burst_arlen;
+/*mux_wire*/ logic[1:0] packed_command;
+// (zero sized) chunk_offset_2
+// (zero sized) stored_end_align
+/*state*/ logic stored_is_last;
+/*state*/ logic stored_is_empty_burst;
+// (zero sized) stored_extra_data_out
+/*mux_wire*/ logic[31:0] elements_2[0:0];
+/*mux_wire*/ logic[0:0] chunk_length_2;
+/*mux_wire*/ logic is_final_last;
+/*mux_wire*/ logic should_get_new_burst;
+/*mux_wire*/ logic[1:0] pop_data;
+// (zero sized) cmd_start_align
+// (zero sized) cmd_end_align
+/*mux_wire*/ logic cmd_is_last;
+/*mux_wire*/ logic cmd_is_empty_burst;
+// (zero sized) extra_data_2
+/*latency*/ logic signed[32:0] _arlen_remaining_D0; always_ff @(posedge clk) begin _arlen_remaining_D0 <= arlen_remaining; end
 wire[63:0] _2;
 assign _2 = araddr_transfer << 2'd2;
 localparam[1:0] _3 = 2'b01;
 localparam[2:0] _4 = 3'b000;
 localparam[3:0] _5 = 4'b0010;
 /*mux_wire*/ logic[1:0] _rresp;
-/*state*/ logic cur_addr_valid;
-/*state*/ logic[61:0] cur_addr;
-/*state*/ logic[31:0] elements_remaining;
-// (zero sized) stored_extra_data
 /*mux_wire*/ logic[61:0] _pack_feedback_loop_v1_i;
 /*mux_wire*/ logic[31:0] _pack_feedback_loop_v2_i;
 wire[93:0] _pack_feedback_loop_packed_o;
 /*mux_wire*/ logic[93:0] _feedback_loop_pipeline_in;
-/*mux_wire*/ logic[61:0] cur_addr_begin_pipeline;
-/*mux_wire*/ logic[31:0] elements_remaining_begin_pipeline;
 wire[93:0] _feedback_loop_pipeline_out;
 /*mux_wire*/ logic[93:0] _pack_feedback_loop_packed_i;
 wire[61:0] _pack_feedback_loop_v1_o;
 wire[31:0] _pack_feedback_loop_v2_o;
-/*mux_wire*/ logic[53:0] addr_burst;
-/*mux_wire*/ logic[7:0] first_elem_in_burst;
 /*mux_wire*/ logic[61:0] _BitwiseIntSplit_v;
 wire[53:0] _BitwiseIntSplit_upper;
 wire[7:0] _BitwiseIntSplit_lower;
-/*mux_wire*/ logic[7:0] first_transfer_idx;
-// (zero sized) first_elem_in_transfer
 /*mux_wire*/ logic[7:0] _BitwiseIntSplit_2_v;
 wire[7:0] _BitwiseIntSplit_2_upper;
 // (zero sized) _BitwiseIntSplit_2_lower
-/*mux_wire*/ logic[53:0] next_addr_burst_idx;
 wire[54:0] _16;
 assign _16 = addr_burst + 1'd1;
 wire[53:0] _18;
 assign _18 = _16; // == mod 18014398509481984 (target is 54 bits wide)
 /*latency*/ logic[53:0] __18_D0; always_ff @(posedge clk) begin __18_D0 <= _18; end
-/*mux_wire*/ logic[8:0] max_number_of_elements_in_this_burst;
 wire[8:0] _20;
 assign _20 = 9'd256 - first_elem_in_burst;
-/*mux_wire*/ logic signed[32:0] reduced_elements_remaining;
 wire signed[32:0] _23;
 assign _23 = elements_remaining_begin_pipeline - max_number_of_elements_in_this_burst;
 /*latency*/ logic signed[32:0] __23_D0; always_ff @(posedge clk) begin __23_D0 <= _23; end
-/*mux_wire*/ logic is_last;
 wire _26;
 assign _26 = reduced_elements_remaining <= $signed({1'b0, 1'd0});
-/*mux_wire*/ logic is_zero_sized_burst;
 wire _29;
 assign _29 = elements_remaining_begin_pipeline == 1'd0;
 /*latency*/ logic __29_D0; always_ff @(posedge clk) begin __29_D0 <= _29; end
-/*mux_wire*/ logic signed[32:0] arlen_remaining;
-/*latency*/ logic signed[32:0] _arlen_remaining_D0; always_ff @(posedge clk) begin _arlen_remaining_D0 <= arlen_remaining; end
 wire[31:0] _32;
 assign _32 = elements_remaining_begin_pipeline + 1'd0;
 wire signed[32:0] _34;
 assign _34 = _32 - 1'd1;
-/*state*/ logic[8:0] in_flight_headroom;
 wire _36;
 assign _36 = ~cur_addr_valid;
-/*mux_wire*/ logic[61:0] elem_addr;
 /*mux_wire*/ logic[1:0] _misalign;
 /*mux_wire*/ logic[63:0] _BitwiseIntSplit_3_v;
 wire[61:0] _BitwiseIntSplit_3_upper;
 wire[1:0] _BitwiseIntSplit_3_lower;
 /*mux_wire*/ logic _feedback_loop_input_changed;
-/*mux_wire*/ logic signed[8:0] num_transfers_in_this_burst;
 wire _45;
 assign _45 = arvalid & arready;
-/*mux_wire*/ logic enough_in_flight_headroom;
 wire signed[9:0] _50;
 assign _50 = $signed({1'b0, in_flight_headroom}) - num_transfers_in_this_burst;
 wire _53;
@@ -6699,7 +6616,6 @@ assign _56 = _50 - $signed({1'b0, _55});
 wire[8:0] _IntNarrow_dout;
 wire _58;
 assign _58 = in_flight_headroom >= 9'd256;
-/*mux_wire*/ logic offset_receiver_is_ready;
 /*mux_wire*/ logic _LatencyOffset_din;
 wire _LatencyOffset_dout;
 wire _63;
@@ -6717,9 +6633,6 @@ wire _feedback_loop_pipeline_stable;
 wire _72;
 assign _72 = _70 & _feedback_loop_pipeline_stable;
 /*latency*/ logic __72_D1; always_ff @(posedge clk) begin __72_D1 <= _72; end
-// (zero sized) final_align
-/*mux_wire*/ logic[7:0] new_arlen;
-/*mux_wire*/ logic[7:0] final_burst_arlen;
 /*mux_wire*/ logic signed[32:0] _IntNarrow_2_din;
 wire[7:0] _IntNarrow_2_dout;
 /*mux_wire*/ logic[7:0] _BitwiseIntSplit_4_v;
@@ -6739,7 +6652,6 @@ assign _86 = ~is_zero_sized_burst;
 /*mux_wire*/ logic[61:0] _BitwiseIntSplit_5_v;
 wire[61:0] _BitwiseIntSplit_5_upper;
 // (zero sized) _BitwiseIntSplit_5_lower
-/*mux_wire*/ logic[1:0] packed_command;
 // (zero sized) _command_tuple_v1_i
 // (zero sized) _command_tuple_v2_i
 /*mux_wire*/ logic _command_tuple_v3_i;
@@ -6749,20 +6661,12 @@ wire[1:0] _command_tuple_packed_o;
 /*latency*/ logic[1:0] __command_tuple_packed_o_D1; always_ff @(posedge clk) begin __command_tuple_packed_o_D1 <= _command_tuple_packed_o; end
 /*mux_wire*/ logic _command_fifo_push;
 /*mux_wire*/ logic[1:0] _command_fifo_push_data;
-// (zero sized) chunk_offset_2
-// (zero sized) stored_end_align
-/*state*/ logic stored_is_last;
-/*state*/ logic stored_is_empty_burst;
-// (zero sized) stored_extra_data_out
-/*mux_wire*/ logic[31:0] elements_2[0:0];
 wire[31:0] _96;
 generate
 for(_g0 = 0; _g0 < 32; _g0 = _g0 + 1) begin
 assign _96[_g0] = rdata[_g0];
 end
 endgenerate
-/*mux_wire*/ logic[0:0] chunk_length_2;
-/*mux_wire*/ logic is_final_last;
 wire _101;
 assign _101 = rlast & stored_is_last;
 wire[0:0] _105;
@@ -6777,7 +6681,6 @@ wire _112;
 assign _112 = rready & rvalid;
 wire _114;
 assign _114 = _112 | stored_is_empty_burst;
-/*mux_wire*/ logic should_get_new_burst;
 wire _124;
 assign _124 = rready & rvalid;
 wire _126;
@@ -6790,13 +6693,7 @@ wire _131;
 assign _131 = _128 | _130;
 wire _command_fifo_pop_available;
 wire[1:0] _command_fifo_pop_data;
-/*mux_wire*/ logic[1:0] pop_data;
 /*mux_wire*/ logic _command_fifo_pop;
-// (zero sized) cmd_start_align
-// (zero sized) cmd_end_align
-/*mux_wire*/ logic cmd_is_last;
-/*mux_wire*/ logic cmd_is_empty_burst;
-// (zero sized) extra_data_2
 /*mux_wire*/ logic[1:0] _command_tuple_packed_i;
 // (zero sized) _command_tuple_v1_o
 // (zero sized) _command_tuple_v2_o
@@ -7094,17 +6991,17 @@ end
 always_comb begin // combinatorial elem_addr
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	elem_addr = 62'dx;
-	if(request_new_read) elem_addr = _BitwiseIntSplit_3_upper;
+	elem_addr = _BitwiseIntSplit_3_upper;
 end
 always_comb begin // combinatorial _misalign
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_misalign = 2'dx;
-	if(request_new_read) _misalign = _BitwiseIntSplit_3_lower;
+	_misalign = _BitwiseIntSplit_3_lower;
 end
 always_comb begin // combinatorial _BitwiseIntSplit_3_v
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitwiseIntSplit_3_v = 64'dx;
-	if(request_new_read) _BitwiseIntSplit_3_v = start_addr;
+	_BitwiseIntSplit_3_v = start_addr;
 end
 always_comb begin // combinatorial _feedback_loop_input_changed
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -7166,20 +7063,20 @@ always_comb begin // combinatorial elements
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	elements = '{32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx};
 	for(int _v0 = 0; _v0 < 1; _v0 = _v0 + 1) begin
-if(_114) elements[_v0] = elements_2[_v0];
+elements[_v0] = elements_2[_v0];
 end
 end
 always_comb begin // combinatorial chunk_length
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	chunk_length = 1'dx;
-	if(_114) chunk_length = chunk_length_2;
+	chunk_length = chunk_length_2;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	chunk_length = chunk_length;
 end
 always_comb begin // combinatorial last
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	last = 1'bx;
-	if(_114) last = is_final_last;
+	last = is_final_last;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	last = last;
 end
@@ -7192,54 +7089,54 @@ end
 always_comb begin // combinatorial final_burst_arlen
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	final_burst_arlen = 8'dx;
-	if(_72) if(is_last) final_burst_arlen = _IntNarrow_2_dout;
+	final_burst_arlen = _IntNarrow_2_dout;
 end
 always_comb begin // combinatorial _IntNarrow_2_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_2_din = 33'sdx;
-	if(_72) if(is_last) _IntNarrow_2_din = _arlen_remaining_D0;
+	_IntNarrow_2_din = _arlen_remaining_D0;
 end
 always_comb begin // combinatorial _BitwiseIntSplit_4_v
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitwiseIntSplit_4_v = 8'dx;
-	if(_72) if(is_last) _BitwiseIntSplit_4_v = final_burst_arlen;
+	_BitwiseIntSplit_4_v = final_burst_arlen;
 end
 always_comb begin // combinatorial _IntNarrow_3_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_3_din = 33'sdx;
-	if(_72) if(!is_last) _IntNarrow_3_din = reduced_elements_remaining;
+	_IntNarrow_3_din = reduced_elements_remaining;
 end
 always_comb begin // combinatorial _BitwiseIntConcat_upper
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitwiseIntConcat_upper = 54'dx;
-	if(_72) if(!is_last) _BitwiseIntConcat_upper = next_addr_burst_idx;
+	_BitwiseIntConcat_upper = next_addr_burst_idx;
 end
 always_comb begin // combinatorial _BitwiseIntConcat_lower
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitwiseIntConcat_lower = 8'dx;
-	if(_72) if(!is_last) _BitwiseIntConcat_lower = 1'd0;
+	_BitwiseIntConcat_lower = 1'd0;
 end
 always_comb begin // combinatorial _BitwiseIntSplit_5_v
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_BitwiseIntSplit_5_v = 62'dx;
-	if(_72) _BitwiseIntSplit_5_v = cur_addr;
+	_BitwiseIntSplit_5_v = cur_addr;
 end
 always_comb begin // combinatorial packed_command
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	packed_command = 2'bxx;
-	if(__72_D1) packed_command = __command_tuple_packed_o_D1;
+	packed_command = __command_tuple_packed_o_D1;
 end
 always_comb begin // combinatorial _command_tuple_v3_i
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_command_tuple_v3_i = 1'bx;
-	if(_72) _command_tuple_v3_i = is_last;
+	_command_tuple_v3_i = is_last;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_command_tuple_v3_i = _command_tuple_v3_i;
 end
 always_comb begin // combinatorial _command_tuple_v4_i
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_command_tuple_v4_i = 1'bx;
-	if(_72) _command_tuple_v4_i = is_zero_sized_burst;
+	_command_tuple_v4_i = is_zero_sized_burst;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_command_tuple_v4_i = _command_tuple_v4_i;
 end
@@ -7254,7 +7151,7 @@ end
 always_comb begin // combinatorial _command_fifo_push_data
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_command_fifo_push_data = 2'bxx;
-	if(__72_D1) _command_fifo_push_data = packed_command;
+	_command_fifo_push_data = packed_command;
 end
 always_ff @(posedge clk) begin // state stored_is_last
 	if(should_get_new_burst) if(_command_fifo_pop_available) stored_is_last <= cmd_is_last;
@@ -7289,7 +7186,7 @@ end
 always_comb begin // combinatorial _IntNarrow_4_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_4_din = 1'dx;
-	if(!stored_is_empty_burst) if(is_final_last) _IntNarrow_4_din = _107;
+	_IntNarrow_4_din = _107;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	_IntNarrow_4_din = _IntNarrow_4_din;
 end
@@ -7303,7 +7200,7 @@ end
 always_comb begin // combinatorial pop_data
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	pop_data = 2'bxx;
-	if(should_get_new_burst) if(_command_fifo_pop_available) pop_data = _command_fifo_pop_data;
+	pop_data = _command_fifo_pop_data;
 end
 always_comb begin // combinatorial _command_fifo_pop
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -7316,21 +7213,21 @@ end
 always_comb begin // combinatorial cmd_is_last
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	cmd_is_last = 1'bx;
-	if(should_get_new_burst) if(_command_fifo_pop_available) cmd_is_last = _command_tuple_v3_o;
+	cmd_is_last = _command_tuple_v3_o;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	cmd_is_last = cmd_is_last;
 end
 always_comb begin // combinatorial cmd_is_empty_burst
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	cmd_is_empty_burst = 1'bx;
-	if(should_get_new_burst) if(_command_fifo_pop_available) cmd_is_empty_burst = _command_tuple_v4_o;
+	cmd_is_empty_burst = _command_tuple_v4_o;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	cmd_is_empty_burst = cmd_is_empty_burst;
 end
 always_comb begin // combinatorial _command_tuple_packed_i
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_command_tuple_packed_i = 2'bxx;
-	if(should_get_new_burst) if(_command_fifo_pop_available) _command_tuple_packed_i = pop_data;
+	_command_tuple_packed_i = pop_data;
 end
 always_comb begin // combinatorial _command_fifo_rst
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -7664,6 +7561,7 @@ module FWFT_T_type_bool_2_DEPTH_256_MAY_PUSH_LATENCY_1(
 /*mux_wire*/ logic[2:0] outflow_path_valids;
 /*mux_wire*/ logic[1:0] outflow_path_elems[0:2];
 /*mux_wire*/ logic[2:0] will_shifts;
+/*mux_wire*/ logic[7:0] space_remaining;
 wire _3;
 assign _3 = read_addr != write_addr;
 wire[1:0] _5 = mem[read_addr];
@@ -7689,7 +7587,6 @@ assign _20 = _17 | _19;
 wire _21 = will_shifts[2];
 wire _22 = outflow_path_valids[2];
 wire[1:0] _23 = outflow_path_elems[2];
-/*mux_wire*/ logic[7:0] space_remaining;
 wire signed[8:0] _26;
 assign _26 = read_addr - write_addr;
 wire signed[8:0] _28;
@@ -7698,9 +7595,7 @@ wire[7:0] _29;
 assign _29 = _28; // == mod 256 (target is 8 bits wide)
 wire _32;
 assign _32 = space_remaining > 2'd2;
-/*mux_wire*/ logic _LatencyOffset_din;
-wire _LatencyOffset_dout;
-/*latency*/ logic __LatencyOffset_dout_N1; always_ff @(posedge clk) begin __LatencyOffset_dout_N1 <= _LatencyOffset_dout; end
+/*latency*/ logic __32_D1; always_ff @(posedge clk) begin __32_D1 <= _32; end
 /*mux_wire*/ logic[1:0] _ToBits_value;
 wire[1:0] _ToBits_bits;
 wire[8:0] _37;
@@ -7719,11 +7614,6 @@ wire _47 = outflow_path_valids[0];
 wire[1:0] _48 = outflow_path_elems[0];
 /*mux_wire*/ logic[1:0] _FromBits_bits;
 wire[1:0] _FromBits_value;
-LatencyOffset_T_type_bool_OFFSET_N2 LatencyOffset(
-	.clk(clk),
-	.din(_LatencyOffset_din),
-	.dout(_LatencyOffset_dout)
-);
 ToBits_T_type_bool_2 ToBits(
 	.clk(clk),
 	.value(_ToBits_value),
@@ -7785,21 +7675,14 @@ end
 always_comb begin // combinatorial may_push
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	may_push = 1'bx;
-	may_push = __LatencyOffset_dout_N1;
+	may_push = __32_D1;
 	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
 	may_push = may_push;
-end
-always_comb begin // combinatorial _LatencyOffset_din
-	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	_LatencyOffset_din = 1'bx;
-	_LatencyOffset_din = _32;
-	// PATCH Vivado 23.1 Simulator Bug: 1-bit Conditional Assigns become don't care
-	_LatencyOffset_din = _LatencyOffset_din;
 end
 always_comb begin // combinatorial _ToBits_value
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_ToBits_value = 2'bxx;
-	if(push) _ToBits_value = push_data;
+	_ToBits_value = push_data;
 end
 always_comb begin // combinatorial pop_available
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -7812,12 +7695,12 @@ end
 always_comb begin // combinatorial pop_data
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	pop_data = 2'bxx;
-	if(_47) pop_data = _FromBits_value;
+	pop_data = _FromBits_value;
 end
 always_comb begin // combinatorial _FromBits_bits
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_FromBits_bits = 2'bxx;
-	if(_47) _FromBits_bits = _48;
+	_FromBits_bits = _48;
 end
 endmodule // FWFT #(T: type bool #()[2], DEPTH: 256, MAY_PUSH_LATENCY: 1)
 
@@ -7840,16 +7723,6 @@ module ToBits_T_type_bool_2(
 
 assign bits = value;
 endmodule // ToBits #(T: type bool #()[2])
-
-// LatencyOffset #(T: type bool #(), OFFSET: -2)
-module LatencyOffset_T_type_bool_OFFSET_N2(
-	/* clock */ input clk,
-	input wire din,
-	output /*mux_wire*/ logic dout
-);
-
-	assign dout = din;
-endmodule // LatencyOffset #(T: type bool #(), OFFSET: -2)
 
 // Tuple5 #(T1: type int #(FROM: 0, TO: 1), T2: type int #(FROM: 0, TO: 1), T3: type bool #(), T4: type bool #(), T5: type bool #()[0])
 module Tuple5_T1_type_int_FROM_0_TO_1_T2_type_int_FROM_0_TO_1_T3_type_bool_T4_type_bool_T5_type_bool_0(
@@ -8414,10 +8287,10 @@ module SlowStablePipelineCustom_T_type_bool_94_PIPELINE_DEPTH_1(
 
 /*state*/ logic[0:0] cooldown;
 localparam[0:0] RepeatGen = 1'b0;
+localparam[0:0] RepeatGen_2 = 1'b0;
 wire _1 = cooldown[0];
 /*mux_wire*/ logic[93:0] _LatencyOffset_din;
 wire[93:0] _LatencyOffset_dout;
-localparam[0:0] RepeatGen_2 = 1'b0;
 LatencyOffset_T_type_bool_94_OFFSET_N1 LatencyOffset(
 	.clk(clk),
 	.din(_LatencyOffset_din),
@@ -8495,6 +8368,21 @@ genvar _g0;
 /*state*/ logic stored_addr_valid;
 /*state*/ logic[1:0] last_bresp;
 /*state*/ logic last_werr_valid;
+localparam[1:0] RESP_SLVERR = 2'b10;
+localparam[1:0] RESP_OKAY = 2'b00;
+/*mux_wire*/ logic[5:0] write_idx;
+localparam[1:0] RESP_OKAY_2 = 2'b00;
+/*state*/ logic last_rdata_valid;
+/*state*/ logic[31:0] last_rdata;
+/*state*/ logic[1:0] last_rresp;
+/*mux_wire*/ logic[31:0] regs_read_multiplexer[0:44];
+localparam[1:0] RESP_SLVERR_2 = 2'b10;
+/*mux_wire*/ logic[9:0] read_addr;
+localparam[1:0] RESP_OKAY_3 = 2'b00;
+/*mux_wire*/ logic[5:0] read_idx;
+localparam[1:0] RESP_OKAY_4 = 2'b00;
+localparam[31:0] RepeatGen[0:44] = '{32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000};
+// (zero sized) RepeatGen_2
 wire _4;
 assign _4 = ~stored_addr_valid;
 wire _6;
@@ -8511,21 +8399,18 @@ wire[9:0] _18;
 assign _18 = awaddr[11:2]; // == div 4
 wire _21;
 assign _21 = wready & wvalid;
-localparam[1:0] RESP_SLVERR = 2'b10;
 wire _23;
 assign _23 = stored_addr == 1'd0;
 wire _24 = wstrb[0];
 wire _25 = wdata[0];
 wire _26;
 assign _26 = _24 & _25;
-localparam[1:0] RESP_OKAY = 2'b00;
 wire _29;
 assign _29 = stored_addr >= 3'd4;
 wire _32;
 assign _32 = stored_addr < 6'd49;
 wire _33;
 assign _33 = _29 & _32;
-/*mux_wire*/ logic[5:0] write_idx;
 /*mux_wire*/ logic[9:0] _IntNarrow_din;
 wire[5:0] _IntNarrow_dout;
 wire[5:0] _35;
@@ -8558,13 +8443,8 @@ for(_g0 = 0; _g0 < 8; _g0 = _g0 + 1) begin
 assign _47[_g0] = wdata[24 + _g0];
 end
 endgenerate
-localparam[1:0] RESP_OKAY_2 = 2'b00;
 wire _50;
 assign _50 = bready & bvalid;
-/*state*/ logic last_rdata_valid;
-/*state*/ logic[31:0] last_rdata;
-/*state*/ logic[1:0] last_rresp;
-/*mux_wire*/ logic[31:0] regs_read_multiplexer[0:44];
 wire _56;
 assign _56 = ~last_rdata_valid;
 wire _58;
@@ -8573,31 +8453,24 @@ wire _59;
 assign _59 = _56 & _58;
 wire _63;
 assign _63 = arready & arvalid;
-localparam[1:0] RESP_SLVERR_2 = 2'b10;
-/*mux_wire*/ logic[9:0] read_addr;
 wire[9:0] _65;
 assign _65 = araddr[11:2]; // == div 4
 wire _67;
 assign _67 = read_addr == 1'd0;
 localparam[27:0] _72 = 28'b0000000000000000000000000000;
-localparam[1:0] RESP_OKAY_3 = 2'b00;
 wire _75;
 assign _75 = read_addr >= 3'd4;
 wire _78;
 assign _78 = read_addr < 6'd49;
 wire _79;
 assign _79 = _75 & _78;
-/*mux_wire*/ logic[5:0] read_idx;
 /*mux_wire*/ logic[9:0] _IntNarrow_2_din;
 wire[5:0] _IntNarrow_2_dout;
 wire[5:0] _81;
 assign _81 = _IntNarrow_2_dout - 3'd4;
 wire[31:0] _83 = regs_read_multiplexer[read_idx];
-localparam[1:0] RESP_OKAY_4 = 2'b00;
 wire _86;
 assign _86 = rready & rvalid;
-localparam[31:0] RepeatGen[0:44] = '{32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000, 32'b00000000000000000000000000000000};
-// (zero sized) RepeatGen_2
 IntNarrow_FROM_I_0_TO_I_1024_FROM_4_TO_49 IntNarrow(
 	.clk(clk),
 	.din(_IntNarrow_din),
@@ -8740,12 +8613,12 @@ end
 always_comb begin // combinatorial write_idx
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	write_idx = 6'dx;
-	if(_21) if(_33) write_idx = _35;
+	write_idx = _35;
 end
 always_comb begin // combinatorial _IntNarrow_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_din = 10'dx;
-	if(_21) if(_33) _IntNarrow_din = stored_addr;
+	_IntNarrow_din = stored_addr;
 end
 always_ff @(posedge clk) begin // state last_rdata_valid
 	if(_63) last_rdata_valid <= 1'b1;
@@ -8777,17 +8650,17 @@ end
 always_comb begin // combinatorial read_addr
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	read_addr = 10'dx;
-	if(_63) read_addr = _65;
+	read_addr = _65;
 end
 always_comb begin // combinatorial read_idx
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	read_idx = 6'dx;
-	if(_63) if(_79) read_idx = _81;
+	read_idx = _81;
 end
 always_comb begin // combinatorial _IntNarrow_2_din
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
 	_IntNarrow_2_din = 10'dx;
-	if(_63) if(_79) _IntNarrow_2_din = read_addr;
+	_IntNarrow_2_din = read_addr;
 end
 endmodule // xrt_ctrl_slave #(NUM_INPUT_REGS: 45, NUM_OUTPUT_REGS: 0, ADDR_WIDTH: 12, AXI_WIDTH: 32)
 

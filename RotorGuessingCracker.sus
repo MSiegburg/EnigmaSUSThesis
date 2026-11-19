@@ -509,6 +509,7 @@ module enigma_machine_driver_rotors#(){
         int#(FROM: 0,TO: 26)[9] concat_temp5    
     
         // get all the best settings out of the setting modules and assign them to our temp values 
+        // would have done this with iterator to reduce hardware usage but lacked the time
         when safe_best_settings_at_end {
             
 

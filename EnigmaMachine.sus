@@ -92,7 +92,7 @@ module enigma_machine_runtime{
         plugboard2=plugboard_inst.pass_letter_backward(rrotor2)
         encode_letter_final=plugboard2
     }
-    action cur_settings:->int#(FROM: 0,TO: 5)[3] cur_rotors{    // give feedback on which rotor is used atm
+    action cur_settings:->int#(FROM: 0,TO: 5)[3] cur_rotors{    // give feedback on which rotor is used atm wasn not really used at any point
         cur_rotors[0]=right_rotor_used
         cur_rotors[1]=middle_rotor_used
         cur_rotors[2]=left_rotor_used
@@ -145,17 +145,17 @@ module enigma_rotor_runtime#(int backward_lat){
     }
     action encode_left'0: int#(FROM: 0,TO: 26) letter_index'0 -> int#(FROM: 0,TO: 26) encode_letter'2 {            // encode letter adding offset to value of ring position
         int#(FROM: 0,TO: 26) substitution_result_left
-        int#(FROM: 0,TO: 26) shift                                                                          // for debugging
-        shift=rotor_position-ring_position+26 mod 26
-        reg substitution_result_left=rotors[rotor_in_use][(letter_index+shift)mod 26]
-        reg encode_letter=substitution_result_left-shift mod 26
+        int#(FROM: 0,TO: 26) offset                                                                          // for debugging
+        offset=rotor_position-ring_position+26 mod 26
+        reg substitution_result_left=rotors[rotor_in_use][(letter_index+offset)mod 26]
+        reg encode_letter=substitution_result_left-offset mod 26
     }
     action encode_right: int#(FROM: 0,TO: 26) rev_letter_index'backward_lat -> int#(FROM: 0,TO: 26) rev_encode_letter'backward_lat+2{   // encode letter adding offset to index of ring position
         int#(FROM: 0,TO: 26) substitution_result_right
-        int#(FROM: 0,TO: 26) shift                                                                          // for debugging
-        shift=rotor_position-ring_position+26 mod 26
-        substitution_result_right=rotors[rotor_in_use+5][(rev_letter_index+shift )mod 26]                   
-        rev_encode_letter=substitution_result_right-shift mod 26
+        int#(FROM: 0,TO: 26) offset                                                                          // for debugging
+        offset=rotor_position-ring_position+26 mod 26
+        substitution_result_right=rotors[rotor_in_use+5][(rev_letter_index+offset )mod 26]                   
+        rev_encode_letter=substitution_result_right-offset mod 26
     }
 }
 

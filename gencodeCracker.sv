@@ -1,4 +1,4 @@
-// THIS IS A GENERATED FILE (Generated at 2026-11-13T17:02:45+01:00)
+// THIS IS A GENERATED FILE (Generated at 2026-11-19T11:16:24+01:00)
 // This file was generated with SUS Compiler 0.6.0-dev (8c2e9c201cc10fc6686c39ac760ada7e43680583) built at 2026-10-29_14:08:47
 // cracker_rotors_top #()
 module cracker_rotors_top(
@@ -49868,12 +49868,12 @@ module enigma_rotor_runtime_backward_lat_2(
 /*mux_wire*/ logic[4:0] modified_advance_position;
 localparam[4:0] turnover_positions[0:4] = '{5'd16, 5'd4, 5'd21, 5'd9, 5'd25};
 /*mux_wire*/ logic[4:0] substitution_result_left;
-/*mux_wire*/ logic[4:0] shift;
+/*mux_wire*/ logic[4:0] offset;
 localparam[4:0] rotors[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
 /*mux_wire*/ logic[4:0] substitution_result_right;
-/*mux_wire*/ logic[4:0] shift_2;
+/*mux_wire*/ logic[4:0] offset_2;
 localparam[4:0] rotors_2[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
-/*latency*/ logic[4:0] _shift_D1; always_ff @(posedge clk) begin _shift_D1 <= shift; end
+/*latency*/ logic[4:0] _offset_D1; always_ff @(posedge clk) begin _offset_D1 <= offset; end
 /*latency*/ logic[4:0] _rev_letter_index_D3; always_ff @(posedge clk) begin _rev_letter_index_D3 <= rev_letter_index; end
 /*latency*/ logic[4:0] _rev_letter_index_D4; always_ff @(posedge clk) begin _rev_letter_index_D4 <= _rev_letter_index_D3; end
 wire[4:0] _3;
@@ -49894,13 +49894,13 @@ assign _22 = _20 + $signed({1'b0, 5'd26});
 wire[4:0] _24;
 assign _24 = _22 - ((_22 >= 26) ? 26 : 0); // == mod 26
 wire[5:0] _28;
-assign _28 = letter_index + shift;
+assign _28 = letter_index + offset;
 wire[4:0] _30;
 assign _30 = _28 - ((_28 >= 26) ? 26 : 0); // == mod 26
 wire[4:0] _31 = rotors[rotor_in_use][_30];
 /*latency*/ logic[4:0] __31_D1; always_ff @(posedge clk) begin __31_D1 <= _31; end
 wire signed[5:0] _34;
-assign _34 = substitution_result_left - _shift_D1;
+assign _34 = substitution_result_left - _offset_D1;
 wire[4:0] _36;
 assign _36 = _34 + ((_34 < 0) ? 26 : 0); // == mod 26
 /*latency*/ logic[4:0] __36_D2; always_ff @(posedge clk) begin __36_D2 <= _36; end
@@ -49921,12 +49921,12 @@ assign _46 = rotor_in_use + 3'd5;
 /*latency*/ logic[3:0] __46_D3; always_ff @(posedge clk) begin __46_D3 <= __46_D2; end
 /*latency*/ logic[3:0] __46_D4; always_ff @(posedge clk) begin __46_D4 <= __46_D3; end
 wire[5:0] _49;
-assign _49 = _rev_letter_index_D4 + shift_2;
+assign _49 = _rev_letter_index_D4 + offset_2;
 wire[4:0] _51;
 assign _51 = _49 - ((_49 >= 26) ? 26 : 0); // == mod 26
 wire[4:0] _52 = rotors_2[__46_D4][_51];
 wire signed[5:0] _55;
-assign _55 = substitution_result_right - shift_2;
+assign _55 = substitution_result_right - offset_2;
 wire[4:0] _57;
 assign _57 = _55 + ((_55 < 0) ? 26 : 0); // == mod 26
 always_ff @(posedge clk) begin // state rotor_in_use
@@ -49962,10 +49962,10 @@ always_comb begin // combinatorial substitution_result_left
 	substitution_result_left = 5'dx;
 	substitution_result_left = __31_D1;
 end
-always_comb begin // combinatorial shift
+always_comb begin // combinatorial offset
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	shift = 5'dx;
-	shift = _24;
+	offset = 5'dx;
+	offset = _24;
 end
 always_comb begin // combinatorial rev_encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -49977,10 +49977,10 @@ always_comb begin // combinatorial substitution_result_right
 	substitution_result_right = 5'dx;
 	substitution_result_right = _52;
 end
-always_comb begin // combinatorial shift_2
+always_comb begin // combinatorial offset_2
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	shift_2 = 5'dx;
-	shift_2 = __43_D4;
+	offset_2 = 5'dx;
+	offset_2 = __43_D4;
 end
 endmodule // enigma_rotor_runtime #(backward_lat: 2)
 
@@ -50008,12 +50008,12 @@ module enigma_rotor_runtime_backward_lat_6(
 /*mux_wire*/ logic[4:0] modified_advance_position;
 localparam[4:0] turnover_positions[0:4] = '{5'd16, 5'd4, 5'd21, 5'd9, 5'd25};
 /*mux_wire*/ logic[4:0] substitution_result_left;
-/*mux_wire*/ logic[4:0] shift;
+/*mux_wire*/ logic[4:0] offset;
 localparam[4:0] rotors[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
 /*mux_wire*/ logic[4:0] substitution_result_right;
-/*mux_wire*/ logic[4:0] shift_2;
+/*mux_wire*/ logic[4:0] offset_2;
 localparam[4:0] rotors_2[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
-/*latency*/ logic[4:0] _shift_D1; always_ff @(posedge clk) begin _shift_D1 <= shift; end
+/*latency*/ logic[4:0] _offset_D1; always_ff @(posedge clk) begin _offset_D1 <= offset; end
 /*latency*/ logic[4:0] _rev_letter_index_D7; always_ff @(posedge clk) begin _rev_letter_index_D7 <= rev_letter_index; end
 /*latency*/ logic[4:0] _rev_letter_index_D8; always_ff @(posedge clk) begin _rev_letter_index_D8 <= _rev_letter_index_D7; end
 wire[4:0] _3;
@@ -50034,13 +50034,13 @@ assign _22 = _20 + $signed({1'b0, 5'd26});
 wire[4:0] _24;
 assign _24 = _22 - ((_22 >= 26) ? 26 : 0); // == mod 26
 wire[5:0] _28;
-assign _28 = letter_index + shift;
+assign _28 = letter_index + offset;
 wire[4:0] _30;
 assign _30 = _28 - ((_28 >= 26) ? 26 : 0); // == mod 26
 wire[4:0] _31 = rotors[rotor_in_use][_30];
 /*latency*/ logic[4:0] __31_D1; always_ff @(posedge clk) begin __31_D1 <= _31; end
 wire signed[5:0] _34;
-assign _34 = substitution_result_left - _shift_D1;
+assign _34 = substitution_result_left - _offset_D1;
 wire[4:0] _36;
 assign _36 = _34 + ((_34 < 0) ? 26 : 0); // == mod 26
 /*latency*/ logic[4:0] __36_D2; always_ff @(posedge clk) begin __36_D2 <= _36; end
@@ -50069,12 +50069,12 @@ assign _46 = rotor_in_use + 3'd5;
 /*latency*/ logic[3:0] __46_D7; always_ff @(posedge clk) begin __46_D7 <= __46_D6; end
 /*latency*/ logic[3:0] __46_D8; always_ff @(posedge clk) begin __46_D8 <= __46_D7; end
 wire[5:0] _49;
-assign _49 = _rev_letter_index_D8 + shift_2;
+assign _49 = _rev_letter_index_D8 + offset_2;
 wire[4:0] _51;
 assign _51 = _49 - ((_49 >= 26) ? 26 : 0); // == mod 26
 wire[4:0] _52 = rotors_2[__46_D8][_51];
 wire signed[5:0] _55;
-assign _55 = substitution_result_right - shift_2;
+assign _55 = substitution_result_right - offset_2;
 wire[4:0] _57;
 assign _57 = _55 + ((_55 < 0) ? 26 : 0); // == mod 26
 always_ff @(posedge clk) begin // state rotor_in_use
@@ -50110,10 +50110,10 @@ always_comb begin // combinatorial substitution_result_left
 	substitution_result_left = 5'dx;
 	substitution_result_left = __31_D1;
 end
-always_comb begin // combinatorial shift
+always_comb begin // combinatorial offset
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	shift = 5'dx;
-	shift = _24;
+	offset = 5'dx;
+	offset = _24;
 end
 always_comb begin // combinatorial rev_encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -50125,10 +50125,10 @@ always_comb begin // combinatorial substitution_result_right
 	substitution_result_right = 5'dx;
 	substitution_result_right = _52;
 end
-always_comb begin // combinatorial shift_2
+always_comb begin // combinatorial offset_2
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	shift_2 = 5'dx;
-	shift_2 = __43_D8;
+	offset_2 = 5'dx;
+	offset_2 = __43_D8;
 end
 endmodule // enigma_rotor_runtime #(backward_lat: 6)
 
@@ -50156,12 +50156,12 @@ module enigma_rotor_runtime_backward_lat_10(
 /*mux_wire*/ logic[4:0] modified_advance_position;
 localparam[4:0] turnover_positions[0:4] = '{5'd16, 5'd4, 5'd21, 5'd9, 5'd25};
 /*mux_wire*/ logic[4:0] substitution_result_left;
-/*mux_wire*/ logic[4:0] shift;
+/*mux_wire*/ logic[4:0] offset;
 localparam[4:0] rotors[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
 /*mux_wire*/ logic[4:0] substitution_result_right;
-/*mux_wire*/ logic[4:0] shift_2;
+/*mux_wire*/ logic[4:0] offset_2;
 localparam[4:0] rotors_2[0:9][0:25] = '{'{5'd4, 5'd10, 5'd12, 5'd5, 5'd11, 5'd6, 5'd3, 5'd16, 5'd21, 5'd25, 5'd13, 5'd19, 5'd14, 5'd22, 5'd24, 5'd7, 5'd23, 5'd20, 5'd18, 5'd15, 5'd0, 5'd8, 5'd1, 5'd17, 5'd2, 5'd9}, '{5'd0, 5'd9, 5'd3, 5'd10, 5'd18, 5'd8, 5'd17, 5'd20, 5'd23, 5'd1, 5'd11, 5'd7, 5'd22, 5'd19, 5'd12, 5'd2, 5'd16, 5'd6, 5'd25, 5'd13, 5'd15, 5'd24, 5'd5, 5'd21, 5'd14, 5'd4}, '{5'd1, 5'd3, 5'd5, 5'd7, 5'd9, 5'd11, 5'd2, 5'd15, 5'd17, 5'd19, 5'd23, 5'd21, 5'd25, 5'd13, 5'd24, 5'd4, 5'd8, 5'd22, 5'd6, 5'd0, 5'd10, 5'd12, 5'd20, 5'd18, 5'd16, 5'd14}, '{5'd4, 5'd18, 5'd14, 5'd21, 5'd15, 5'd25, 5'd9, 5'd0, 5'd24, 5'd16, 5'd20, 5'd8, 5'd17, 5'd7, 5'd23, 5'd11, 5'd13, 5'd5, 5'd19, 5'd6, 5'd10, 5'd3, 5'd2, 5'd12, 5'd22, 5'd1}, '{5'd21, 5'd25, 5'd1, 5'd17, 5'd6, 5'd8, 5'd19, 5'd24, 5'd20, 5'd15, 5'd18, 5'd3, 5'd13, 5'd7, 5'd11, 5'd23, 5'd0, 5'd22, 5'd12, 5'd9, 5'd16, 5'd14, 5'd5, 5'd4, 5'd2, 5'd10}, '{5'd20, 5'd22, 5'd24, 5'd6, 5'd0, 5'd3, 5'd5, 5'd15, 5'd21, 5'd25, 5'd1, 5'd4, 5'd2, 5'd10, 5'd12, 5'd19, 5'd7, 5'd23, 5'd18, 5'd11, 5'd17, 5'd8, 5'd13, 5'd16, 5'd14, 5'd9}, '{5'd0, 5'd9, 5'd15, 5'd2, 5'd25, 5'd22, 5'd17, 5'd11, 5'd5, 5'd1, 5'd3, 5'd10, 5'd14, 5'd19, 5'd24, 5'd20, 5'd16, 5'd6, 5'd4, 5'd13, 5'd7, 5'd23, 5'd12, 5'd8, 5'd21, 5'd18}, '{5'd19, 5'd0, 5'd6, 5'd1, 5'd15, 5'd2, 5'd18, 5'd3, 5'd16, 5'd4, 5'd20, 5'd5, 5'd21, 5'd13, 5'd25, 5'd7, 5'd24, 5'd8, 5'd23, 5'd9, 5'd22, 5'd11, 5'd17, 5'd10, 5'd14, 5'd12}, '{5'd7, 5'd25, 5'd22, 5'd21, 5'd0, 5'd17, 5'd19, 5'd13, 5'd11, 5'd6, 5'd20, 5'd15, 5'd23, 5'd16, 5'd2, 5'd4, 5'd9, 5'd12, 5'd1, 5'd18, 5'd10, 5'd3, 5'd24, 5'd14, 5'd8, 5'd5}, '{5'd16, 5'd2, 5'd24, 5'd11, 5'd23, 5'd22, 5'd4, 5'd13, 5'd5, 5'd19, 5'd25, 5'd14, 5'd18, 5'd12, 5'd21, 5'd9, 5'd20, 5'd3, 5'd10, 5'd6, 5'd8, 5'd0, 5'd17, 5'd15, 5'd7, 5'd1}};
-/*latency*/ logic[4:0] _shift_D1; always_ff @(posedge clk) begin _shift_D1 <= shift; end
+/*latency*/ logic[4:0] _offset_D1; always_ff @(posedge clk) begin _offset_D1 <= offset; end
 /*latency*/ logic[4:0] _rev_letter_index_D11; always_ff @(posedge clk) begin _rev_letter_index_D11 <= rev_letter_index; end
 /*latency*/ logic[4:0] _rev_letter_index_D12; always_ff @(posedge clk) begin _rev_letter_index_D12 <= _rev_letter_index_D11; end
 wire[4:0] _3;
@@ -50182,13 +50182,13 @@ assign _22 = _20 + $signed({1'b0, 5'd26});
 wire[4:0] _24;
 assign _24 = _22 - ((_22 >= 26) ? 26 : 0); // == mod 26
 wire[5:0] _28;
-assign _28 = letter_index + shift;
+assign _28 = letter_index + offset;
 wire[4:0] _30;
 assign _30 = _28 - ((_28 >= 26) ? 26 : 0); // == mod 26
 wire[4:0] _31 = rotors[rotor_in_use][_30];
 /*latency*/ logic[4:0] __31_D1; always_ff @(posedge clk) begin __31_D1 <= _31; end
 wire signed[5:0] _34;
-assign _34 = substitution_result_left - _shift_D1;
+assign _34 = substitution_result_left - _offset_D1;
 wire[4:0] _36;
 assign _36 = _34 + ((_34 < 0) ? 26 : 0); // == mod 26
 /*latency*/ logic[4:0] __36_D2; always_ff @(posedge clk) begin __36_D2 <= _36; end
@@ -50225,12 +50225,12 @@ assign _46 = rotor_in_use + 3'd5;
 /*latency*/ logic[3:0] __46_D11; always_ff @(posedge clk) begin __46_D11 <= __46_D10; end
 /*latency*/ logic[3:0] __46_D12; always_ff @(posedge clk) begin __46_D12 <= __46_D11; end
 wire[5:0] _49;
-assign _49 = _rev_letter_index_D12 + shift_2;
+assign _49 = _rev_letter_index_D12 + offset_2;
 wire[4:0] _51;
 assign _51 = _49 - ((_49 >= 26) ? 26 : 0); // == mod 26
 wire[4:0] _52 = rotors_2[__46_D12][_51];
 wire signed[5:0] _55;
-assign _55 = substitution_result_right - shift_2;
+assign _55 = substitution_result_right - offset_2;
 wire[4:0] _57;
 assign _57 = _55 + ((_55 < 0) ? 26 : 0); // == mod 26
 always_ff @(posedge clk) begin // state rotor_in_use
@@ -50266,10 +50266,10 @@ always_comb begin // combinatorial substitution_result_left
 	substitution_result_left = 5'dx;
 	substitution_result_left = __31_D1;
 end
-always_comb begin // combinatorial shift
+always_comb begin // combinatorial offset
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	shift = 5'dx;
-	shift = _24;
+	offset = 5'dx;
+	offset = _24;
 end
 always_comb begin // combinatorial rev_encode_letter
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
@@ -50281,10 +50281,10 @@ always_comb begin // combinatorial substitution_result_right
 	substitution_result_right = 5'dx;
 	substitution_result_right = _52;
 end
-always_comb begin // combinatorial shift_2
+always_comb begin // combinatorial offset_2
 	// Combinatorial wires are not defined when not valid. This is just so that the synthesis tool doesn't generate latches
-	shift_2 = 5'dx;
-	shift_2 = __43_D12;
+	offset_2 = 5'dx;
+	offset_2 = __43_D12;
 end
 endmodule // enigma_rotor_runtime #(backward_lat: 10)
 
